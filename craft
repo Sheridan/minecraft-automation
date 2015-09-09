@@ -51,6 +51,9 @@ sub help
 			comparator - Крафт краснокаменного компаратора
 				В основном инвертаре 3х3 идет камень, красная пыль, палки
 				В руках первые три ячейки - кварц
+			map - Крафт пустой карты + бумага
+				Нижние два ряда заполнить тростником
+				В нулевом и первом ряду - по 4 стека слитков железа и по 1 стеку красной пыли
 				
 _HELP_
 	exit(0);
@@ -143,7 +146,8 @@ sub craft_cube_2x2
 
 sub craft_paper
 {
-	for my $y (0..3)
+	my ($from_row, $to_row) = @_[0..1];
+	for my $y ($from_row..$to_row)
 	{
 		for my $dx (0, 3, 6)
 		{
@@ -180,7 +184,8 @@ sub craft_jack_lantern
 
 sub craft_enhanced_item
 {
-	for my $y (0..3)
+	my ($from_row, $to_row) = @_[0..1];
+	for my $y ($from_row..$to_row)
 	{
 		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{$y}, $config->{'system'}{'crafttable'}{0}{0});
 		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{1}{$y}, $config->{'system'}{'crafttable'}{0}{1});
@@ -358,19 +363,37 @@ sub craft_comparator
 		}
 }
 
+sub craft_map
+{
+	craft_paper(2, 3);
+	for my $y (0..1)
+	{
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{$y}, $config->{'system'}{'crafttable'}{1}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{1}{$y}, $config->{'system'}{'crafttable'}{0}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{2}{$y}, $config->{'system'}{'crafttable'}{2}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{3}{$y}, $config->{'system'}{'crafttable'}{1}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{4}{$y}, $config->{'system'}{'crafttable'}{1}{1});
+		Minecraft::Automation::move_stack_from_craft_result();
+	}
+	Minecraft::Automation::swap_stack_between_cells($config->{'system'}{'invertory'}{7}{1}, $config->{'system'}{'invertory'}{8}{2});
+	Minecraft::Automation::swap_stack_between_cells($config->{'system'}{'invertory'}{8}{1}, $config->{'system'}{'invertory'}{8}{3});
+	craft_enhanced_item(2, 3);
+}
+
 for ($craft)
 {
-	if		(/cube2x2/)      { craft_cube_2x2();      }
-	elsif	(/cube3x3/)      { craft_cube_3x3();      }
-	elsif	(/sea_lantern/)  { craft_sea_lantern();   }
-	elsif	(/tnt/) 		 { craft_tnt();           }
-	elsif	(/book/) 		 { craft_book();          }
-	elsif	(/paper/) 		 { craft_paper();         }
-	elsif	(/chest/) 		 { craft_chest();         }
-	elsif	(/jack_lantern/) { craft_jack_lantern();  }
-	elsif	(/enhance/) 	 { craft_enhanced_item(); }
-	elsif	(/repeater/) 	 { craft_repeater();      }
-	elsif	(/comparator/) 	 { craft_comparator();    }
-	else			 		 { help();                }
+	if		(/cube2x2/)      { craft_cube_2x2();          }
+	elsif	(/cube3x3/)      { craft_cube_3x3();          }
+	elsif	(/sea_lantern/)  { craft_sea_lantern();       }
+	elsif	(/tnt/) 		 { craft_tnt();               }
+	elsif	(/map/) 		 { craft_map();               }
+	elsif	(/book/) 		 { craft_book();              }
+	elsif	(/paper/) 		 { craft_paper(0, 3);         }
+	elsif	(/chest/) 		 { craft_chest();             }
+	elsif	(/jack_lantern/) { craft_jack_lantern();      }
+	elsif	(/enhance/) 	 { craft_enhanced_item(0, 3); }
+	elsif	(/repeater/) 	 { craft_repeater();          }
+	elsif	(/comparator/) 	 { craft_comparator();        }
+	else			 		 { help();                    }
 	
 }

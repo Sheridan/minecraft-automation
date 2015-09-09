@@ -96,6 +96,13 @@ sub move_half_stack_between_cells
     mouse_move_to_cell($to_cell)  ; mouse_left_click();
 }
 
+sub swap_stack_between_cells
+{
+    my ($from_cell, $to_cell) = @_[0..1];
+    move_stack_between_cells($from_cell, $to_cell);
+    mouse_move_to_cell($from_cell); mouse_left_click();
+}
+
 sub move_stack_from_craft_result
 {
     mouse_move_to_cell($config->{'system'}{'crafttable'}{'result'});  mouse_shift_left_click();
