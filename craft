@@ -44,6 +44,8 @@ sub help
 			tnt - Крафт динамита
 				Сначала возьмите 20 пороха (shift+click), 
 				они займут нижние ячейки инвертаря, остальное заполните песком
+			book - крафт книг из кожи и тростника
+				Самый нижний ряд заполните кожей, остальное тростником
 				
 _HELP_
 	exit(0);
@@ -265,12 +267,33 @@ sub craft_tnt
 		Minecraft::Automation::move_stack_from_craft_result();
 }
 
+sub craft_book
+{
+	for my $x (0..8)
+	{
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{0}, $config->{'system'}{'crafttable'}{0}{1});
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{1}, $config->{'system'}{'crafttable'}{1}{1});
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{2}, $config->{'system'}{'crafttable'}{2}{1});
+			Minecraft::Automation::move_stack_from_craft_result();
+	}
+	for my $x (0..8)
+	{
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{0}, $config->{'system'}{'crafttable'}{1}{0});
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{1}, $config->{'system'}{'crafttable'}{1}{1});
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{2}, $config->{'system'}{'crafttable'}{1}{2});
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$x}{3}, $config->{'system'}{'crafttable'}{0}{1});
+			Minecraft::Automation::move_stack_from_craft_result();
+	}
+}
+
+
 for ($craft)
 {
 	if		(/cube2x2/)      { craft_cube_2x2();      }
 	elsif	(/cube3x3/)      { craft_cube_3x3();      }
 	elsif	(/sea_lantern/)  { craft_sea_lantern();   }
 	elsif	(/tnt/) 		 { craft_tnt();           }
+	elsif	(/book/) 		 { craft_book();          }
 	elsif	(/paper/) 		 { craft_paper();         }
 	elsif	(/chest/) 		 { craft_chest();         }
 	elsif	(/jack_lantern/) { craft_jack_lantern();  }
