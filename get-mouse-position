@@ -1,0 +1,6 @@
+#!/bin/bash
+cnee --record --mouse 2>/dev/null | \
+	awk  '/7,4,0,0,1/ { system("xdotool getmouselocation 2>/dev/null; killall cnee > /dev/null") }' 2>/dev/null | \
+	grep "x:" | \
+	awk '{ print $1 $2; }' | \
+	sed -e 's/x://ig' -e 's/y:/ /ig'

@@ -1,0 +1,10 @@
+{
+    "minecraft":
+    {
+	"title": "Minecraft 1.8.8"
+    },
+    "paths":
+    {
+	"temp" : "./temp"
+    }
+}
