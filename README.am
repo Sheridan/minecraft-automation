@@ -1,0 +1,9 @@
+# minecraft-automation
+Automation vanilla minecraft by emulating user actions. Linux only.
+
+Dependencies:
+  1. xdotool
+  2. perl Digest::MD5::File
+  3. perl Time::HiRes
+  4. perl JSON
+  5. Xnee
