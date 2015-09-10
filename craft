@@ -28,9 +28,9 @@ sub help
 				они займут нижние ячейки инвертаря, остальное заполните осколками
 			jack_lantern - Светильник Джека (из тыквы)
 				Крафтится из палок, угля и тыкв
-				0:0 - 8:0 пусто
-				0:1 - 7:1 и 0:2 - 7:2 - тыквы
-				0:3 - 3:3 - палки и 4:3 - 4:7 - уголь
+				0:0-8:0 пусто
+				0:1-7:1 и 0:2-7:2 - тыквы
+				0:3-3:3 - палки и 4:3-4:7 - уголь
 			cube3x3 и cube2x2 - Объединение чего нибудь одинакового. Например слитки в куб
 				Нужен полный инвертарь исходников
 			paper - Крафт бумаги из тростника
@@ -54,6 +54,9 @@ sub help
 			map - Крафт пустой карты + бумага
 				Нижние два ряда заполнить тростником
 				В нулевом и первом ряду - по 4 стека слитков железа и по 1 стеку красной пыли
+			piston - Крафт поршня
+				0:0-2:3 - доски, 3:0-6:6 - булыжник, 
+				7:0-7:3 - красная пыль и 8:0-8:3 - железные слитки
 				
 _HELP_
 	exit(0);
@@ -380,6 +383,23 @@ sub craft_map
 	craft_enhanced_item(2, 3);
 }
 
+sub craft_piston
+{
+	for my $y (0..3)
+	{
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{$y}, $config->{'system'}{'crafttable'}{0}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{1}{$y}, $config->{'system'}{'crafttable'}{1}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{2}{$y}, $config->{'system'}{'crafttable'}{2}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{3}{$y}, $config->{'system'}{'crafttable'}{0}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{4}{$y}, $config->{'system'}{'crafttable'}{0}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{5}{$y}, $config->{'system'}{'crafttable'}{2}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{6}{$y}, $config->{'system'}{'crafttable'}{2}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{7}{$y}, $config->{'system'}{'crafttable'}{1}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{8}{$y}, $config->{'system'}{'crafttable'}{1}{1});
+		Minecraft::Automation::move_stack_from_craft_result();
+	}
+}
+
 for ($craft)
 {
 	if		(/cube2x2/)      { craft_cube_2x2();          }
@@ -390,6 +410,7 @@ for ($craft)
 	elsif	(/book/) 		 { craft_book();              }
 	elsif	(/paper/) 		 { craft_paper(0, 3);         }
 	elsif	(/chest/) 		 { craft_chest();             }
+	elsif	(/piston/) 		 { craft_piston();            }
 	elsif	(/jack_lantern/) { craft_jack_lantern();      }
 	elsif	(/enhance/) 	 { craft_enhanced_item(0, 3); }
 	elsif	(/repeater/) 	 { craft_repeater();          }
