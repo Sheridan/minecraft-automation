@@ -111,16 +111,16 @@ sub craft_cube_3x3
 {
 	for my $y (0..3)
 	{
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{$y}, $config->{'system'}{'crafttable'}{0}{0});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{1}{$y}, $config->{'system'}{'crafttable'}{0}{1});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{2}{$y}, $config->{'system'}{'crafttable'}{0}{2});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{3}{$y}, $config->{'system'}{'crafttable'}{1}{0});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{4}{$y}, $config->{'system'}{'crafttable'}{1}{1});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{5}{$y}, $config->{'system'}{'crafttable'}{1}{2});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{6}{$y}, $config->{'system'}{'crafttable'}{2}{0});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{7}{$y}, $config->{'system'}{'crafttable'}{2}{1});
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{8}{$y}, $config->{'system'}{'crafttable'}{2}{2});
-	Minecraft::Automation::move_stack_from_craft_result();
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{$y}, $config->{'system'}{'crafttable'}{0}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{1}{$y}, $config->{'system'}{'crafttable'}{0}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{2}{$y}, $config->{'system'}{'crafttable'}{0}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{3}{$y}, $config->{'system'}{'crafttable'}{1}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{4}{$y}, $config->{'system'}{'crafttable'}{1}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{5}{$y}, $config->{'system'}{'crafttable'}{1}{2});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{6}{$y}, $config->{'system'}{'crafttable'}{2}{0});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{7}{$y}, $config->{'system'}{'crafttable'}{2}{1});
+		Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{8}{$y}, $config->{'system'}{'crafttable'}{2}{2});
+		Minecraft::Automation::move_stack_from_craft_result();
 	}
 }
 

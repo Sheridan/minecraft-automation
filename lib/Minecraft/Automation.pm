@@ -92,7 +92,8 @@ sub take_stack_from_cell
 sub take_half_stack_from_cell
 {
     my ($from_cell) = $_[0];
-    mouse_move_to_cell($from_cell); mouse_rigt_click();
+    mouse_move_to_cell($from_cell); 
+    mouse_rigt_click();
 }
 
 sub put_stack_to_cell
@@ -122,14 +123,21 @@ sub swap_stack_between_cells
     put_stack_to_cell($from_cell);
 }
 
+sub take_stack_to_invertory
+{
+    my ($from_cell) = $_[0];
+    mouse_move_to_cell($from_cell);  
+    mouse_shift_left_click();
+}
+
 sub move_stack_from_craft_result
 {
-    mouse_move_to_cell($config->{'system'}{'crafttable'}{'result'});  mouse_shift_left_click();
+    take_stack_to_invertory($config->{'system'}{'crafttable'}{'result'});
 }
 
 sub move_stack_from_trade_result
 {
-    mouse_move_to_cell($config->{'system'}{'villager'}{'result'});  mouse_shift_left_click();
+    take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
 }
 
 1;
