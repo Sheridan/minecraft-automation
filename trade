@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+use strict;
+use JSON;
+use Time::HiRes qw (sleep);
+use Data::Dumper;
+use Getopt::Long;
+use lib './lib';
+use Minecraft::Automation;
+my $config = Minecraft::Automation::read_config();
+my $craft = '';
+GetOptions(
+		"craft=s" => \$craft,
+		"help"    => \&help
+	  ) or die("Что то не так с опциями командной строки\n");
+
+sub help
+{
+	print <<_HELP_;
+Использование: craft <options>
+Опции:
+	--craft=строка  Что надо скрафтить.
+
+				
+_HELP_
+	exit(0);
+}
