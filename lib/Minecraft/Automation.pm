@@ -79,33 +79,57 @@ sub mouse_rigt_click
 
 sub mouse_shift_left_click
 {
-    system('xdotool keydown shift sleep 0.2 click --delay 100 1 sleep 0.2 keyup shift sleep 0.2');
+    system('xdotool keydown shift sleep 0.1 click --delay 100 1 sleep 0.2 keyup shift sleep 0.1');
+}
+
+sub take_stack_from_cell
+{
+    my ($from_cell) = $_[0];
+    mouse_move_to_cell($from_cell); 
+    mouse_left_click();
+}
+
+sub take_half_stack_from_cell
+{
+    my ($from_cell) = $_[0];
+    mouse_move_to_cell($from_cell); mouse_rigt_click();
+}
+
+sub put_stack_to_cell
+{
+    my ($to_cell) = $_[0];
+    take_stack_from_cell($to_cell);
 }
 
 sub move_stack_between_cells
 {
     my ($from_cell, $to_cell) = @_[0..1];
-    mouse_move_to_cell($from_cell); mouse_left_click();
-    mouse_move_to_cell($to_cell)  ; mouse_left_click();
+    take_stack_from_cell($from_cell);
+    put_stack_to_cell($to_cell);
 }
 
 sub move_half_stack_between_cells
 {
     my ($from_cell, $to_cell) = @_[0..1];
-    mouse_move_to_cell($from_cell); mouse_rigt_click();
-    mouse_move_to_cell($to_cell)  ; mouse_left_click();
+    take_half_stack_from_cell($from_cell);
+    put_stack_to_cell($to_cell);
 }
 
 sub swap_stack_between_cells
 {
     my ($from_cell, $to_cell) = @_[0..1];
     move_stack_between_cells($from_cell, $to_cell);
-    mouse_move_to_cell($from_cell); mouse_left_click();
+    put_stack_to_cell($from_cell);
 }
 
 sub move_stack_from_craft_result
 {
     mouse_move_to_cell($config->{'system'}{'crafttable'}{'result'});  mouse_shift_left_click();
+}
+
+sub move_stack_from_trade_result
+{
+    mouse_move_to_cell($config->{'system'}{'villager'}{'result'});  mouse_shift_left_click();
 }
 
 1;

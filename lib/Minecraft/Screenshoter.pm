@@ -3,10 +3,17 @@ package Minecraft::Screenshoter;
 use strict;
 use warnings;
 use Data::Dumper;
+use Digest::MD5::File qw(file_md5_base64); 
 use Minecraft::Automation;
 use Exporter qw(import);
 
 my $config = Minecraft::Automation::read_config();
+
+sub screenshot_full_filename
+{
+	my $name = $_[0];
+	return sprintf("%s/%s.bmp", $config->{'user'}{'paths'}{'temp'}, $name);
+}
 
 sub take_screenshot
 { 
@@ -17,8 +24,14 @@ sub take_screenshot
 		$coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'}, 
 		$coordinates->{'tl'}{'x'},
 		$coordinates->{'tl'}{'y'},
-		sprintf("%s/%s.bmp", $config->{'user'}{'paths'}{'temp'}, $filename)));
+		screenshot_full_filename($filename)));
 	return $filename;
+}
+
+sub take_temp_screenshot
+{
+	my $coordinates = $_[0];
+	return take_screenshot('temporally', $coordinates);
 }
 
 sub get_window_size_position
@@ -30,6 +43,13 @@ sub get_window_size_position
 	$config->{'system'}{'window'}{'geometry'} = { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
 	$config = Minecraft::Automation::save_system_config($config);
 	return $config;
+}
+
+sub compare_screenshots
+{
+    my ($f0, $f1) = @_[0..1];
+    #print sprintf("%s == %s : %s\n",file_md5_base64($f0), file_md5_base64($f1) ,file_md5_base64($f0) eq file_md5_base64($f1));
+    return file_md5_base64(screenshot_full_filename($f0)) eq file_md5_base64(screenshot_full_filename($f1));
 }
 
 1;

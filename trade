@@ -7,21 +7,152 @@ use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
+use Minecraft::Screenshoter;
 my $config = Minecraft::Automation::read_config();
-my $craft = '';
+my $seller = '';
 GetOptions(
-		"craft=s" => \$craft,
-		"help"    => \&help
+		"seller=s" => \$seller,
+		"help"     => \&help
 	  ) or die("Что то не так с опциями командной строки\n");
 
 sub help
 {
 	print <<_HELP_;
-Использование: craft <options>
+Использование: trade <options>
 Опции:
-	--craft=строка  Что надо скрафтить.
+		--seller=строка  С кем надо торговать
+			Доступно: 
+			farmer - Фермер
+				В инвертаре выложить ряды, снизу вверх: арбузы, тыквы, картошка, морковь
+
 
 				
 _HELP_
 	exit(0);
+}
+# ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
+sub switch_to_trader_page
+{
+    my $page = $_[0];
+	switch_to_first_trader_page();
+	if($page > 1)
+	{
+		Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{'next_page'}); 
+		for(my $i = 1; $i < $page; $i++)
+		{
+			Minecraft::Automation::mouse_left_click();
+		}
+	}
+}
+
+sub switch_to_first_trader_page
+{
+    Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{'prev_page'}); 
+    for (0..15)
+    {
+		Minecraft::Automation::mouse_left_click();
+    }
+}
+# ---------------------------------------------  обратная связь, скриншоты ----------------------------------
+sub trader_can_sell
+{
+    return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-trade-avialable', 
+														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'trade-avialable'}));
+}
+
+sub trader_can_sell_on_page
+{
+    my $page = $_[0];
+    switch_to_trader_page($page);
+    return trader_can_sell();
+}
+
+sub trader_result_is_empty
+{
+	return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-result-empty', 
+														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'result'}));
+}
+# ---------------------------------------------  элементы торговли ----------------------------------
+sub sell_stack
+{
+    my ($ix, $iy, $ti) = @_[0..2];
+	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$ix}{$iy}, $config->{'system'}{'villager'}{'invertory'}{$ti});
+    Minecraft::Automation::move_stack_from_trade_result();
+    while(!trader_result_is_empty() && trader_can_sell())
+    {
+		Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$ti});
+        Minecraft::Automation::move_stack_from_trade_result();
+    }
+}
+
+sub sell_invertory_row
+{
+    my ($x, $y, $page) = @_[0..2];
+	my $trader_invertory = 0;
+    switch_to_trader_page($page);
+    for (; $x <= 8; $x++)
+    {
+        sell_stack($x, $y, $trader_invertory);
+        if(!trader_can_sell())
+        {
+			if(!trader_result_is_empty())
+			{
+				Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+			}
+			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{$x}{$y});
+			return $x;
+		}
+    }
+    return -1;
+}
+
+sub wait_for_trader_upgrade
+{
+    my @pages_to_check = @_;
+    Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
+    system('xdotool key e sleep 3 click --delay 100 3 sleep 2');
+    if(scalar(@pages_to_check) > 0)
+    {
+		my $flag = 0;
+		Minecraft::Automation::say("Проверяем, проапгредился ли торговец...");
+		for my $page (@pages_to_check)
+		{
+				$flag += trader_can_sell_on_page($page) ? 1 : 0;
+		}
+		if($flag < scalar(@pages_to_check))
+		{
+				Minecraft::Automation::say("Торговец устал, уходим.");
+				exit(0);
+		}
+    }
+    return 1;
+}
+
+# --------------------------------------------- торговля с деревенскими ----------------------------------
+sub trade_farmer
+{
+	my ($xpos_0, $xpos_1, $xpos_2, $xpos_3) = @_[0..3];
+	# снизу-вверх ряды арбуз(7), тыква(5), картошка (2), морковка (3)
+	if($xpos_0 >= 0) { Minecraft::Automation::say("Торгуем морковь");  $xpos_0 = sell_invertory_row($xpos_0, 0, 3); } 
+	if($xpos_1 >= 0) { Minecraft::Automation::say("Торгуем картошку"); $xpos_1 = sell_invertory_row($xpos_1, 1, 2); } 
+	if($xpos_2 >= 0) { Minecraft::Automation::say("Торгуем тыкву");    $xpos_2 = sell_invertory_row($xpos_2, 2, 5); } 
+	if($xpos_3 >= 0) { Minecraft::Automation::say("Торгуем арбуз");    $xpos_3 = sell_invertory_row($xpos_3, 3, 7); } 
+	if($xpos_0 < 0 && $xpos_1 < 0 && $xpos_2 < 0 && $xpos_3 < 0) 
+	{
+		Minecraft::Automation::say("Торговать больше нечем, уходим.");
+		exit (0); 
+	}
+	if(wait_for_trader_upgrade(2,3,5,7))
+	{
+		trade_farmer($xpos_0, $xpos_1, $xpos_2, $xpos_3);
+	}
+}
+
+
+for ($seller)
+{
+	if		(/farmer/)       { trade_farmer(0, 0, 0 ,0);          }
+	elsif	(/farmer/)      { trade_farmer();          }
+	else			 		 { help();                    }
+	
 }
