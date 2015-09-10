@@ -1,0 +1,30 @@
+#!/bin/bash
+
+xdotool search --name "Minecraft 1.8.8" windowactivate --sync 	key e
+
+for ((i=0; i<200; i++))
+do
+    xdotool search --name "Minecraft 1.8.8" windowactivate --sync \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative     50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 \
+	mousemove_relative -- -50 0 click 1 sleep 0.2 
+	echo -n "$i "
+done
+echo
