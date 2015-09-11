@@ -540,6 +540,7 @@ sub check_trader_avialable_on_page
     return check_trader_avialable();
 }
 
+
 sub check_trader_result_empty
 {
     return compare_screenshots('screenshot-etalon-trader-result-empty.bmp', get_screenshot("100x100+950+360", '/tmp/trader-remp.bmp', 0));

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_base64); 
+use Time::HiRes qw (sleep);
 use Minecraft::Automation;
 use Exporter qw(import);
 
@@ -29,6 +30,7 @@ sub screenshot_full_filename
 sub take_screenshot
 { 
 	my ($filename, $coordinates) = @_[0..1];
+	sleep(0.1);
 	system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s', 
 		$config->{'user'}{'minecraft'}{'title'}, 
 		$coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'}, 

@@ -123,6 +123,14 @@ sub swap_stack_between_cells
     put_stack_to_cell($from_cell);
 }
 
+sub drop_item_from_cell
+{
+    my ($from_cell) = $_[0];
+    take_stack_from_cell($from_cell);
+    mouse_hide_from_interface();
+    mouse_left_click();
+}
+
 sub take_stack_to_invertory
 {
     my ($from_cell) = $_[0];

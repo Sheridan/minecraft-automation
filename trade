@@ -24,9 +24,8 @@ sub help
 			Доступно: 
 			farmer - Фермер
 				В инвертаре выложить ряды, снизу вверх: арбузы, тыквы, картошка, морковь
-
-
-				
+			libraryan - Библиотекарь
+				Инвертарь надо забить бумагой				
 _HELP_
 	exit(0);
 }
@@ -128,6 +127,81 @@ sub wait_for_trader_upgrade
     return 1;
 }
 
+sub sell_all_invertory
+{
+    my ($xpos, $ypos, $page) = @_[0..2];
+    my $trader_invertory = 0;
+    Minecraft::Automation::say("Торгуем весь инвертарь.");
+    switch_to_trader_page($page);
+    if(!trader_can_sell())
+    {
+		return { 'x' => $xpos, 'y' => $ypos, 'done' => 0 };
+    }
+    for (my $y=$ypos; $y<=3; $y++)
+    {
+		for (my $x=$xpos; $x<=8; $x++)
+		{
+			sell_stack($x, $y, $trader_invertory);
+			if(!trader_can_sell())
+			{
+				if(!trader_result_is_empty())
+				{
+					Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+				}
+				Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{$x}{$y});
+				return { 'x' => $x, 'y' => $y, 'done' => 1 };
+			}
+			if($xpos > 0) { $xpos = 0; } 
+		}
+		if($ypos > 0) { $ypos = 0; } 
+    }
+    return { 'done' => -1 };
+}
+
+sub buy_items_on_page
+{
+    my $page = $_[0];
+    switch_to_trader_page($page);
+	Minecraft::Automation::say("Покупаем шмот.");
+	my $trader_invertory = 0;
+	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{0}, $config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+    do
+    {
+		Minecraft::Automation::drop_item_from_cell($config->{'system'}{'villager'}{'result'});
+		Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'result'});
+    }
+    while(trader_can_sell() && !trader_result_is_empty());
+	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{0}{0});
+}
+
+sub trade_simple
+{
+    my ($xpos, $ypos, $item_page, $buy_pages) = @_[0..3];
+    my $trade_stat = sell_all_invertory($xpos, $ypos, $item_page);
+    if($trade_stat->{'done'} < 0)
+    {
+		Minecraft::Automation::say("Торговать больше нечем, уходим.");
+		exit (0); 
+    }
+    wait_for_trader_upgrade();
+    if(trader_can_sell_on_page($item_page))
+    {
+		trade_simple($trade_stat->{'x'}, $trade_stat->{'y'}, $item_page, $buy_pages);
+    }
+    for my $bpage (@{$buy_pages})
+    {
+		if(trader_can_sell_on_page($bpage))
+		{
+			buy_items_on_page($bpage);
+			wait_for_trader_upgrade();
+			if(trader_can_sell_on_page($item_page))
+			{
+				trade_simple($trade_stat->{'x'}, $trade_stat->{'y'}, $item_page, $buy_pages);
+			}
+		}
+    }
+}
+
 # --------------------------------------------- торговля с деревенскими ----------------------------------
 sub trade_farmer
 {
@@ -148,11 +222,15 @@ sub trade_farmer
 	}
 }
 
+sub trade_libraryan
+{
+    trade_simple(0, 0, 1, [5, 7, 8]);
+}
 
 for ($seller)
 {
 	if		(/farmer/)       { trade_farmer(0, 0, 0 ,0);          }
-	elsif	(/farmer/)      { trade_farmer();          }
+	elsif	(/libraryan/)    { trade_libraryan();          }
 	else			 		 { help();                    }
 	
 }
