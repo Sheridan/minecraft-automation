@@ -25,7 +25,9 @@ sub help
 			farmer - Фермер
 				В инвертаре выложить ряды, снизу вверх: арбузы, тыквы, картошка, морковь
 			libraryan - Библиотекарь
-				Инвертарь надо забить бумагой				
+				Инвертарь надо забить бумагой
+			meater - Мясник
+				Инвертарь надо забить сырой курицей
 _HELP_
 	exit(0);
 }
@@ -227,10 +229,17 @@ sub trade_libraryan
     trade_simple(0, 0, 1, [5, 7, 8]);
 }
 
+sub trade_meater
+{
+    trade_simple(0, 0, 2, [4, 5]);
+}
+
+
 for ($seller)
 {
-	if		(/farmer/)       { trade_farmer(0, 0, 0 ,0);          }
-	elsif	(/libraryan/)    { trade_libraryan();          }
-	else			 		 { help();                    }
+	if		(/farmer/)     { trade_farmer(0, 0, 0 ,0); }
+	elsif	(/libraryan/)  { trade_libraryan();        }
+	elsif	(/meater/)     { trade_meater();           }
+	else			 	   { help();                   }
 	
 }
