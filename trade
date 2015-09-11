@@ -28,6 +28,8 @@ sub help
 				Инвертарь надо забить бумагой
 			meater - Мясник
 				Инвертарь надо забить сырой курицей
+			priest - Священник
+				Инвертарь надо забить гнилой плотью
 _HELP_
 	exit(0);
 }
@@ -234,12 +236,17 @@ sub trade_meater
     trade_simple(0, 0, 2, [4, 5]);
 }
 
+sub trade_priest
+{
+    trade_simple(0, 0, 1, [3, 4, 5, 6]);
+}
 
 for ($seller)
 {
 	if		(/farmer/)     { trade_farmer(0, 0, 0 ,0); }
 	elsif	(/libraryan/)  { trade_libraryan();        }
 	elsif	(/meater/)     { trade_meater();           }
+	elsif	(/priest/)     { trade_priest();           }
 	else			 	   { help();                   }
 	
 }
