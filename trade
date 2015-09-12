@@ -36,7 +36,7 @@ _HELP_
 
 sub move_stack_from_trade_result
 {
-    take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
+    Minecraft::Automation::take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
 }
 
 # ---------------------------------------------  навигация по страницам крестьянина ----------------------------------

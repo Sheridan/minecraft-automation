@@ -8,6 +8,7 @@ use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
 my $config = Minecraft::Automation::read_config();
+my $total_crafted = 0;
 my $craft = '';
 GetOptions(
 		"craft=s" => \$craft,
@@ -64,7 +65,9 @@ _HELP_
 
 sub move_stack_from_craft_result
 {
-    take_stack_to_invertory($config->{'system'}{'crafttable'}{'result'});
+    Minecraft::Automation::take_stack_to_invertory($config->{'system'}{'crafttable'}{'result'});
+    $total_crafted++;
+    Minecraft::Automation::say("%d шт. готово.", $total_crafted);
 }
 
 sub craft_sea_lantern
