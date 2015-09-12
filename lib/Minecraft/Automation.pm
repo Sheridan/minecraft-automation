@@ -11,10 +11,17 @@ my $config = Minecraft::Automation::read_config();
 
 sub read_config
 {
-    return {
+    my $c = {
                 'user'   => read_config_file('user-config.json'),
                 'system' => -e 'system-config.json' ? read_config_file('system-config.json') : {}
             };
+    if(!exists($c->{'user'}{'paths'}{'temp'})) { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
+    if(!exists($c->{'user'}{'paths'}{'screenshosts'}))
+    {
+        say("Нет настройки пути сохранения снимков экрана для обратной связи в user-config.json");
+        
+    }
+    return $c;
 }
 
 sub read_config_file
@@ -138,14 +145,5 @@ sub take_stack_to_invertory
     mouse_shift_left_click();
 }
 
-sub move_stack_from_craft_result
-{
-    take_stack_to_invertory($config->{'system'}{'crafttable'}{'result'});
-}
-
-sub move_stack_from_trade_result
-{
-    take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
-}
 
 1;

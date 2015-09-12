@@ -24,7 +24,7 @@ sub get_window_size_position
 sub screenshot_full_filename
 {
 	my $name = $_[0];
-	return sprintf("%s/%s.bmp", $config->{'user'}{'paths'}{'temp'}, $name);
+	return sprintf("%s/%s.bmp", $config->{'user'}{'paths'}{'screenshosts'}, $name);
 }
 
 sub take_screenshot

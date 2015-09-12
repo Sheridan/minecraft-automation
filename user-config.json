@@ -5,6 +5,7 @@
     },
     "paths":
     {
-	"temp" : "./temp"
+	"temp" 	       : "/tmp"
+	"screenshosts" : "./screenshots"
     }
 }

@@ -33,6 +33,12 @@ sub help
 _HELP_
 	exit(0);
 }
+
+sub move_stack_from_trade_result
+{
+    take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
+}
+
 # ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
 sub switch_to_trader_page
 {
@@ -80,11 +86,11 @@ sub sell_stack
 {
     my ($ix, $iy, $ti) = @_[0..2];
 	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$ix}{$iy}, $config->{'system'}{'villager'}{'invertory'}{$ti});
-    Minecraft::Automation::move_stack_from_trade_result();
+    move_stack_from_trade_result();
     while(!trader_result_is_empty() && trader_can_sell())
     {
 		Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$ti});
-        Minecraft::Automation::move_stack_from_trade_result();
+        move_stack_from_trade_result();
     }
 }
 
