@@ -159,17 +159,17 @@ sub train_view_item_xy
 }
 
 
-#Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
-#get_windowsizeposition();
-#Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
-#get_crafttable_cells();
-#get_invertory_cells();
-#test_crafttable();
-#test_invertory();
+Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
+get_windowsizeposition();
+Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
+get_crafttable_cells();
+get_invertory_cells();
+test_crafttable();
+test_invertory();
 
-#Minecraft::Automation::wait_any_key("Теперь вам надо найти крестьянина. Станьте возле него. Проверьте, что у него доступно несколько товаров");
-#get_villager_interface();
-#test_villager_interface();
+Minecraft::Automation::wait_any_key("Теперь вам надо найти крестьянина. Станьте возле него. Проверьте, что у него доступно несколько товаров");
+get_villager_interface();
+test_villager_interface();
 
 mkdir(sprintf("%s/items/", $config->{'user'}{'paths'}{'screenshosts'}));
 train_view_item_invertory_and_crafttable('pumpkin', 'тыкву');
