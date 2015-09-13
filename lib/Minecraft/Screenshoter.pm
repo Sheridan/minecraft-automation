@@ -47,6 +47,27 @@ sub take_temp_screenshot
 	return take_screenshot('temporally', $coordinates);
 }
 
+sub take_item_screenshot
+{
+	my ($item, $where, $x, $y, $coordinates) = @_[0..4];
+	my $filename = sprintf("items/%s/%s-%d-%d", $item, $where, $x, $y);
+	my $dx = int(($coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'})/3);
+	my $dy = int(($coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'})/3);
+	return take_screenshot($filename, 
+				{
+					'tl' => 
+					{
+						'x' => $coordinates->{'tl'}{'x'}+$dx,
+						'y' => $coordinates->{'tl'}{'y'}+$dy
+					},
+					'br' => 
+					{
+						'x' => $coordinates->{'br'}{'x'}-$dx,
+						'y' => $coordinates->{'br'}{'y'}-$dy
+					}
+				});
+}
+
 sub compare_screenshots
 {
     my ($f0, $f1) = @_[0..1];
