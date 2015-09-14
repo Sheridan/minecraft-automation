@@ -8,10 +8,13 @@ use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
+use Minecraft::Invertory;
 my $config = Minecraft::Automation::read_config();
 my $seller = '';
+my $buy = 'all';
 GetOptions(
 		"seller=s" => \$seller,
+		"buy=s"    => \$buy,
 		"help"     => \&help
 	  ) or die("Что то не так с опциями командной строки\n");
 
@@ -23,21 +26,30 @@ sub help
 		--seller=строка  С кем надо торговать
 			Доступно: 
 			farmer - Фермер
-				В инвертаре выложить ряды, снизу вверх: арбузы, тыквы, картошка, морковь
+				Покупает: тыкву, картофель, морковь, арбуз, пшеницу
+				Продаёт:  apple, cake
 			libraryan - Библиотекарь
-				Инвертарь надо забить бумагой
+				Покупает: бумагу
+				Продаёт: compass,bookshelf,clock,glass
 			meater - Мясник
-				Инвертарь надо забить сырой курицей
+				Покупает: сырую курицу, сырую свинину
+				Продаёт: cooked-porkchop,cooked-hicken
 			priest - Священник
-				Инвертарь надо забить гнилой плотью
+				Покупает: гнилую плоть
+				Продаёт: redstone,lapis_lazuli,eye_of_ender,glowstone,bottle_of_enchanting
+		--buy=строка  Что можно купить (читайте что продают seller'ы выше)
+				Указывайте через запятую, без пробелов
+				Но есть еще две возможности: 
+					--buy=all скупает всё что есть (действие по умолчанию)
+					--buy=none ничего не покупает
 _HELP_
 	exit(0);
 }
 
-sub move_stack_from_trade_result
-{
-    Minecraft::Automation::take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
-}
+# sub move_stack_from_trade_result
+# {
+    # Minecraft::Automation::take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
+# }
 
 # ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
 sub switch_to_trader_page
@@ -50,6 +62,7 @@ sub switch_to_trader_page
 		for(my $i = 1; $i < $page; $i++)
 		{
 			Minecraft::Automation::mouse_left_click();
+			sleep(0.1);
 		}
 	}
 }
@@ -57,7 +70,7 @@ sub switch_to_trader_page
 sub switch_to_first_trader_page
 {
     Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{'prev_page'}); 
-    for (0..15)
+    for (0..10)
     {
 		Minecraft::Automation::mouse_left_click();
     }
@@ -81,45 +94,20 @@ sub trader_result_is_empty
 	return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-result-empty', 
 														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'result'}));
 }
-# ---------------------------------------------  элементы торговли ----------------------------------
-sub sell_stack
-{
-    my ($ix, $iy, $ti) = @_[0..2];
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$ix}{$iy}, $config->{'system'}{'villager'}{'invertory'}{$ti});
-    move_stack_from_trade_result();
-    while(!trader_result_is_empty() && trader_can_sell())
-    {
-		Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$ti});
-        move_stack_from_trade_result();
-    }
-}
 
-sub sell_invertory_row
+sub trader_invertory_is_empty
 {
-    my ($x, $y, $page) = @_[0..2];
-	my $trader_invertory = 0;
-    switch_to_trader_page($page);
-    for (; $x <= 8; $x++)
-    {
-        sell_stack($x, $y, $trader_invertory);
-        if(!trader_can_sell())
-        {
-			if(!trader_result_is_empty())
-			{
-				Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
-			}
-			Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{$x}{$y});
-			return $x;
-		}
-    }
-    return -1;
+	my $trader_invertory = $_[0];
+	return Minecraft::Screenshoter::compare_screenshots(sprintf('dont-delete-villager-invertory-%d', $trader_invertory), 
+														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}));
 }
+# ---------------------------------------------  элементы торговли ----------------------------------
 
 sub wait_for_trader_upgrade
 {
     my @pages_to_check = @_;
     Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
-    system('xdotool key e sleep 3 click --delay 100 3 sleep 2');
+    system('xdotool key e sleep 5 click --delay 100 3 sleep 2');
     if(scalar(@pages_to_check) > 0)
     {
 		my $flag = 0;
@@ -128,131 +116,168 @@ sub wait_for_trader_upgrade
 		{
 				$flag += trader_can_sell_on_page($page) ? 1 : 0;
 		}
-		if($flag < scalar(@pages_to_check))
-		{
-				Minecraft::Automation::say("Торговец устал, уходим.");
-				exit(0);
-		}
+		return $flag > 0;
     }
     return 1;
 }
-
-sub sell_all_invertory
+sub take_to_invertory_or_drop
 {
-    my ($xpos, $ypos, $page) = @_[0..2];
-    my $trader_invertory = 0;
-    Minecraft::Automation::say("Торгуем весь инвертарь.");
-    switch_to_trader_page($page);
-    if(!trader_can_sell())
-    {
-		return { 'x' => $xpos, 'y' => $ypos, 'done' => 0 };
-    }
-    for (my $y=$ypos; $y<=3; $y++)
-    {
-		for (my $x=$xpos; $x<=8; $x++)
-		{
-			sell_stack($x, $y, $trader_invertory);
-			if(!trader_can_sell())
-			{
-				if(!trader_result_is_empty())
-				{
-					Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
-				}
-				Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{$x}{$y});
-				return { 'x' => $x, 'y' => $y, 'done' => 1 };
-			}
-			if($xpos > 0) { $xpos = 0; } 
-		}
-		if($ypos > 0) { $ypos = 0; } 
-    }
-    return { 'done' => -1 };
-}
+	my ($cell, $invertory) = @_[0..1];
 
-sub buy_items_on_page
-{
-    my $page = $_[0];
-    switch_to_trader_page($page);
-	Minecraft::Automation::say("Покупаем шмот.");
-	my $trader_invertory = 0;
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{0}{0}, $config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
-    do
-    {
-		Minecraft::Automation::drop_item_from_cell($config->{'system'}{'villager'}{'result'});
-		Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'result'});
-    }
-    while(trader_can_sell() && !trader_result_is_empty());
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $config->{'system'}{'invertory'}{0}{0});
-}
-
-sub trade_simple
-{
-    my ($xpos, $ypos, $item_page, $buy_pages) = @_[0..3];
-    my $trade_stat = sell_all_invertory($xpos, $ypos, $item_page);
-    if($trade_stat->{'done'} < 0)
-    {
-		Minecraft::Automation::say("Торговать больше нечем, уходим.");
-		exit (0); 
-    }
-    wait_for_trader_upgrade();
-    if(trader_can_sell_on_page($item_page))
-    {
-		trade_simple($trade_stat->{'x'}, $trade_stat->{'y'}, $item_page, $buy_pages);
-    }
-    for my $bpage (@{$buy_pages})
-    {
-		if(trader_can_sell_on_page($bpage))
-		{
-			buy_items_on_page($bpage);
-			wait_for_trader_upgrade();
-			if(trader_can_sell_on_page($item_page))
-			{
-				trade_simple($trade_stat->{'x'}, $trade_stat->{'y'}, $item_page, $buy_pages);
-			}
-		}
-    }
+	if(Minecraft::Invertory::item_exists_in_invertory('empty', $invertory))
+	{
+		Minecraft::Automation::take_stack_to_invertory($cell);
+		Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
+	}
+	else
+	{
+		Minecraft::Automation::drop_item_from_cell($cell);
+	}
 }
 
 # --------------------------------------------- торговля с деревенскими ----------------------------------
+
+sub trade_item_with_trader
+{
+	my ($item_to_trade, $trader_page, $trader_invertory, $invertory) = @_[0..3];
+	switch_to_trader_page($trader_page);
+	while(trader_can_sell() && Minecraft::Invertory::item_exists_in_invertory($item_to_trade, $invertory))
+	{
+		if(Minecraft::Screenshoter::hand_is_empty('villager'))
+		{
+			Minecraft::Invertory::put_stack_to_trader_invertory($item_to_trade, $trader_invertory, $invertory);
+		}
+		else
+		{
+			Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+		}
+		if(!trader_result_is_empty())
+		{
+			take_to_invertory_or_drop($config->{'system'}{'villager'}{'result'}, $invertory);
+		}
+	}
+	Minecraft::Automation::say("Забираем обратно остатки");
+	if(!trader_invertory_is_empty($trader_invertory))
+	{
+		take_to_invertory_or_drop($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+	}
+	if(!Minecraft::Screenshoter::hand_is_empty('villager'))
+	{
+		Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+		take_to_invertory_or_drop($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+	}
+}
+
+sub sell_to_trader 
+{
+    my ($items_to_sell, $trader_invertory, $invertory) = @_[0..2];
+	my @sell_pages; 
+	my $unchanged_invertory_dump = Dumper(%{$invertory});
+	
+	for my $item_to_sell (keys(%{$items_to_sell}))
+	{
+		Minecraft::Automation::say("Продаём %s", $item_to_sell);
+		trade_item_with_trader($item_to_sell, $items_to_sell->{$item_to_sell}, $trader_invertory, $invertory);
+		if(Minecraft::Invertory::item_exists_in_invertory($item_to_sell, $invertory))
+		{
+			push(@sell_pages, $items_to_sell->{$item_to_sell});
+		}
+	}
+	if($unchanged_invertory_dump ne Dumper(%{$invertory}) && scalar(@sell_pages) > 0 && wait_for_trader_upgrade(@sell_pages))
+	{
+		Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
+		sell_to_trader($items_to_sell, $trader_invertory, $invertory);
+	}
+}
+
+sub buy_from_trader
+{
+	my ($items_to_buy, $trader_invertory, $invertory) = @_[0..2];
+	for my $item_to_buy (keys(%{$items_to_buy}))
+	{
+		Minecraft::Automation::say("Покупаем %s", $item_to_buy);
+		trade_item_with_trader('emerald', $items_to_buy->{$item_to_buy}, $trader_invertory, $invertory);
+	}
+}
+
+sub trade_with_seller
+{
+	my ($items_to_sell, $items_to_buy, $invertory) = @_[0..2];
+	my $unchanged_invertory_dump = "";
+	my $trader_invertory = 0;
+	#Minecraft::Invertory::dump_invertory($invertory);
+	
+	do
+	{
+		$unchanged_invertory_dump = Dumper(%{$invertory});
+		sell_to_trader ($items_to_sell, $trader_invertory, $invertory);
+		buy_from_trader($items_to_buy, $trader_invertory, $invertory);
+	}
+	while($unchanged_invertory_dump ne Dumper(%{$invertory}) && wait_for_trader_upgrade());
+	Minecraft::Automation::say("Торговать больше нечем и не на что. Уходим.");
+}
+
+sub filter_buy
+{
+	my $items_to_buy = $_[0];
+	if($buy eq 'all') 
+	{
+		return $items_to_buy;
+	}
+	if($buy eq 'none') 
+	{
+		return {};
+	}
+	my @user_buys = split(/,/, $buy);
+	my $filtered_items_to_buy = {};
+	for my $user_buy (@user_buys)
+	{
+		if(exists($items_to_buy->{$user_buy}))
+		{
+			$filtered_items_to_buy->{$user_buy} = $items_to_buy->{$user_buy};
+		}
+	}
+	return $filtered_items_to_buy;
+}
+
+# ------------------------------------------- торговля -----------------------------------------------
+
 sub trade_farmer
 {
-	my ($xpos_0, $xpos_1, $xpos_2, $xpos_3) = @_[0..3];
-	# снизу-вверх ряды арбуз(7), тыква(5), картошка (2), морковка (3)
-	if($xpos_0 >= 0) { Minecraft::Automation::say("Торгуем морковь");  $xpos_0 = sell_invertory_row($xpos_0, 0, 3); } 
-	if($xpos_1 >= 0) { Minecraft::Automation::say("Торгуем картошку"); $xpos_1 = sell_invertory_row($xpos_1, 1, 2); } 
-	if($xpos_2 >= 0) { Minecraft::Automation::say("Торгуем тыкву");    $xpos_2 = sell_invertory_row($xpos_2, 2, 5); } 
-	if($xpos_3 >= 0) { Minecraft::Automation::say("Торгуем арбуз");    $xpos_3 = sell_invertory_row($xpos_3, 3, 7); } 
-	if($xpos_0 < 0 && $xpos_1 < 0 && $xpos_2 < 0 && $xpos_3 < 0) 
-	{
-		Minecraft::Automation::say("Торговать больше нечем, уходим.");
-		exit (0); 
-	}
-	if(wait_for_trader_upgrade(2,3,5,7))
-	{
-		trade_farmer($xpos_0, $xpos_1, $xpos_2, $xpos_3);
-	}
+	trade_with_seller(	{'pumpkin' => 5, 'carrot' => 3, 'potato' => 2, 'wheat' => 1, 'block-melon' => 7},
+						filter_buy({'apple' => 8, 'cake' => 10}),
+						Minecraft::Invertory::map_invertory());
 }
 
 sub trade_libraryan
 {
-    trade_simple(0, 0, 1, [5, 7, 8]);
-}
-
-sub trade_meater
-{
-    trade_simple(0, 0, 2, [4, 5]);
+    trade_with_seller(	{'paper' => 1},
+						filter_buy({'compass' => 4, 'bookshelf' => 5, 'clock' => 7, 'glass' => 8}),
+						Minecraft::Invertory::map_invertory());
 }
 
 sub trade_priest
 {
-    trade_simple(0, 0, 1, [3, 4, 5, 6]);
+    trade_with_seller(	{'rotten-flesh' => 1},
+						filter_buy({'redstone' => 3, 'lapis-lazuli' => 4, 'eye-of-ender' => 5, 'glowstone' => 6, 'bottle-of-enchanting' => 7}),
+						Minecraft::Invertory::map_invertory());
+}
+
+sub trade_meater
+{
+    trade_with_seller(	{'raw-porkchop' => 1, 'raw-chicken' => 2},
+						filter_buy({'cooked-porkchop' => 4, 'cooked-hicken' => 5}),
+						Minecraft::Invertory::map_invertory());
 }
 
 for ($seller)
 {
-	if		(/farmer/)     { trade_farmer(0, 0, 0 ,0); }
+	if		(/farmer/)     { trade_farmer();           }
 	elsif	(/libraryan/)  { trade_libraryan();        }
 	elsif	(/meater/)     { trade_meater();           }
 	elsif	(/priest/)     { trade_priest();           }
 	else			 	   { help();                   }
 	
 }
+# trade_farmer();
+#print Dumper(Minecraft::Screenshoter::map_invertory());

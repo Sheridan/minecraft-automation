@@ -7,7 +7,7 @@ use Data::Dumper;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
-my $config = Minecraft::Automation::read_config();
+my $config = read_config();
 
 sub read_config
 {
@@ -61,7 +61,10 @@ sub wait_any_key
 sub mouse_move_to_cell
 {
     my $to = $_[0];
-    system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', $config->{'user'}{'minecraft'}{'title'}, $to->{'c'}{'x'}, $to->{'c'}{'y'}));
+    system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
+					$config->{'user'}{'minecraft'}{'title'}, 
+					$to->{'c'}{'x'}, 
+					$to->{'c'}{'y'}));
 }
 
 sub mouse_move_to_button
@@ -144,6 +147,7 @@ sub take_stack_to_invertory
     mouse_move_to_cell($from_cell);  
     mouse_shift_left_click();
 }
+
 
 
 1;
