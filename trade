@@ -60,7 +60,7 @@ sub switch_to_trader_page
 	my $button_name = $page > $current_trader_page ? 'next_page' : 'prev_page';
 	while($page != $current_trader_page)
 	{
-		if(!trader_page_avialable($button_name, $page))
+		if(!trader_page_avialable($button_name, $current_trader_page))
 		{
 			return 0;
 		}
