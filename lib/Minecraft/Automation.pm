@@ -74,7 +74,7 @@ sub mouse_move_to_button
 
 sub mouse_hide_from_interface
 {
-    mouse_move_to_cell({ 'c' => {'x' => 10, 'y' => 10 } });
+    mouse_move_to_cell($config->{'system'}{'no-interface'});
 }
 
 sub mouse_left_click
