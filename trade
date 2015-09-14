@@ -12,6 +12,7 @@ use Minecraft::Invertory;
 my $config = Minecraft::Automation::read_config();
 my $seller = '';
 my $buy = 'all';
+my $current_trader_page = 1;
 GetOptions(
 		"seller=s" => \$seller,
 		"buy=s"    => \$buy,
@@ -55,26 +56,15 @@ _HELP_
 sub switch_to_trader_page
 {
     my $page = $_[0];
-	switch_to_first_trader_page();
-	if($page > 1)
+    Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{$page > $current_trader_page ? 'next_page' : 'prev_page'});
+	while($page != $current_trader_page)
 	{
-		Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{'next_page'}); 
-		for(my $i = 1; $i < $page; $i++)
-		{
-			Minecraft::Automation::mouse_left_click();
-			sleep(0.1);
-		}
+		Minecraft::Automation::mouse_left_click();
+		sleep(0.1);
+		$current_trader_page += $page > $current_trader_page ? 1 : -1;
 	}
 }
 
-sub switch_to_first_trader_page
-{
-    Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{'prev_page'}); 
-    for (0..10)
-    {
-		Minecraft::Automation::mouse_left_click();
-    }
-}
 # ---------------------------------------------  обратная связь, скриншоты ----------------------------------
 sub trader_can_sell
 {
@@ -108,6 +98,7 @@ sub wait_for_trader_upgrade
     my @pages_to_check = @_;
     Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
     system('xdotool key e sleep 5 click --delay 100 3 sleep 2');
+    $current_trader_page = 1;
     if(scalar(@pages_to_check) > 0)
     {
 		my $flag = 0;
