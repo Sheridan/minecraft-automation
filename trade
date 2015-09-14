@@ -35,7 +35,7 @@ sub help
 				Продаёт: compass,bookshelf,clock,glass
 			meater - Мясник
 				Покупает: сырую курицу, сырую свинину
-				Продаёт: cooked-porkchop,cooked-hicken
+				Продаёт: cooked-porkchop,cooked-chicken
 			priest - Священник
 				Покупает: гнилую плоть
 				Продаёт: redstone,lapis_lazuli,eye_of_ender,glowstone,bottle_of_enchanting
@@ -191,14 +191,11 @@ sub sell_to_trader
 	my @sell_pages; 
 	my $unchanged_invertory_dump = Dumper(%{$invertory});
 	
-	for my $item_to_sell (keys(%{$items_to_sell}))
+	for my $item_to_sell (keys(%{filter_sell($items_to_sell, $invertory)}))
 	{
 		Minecraft::Automation::say("Продаём %s", $item_to_sell);
 		trade_item_with_trader($item_to_sell, $items_to_sell->{$item_to_sell}, $trader_invertory, $invertory);
-		if(Minecraft::Invertory::item_exists_in_invertory($item_to_sell, $invertory))
-		{
-			push(@sell_pages, $items_to_sell->{$item_to_sell});
-		}
+		push(@sell_pages, $items_to_sell->{$item_to_sell});
 	}
 	if($unchanged_invertory_dump ne Dumper(%{$invertory}) && scalar(@sell_pages) > 0 && wait_for_trader_upgrade(@sell_pages))
 	{
@@ -219,11 +216,11 @@ sub buy_from_trader
 
 sub trade_with_seller
 {
-	my ($items_to_sell, $items_to_buy, $invertory) = @_[0..2];
+	my ($items_to_sell, $items_to_buy) = @_[0..1];
+	my $invertory = Minecraft::Invertory::map_invertory();
 	my $unchanged_invertory_dump = "";
 	my $trader_invertory = 0;
-	#Minecraft::Invertory::dump_invertory($invertory);
-	
+		
 	do
 	{
 		$unchanged_invertory_dump = Dumper(%{$invertory});
@@ -232,6 +229,20 @@ sub trade_with_seller
 	}
 	while($unchanged_invertory_dump ne Dumper(%{$invertory}) && wait_for_trader_upgrade());
 	Minecraft::Automation::say("Торговать больше нечем и не на что. Уходим.");
+}
+
+sub filter_sell
+{
+	my ($items_to_sell, $invertory) = @_[0..1];
+	my $filtered_items_to_sell = {};
+	for my $item_to_sell (keys(%{$items_to_sell}))
+	{
+		if(Minecraft::Invertory::item_exists_in_invertory($item_to_sell, $invertory))
+		{
+			$filtered_items_to_sell->{$item_to_sell} = $items_to_sell->{$item_to_sell};
+		}
+	}
+	return $filtered_items_to_sell;
 }
 
 sub filter_buy
@@ -262,29 +273,25 @@ sub filter_buy
 sub trade_farmer
 {
 	trade_with_seller(	{'pumpkin' => 5, 'carrot' => 3, 'potato' => 2, 'wheat' => 1, 'block-melon' => 7},
-						filter_buy({'apple' => 8, 'cake' => 10}),
-						Minecraft::Invertory::map_invertory());
+						filter_buy({'apple' => 8, 'cake' => 10}));
 }
 
 sub trade_libraryan
 {
     trade_with_seller(	{'paper' => 1},
-						filter_buy({'compass' => 4, 'bookshelf' => 5, 'clock' => 7, 'glass' => 8}),
-						Minecraft::Invertory::map_invertory());
+						filter_buy({'compass' => 4, 'bookshelf' => 5, 'clock' => 7, 'glass' => 8}));
 }
 
 sub trade_priest
 {
     trade_with_seller(	{'rotten-flesh' => 1},
-						filter_buy({'redstone' => 3, 'lapis-lazuli' => 4, 'eye-of-ender' => 5, 'glowstone' => 6, 'bottle-of-enchanting' => 7}),
-						Minecraft::Invertory::map_invertory());
+						filter_buy({'redstone' => 3, 'lapis-lazuli' => 4, 'eye-of-ender' => 5, 'glowstone' => 6, 'bottle-of-enchanting' => 7}));
 }
 
 sub trade_meater
 {
     trade_with_seller(	{'raw-porkchop' => 1, 'raw-chicken' => 2},
-						filter_buy({'cooked-porkchop' => 4, 'cooked-hicken' => 5}),
-						Minecraft::Invertory::map_invertory());
+						filter_buy({'cooked-porkchop' => 4, 'cooked-hicken' => 5}));
 }
 
 for ($seller)
