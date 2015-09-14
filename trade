@@ -120,7 +120,10 @@ sub wait_for_trader_upgrade
 {
     my @pages_to_check = @_;
     Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
-    system('xdotool key e sleep 5 click --delay 100 3 sleep 2');
+    system(sprintf('xdotool key e sleep %d click --delay %d 3 sleep %d',
+					$config->{'user'}{'timeouts'}{'villager_upgrade'},
+					$config->{'user'}{'timeouts'}{'mouse_click_ms'},
+					$config->{'user'}{'timeouts'}{'trade_interface_open'}));
     $page_avialable_cache = {};
     $current_trader_page = 1;
     if(scalar(@pages_to_check) > 0)

@@ -21,6 +21,11 @@ sub read_config
         say("Нет настройки пути сохранения снимков экрана для обратной связи в user-config.json");
         
     }
+    
+    if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
+    if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'})) { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
+    if(!exists($c->{'user'}{'timeouts'}{'trade_interface_open'})) { $c->{'user'}{'timeouts'}{'trade_interface_open'} = 3; }
+    if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'})) { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
     return $c;
 }
 
@@ -79,17 +84,18 @@ sub mouse_hide_from_interface
 
 sub mouse_left_click
 {
-    system('xdotool click --delay 100 1');
+    system(sprintf('xdotool click --delay %d 1', $config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_rigt_click
 {
-    system('xdotool click --delay 100 3');
+    system(sprintf('xdotool click --delay %d 3', $config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_shift_left_click
 {
-    system('xdotool keydown shift sleep 0.1 click --delay 100 1 sleep 0.2 keyup shift sleep 0.1');
+    system(sprintf('xdotool keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1', 
+					$config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub take_stack_from_cell

@@ -39,7 +39,7 @@ sub take_screenshot
 	if($clean)
 	{
 		Minecraft::Automation::mouse_hide_from_interface();
-		sleep(0.05);
+		sleep($config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
 	}
 	system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s', 
 		$config->{'user'}{'minecraft'}{'title'}, 
@@ -93,7 +93,7 @@ sub hand_is_empty
 {
 	my $interface = $_[0];
 	Minecraft::Automation::mouse_move_to_cell($config->{'system'}{$interface}{'clean'});
-	sleep(0.05);
+	sleep($config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
 	my $ssname = take_screenshot('temporally', $config->{'system'}{$interface}{'clean'}, 0);
 	return compare_screenshots($ssname, sprintf("dont-delete-%s-clean", $interface));
 }

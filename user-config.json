@@ -1,11 +1,18 @@
 {
     "minecraft":
     {
-	"title": "Minecraft 1.8.8"
+		"title": "Minecraft 1.8.8"
     },
     "paths":
     {
-	"temp" 	       : "/tmp",
-	"screenshosts" : "./screenshots"
+		"temp" 	       : "/tmp",
+		"screenshosts" : "./screenshots"
+    },
+    "timeouts":
+    {
+		"between_mouse_hide_and_screenshot": 0.03,
+		"villager_upgrade": 4,
+		"trade_interface_open": 2,
+		"mouse_click_ms": 80
     }
 }
