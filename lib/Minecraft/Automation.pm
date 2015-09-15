@@ -7,8 +7,6 @@ use Data::Dumper;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
-my $config = read_config();
-
 sub read_config
 {
     my $c = {
@@ -67,7 +65,7 @@ sub mouse_move_to_cell
 {
     my $to = $_[0];
     system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
-					$config->{'user'}{'minecraft'}{'title'}, 
+					$main::config->{'user'}{'minecraft'}{'title'}, 
 					$to->{'c'}{'x'}, 
 					$to->{'c'}{'y'}));
 }
@@ -79,23 +77,23 @@ sub mouse_move_to_button
 
 sub mouse_hide_from_interface
 {
-    mouse_move_to_cell($config->{'system'}{'no-interface'});
+    mouse_move_to_cell($main::config->{'system'}{'no-interface'});
 }
 
 sub mouse_left_click
 {
-    system(sprintf('xdotool click --delay %d 1', $config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+    system(sprintf('xdotool click --delay %d 1', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_rigt_click
 {
-    system(sprintf('xdotool click --delay %d 3', $config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+    system(sprintf('xdotool click --delay %d 3', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_shift_left_click
 {
     system(sprintf('xdotool keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1', 
-					$config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub take_stack_from_cell

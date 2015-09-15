@@ -9,7 +9,7 @@ use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
 use Minecraft::Invertory;
-my $config = Minecraft::Automation::read_config();
+my $main::config = Minecraft::Automation::read_config();
 my $seller = '';
 my $buy = 'all';
 my $current_trader_page = 1;
@@ -50,7 +50,7 @@ _HELP_
 
 # sub move_stack_from_trade_result
 # {
-    # Minecraft::Automation::take_stack_to_invertory($config->{'system'}{'villager'}{'result'});
+    # Minecraft::Automation::take_stack_to_invertory($main::config->{'system'}{'villager'}{'result'});
 # }
 
 # ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
@@ -64,7 +64,7 @@ sub switch_to_trader_page
 		{
 			return 0;
 		}
-		Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{$button_name});
+		Minecraft::Automation::mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
 		Minecraft::Automation::mouse_left_click();
 		sleep(0.05);
 		$current_trader_page += $page > $current_trader_page ? 1 : -1;
@@ -77,7 +77,7 @@ sub switch_to_trader_page
 sub trader_can_sell
 {
     return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-trade-avialable', 
-														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'trade-avialable'}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}));
 }
 
 sub trader_can_sell_on_page
@@ -93,14 +93,14 @@ sub trader_can_sell_on_page
 sub trader_result_is_empty
 {
 	return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-result-empty', 
-														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'result'}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}));
 }
 
 sub trader_invertory_is_empty
 {
 	my $trader_invertory = $_[0];
 	return Minecraft::Screenshoter::compare_screenshots(sprintf('dont-delete-villager-invertory-%d', $trader_invertory), 
-														Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}));
 }
 
 sub trader_page_avialable
@@ -110,7 +110,7 @@ sub trader_page_avialable
 	{
 		$page_avialable_cache->{$button_name}{$page} = 
 								!Minecraft::Screenshoter::compare_screenshots(sprintf("dont-delete-villager-%s-not-avialable", $button_name), 
-													Minecraft::Screenshoter::take_temp_screenshot($config->{'system'}{'villager'}{$button_name}));
+													Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}));
 	}
 	return $page_avialable_cache->{$button_name}{$page};
 }
@@ -121,9 +121,9 @@ sub wait_for_trader_upgrade
     my @pages_to_check = @_;
     Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
     system(sprintf('xdotool key e sleep %d click --delay %d 3 sleep %d',
-					$config->{'user'}{'timeouts'}{'villager_upgrade'},
-					$config->{'user'}{'timeouts'}{'mouse_click_ms'},
-					$config->{'user'}{'timeouts'}{'trade_interface_open'}));
+					$main::config->{'user'}{'timeouts'}{'villager_upgrade'},
+					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'},
+					$main::config->{'user'}{'timeouts'}{'trade_interface_open'}));
     $page_avialable_cache = {};
     $current_trader_page = 1;
     if(scalar(@pages_to_check) > 0)
@@ -168,22 +168,22 @@ sub trade_item_with_trader
 			}
 			else	
 			{
-				Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+				Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
 			}
 			if(!trader_result_is_empty())
 			{
-				take_to_invertory_or_drop($config->{'system'}{'villager'}{'result'}, $invertory);
+				take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'result'}, $invertory);
 			}
 		}
 		Minecraft::Automation::say("Забираем обратно остатки");
 		if(!trader_invertory_is_empty($trader_invertory))
 		{
-			take_to_invertory_or_drop($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+			take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
 		}
 		if(!Minecraft::Screenshoter::hand_is_empty('villager'))
 		{
-			Minecraft::Automation::put_stack_to_cell($config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
-			take_to_invertory_or_drop($config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+			Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+			take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
 		}
 	}
 }

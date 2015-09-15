@@ -8,7 +8,7 @@ use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
 
-my $config = Minecraft::Automation::read_config();
+$main::config = Minecraft::Automation::read_config();
 
 sub get_cursor_position
 {
@@ -17,8 +17,8 @@ sub get_cursor_position
     my @tmp = split(/ /, `./get-mouse-position`);
     #print Dumper(@tmp);
     return {
-                'x' => ($tmp[0]+0) > $config->{'system'}{'window'}{'geometry'}{'x'} ? ($tmp[0]+0) - $config->{'system'}{'window'}{'geometry'}{'x'} : $config->{'system'}{'window'}{'geometry'}{'x'} - ($tmp[0]+0),
-                'y' => ($tmp[1]+0) > $config->{'system'}{'window'}{'geometry'}{'y'} ? ($tmp[1]+0) - $config->{'system'}{'window'}{'geometry'}{'y'} : $config->{'system'}{'window'}{'geometry'}{'y'} - ($tmp[1]+0)
+                'x' => ($tmp[0]+0) > $main::config->{'system'}{'window'}{'geometry'}{'x'} ? ($tmp[0]+0) - $main::config->{'system'}{'window'}{'geometry'}{'x'} : $main::config->{'system'}{'window'}{'geometry'}{'x'} - ($tmp[0]+0),
+                'y' => ($tmp[1]+0) > $main::config->{'system'}{'window'}{'geometry'}{'y'} ? ($tmp[1]+0) - $main::config->{'system'}{'window'}{'geometry'}{'y'} : $main::config->{'system'}{'window'}{'geometry'}{'y'} - ($tmp[1]+0)
             };
 }
 
@@ -48,24 +48,25 @@ sub get_button_coordinates
 sub get_windowsizeposition
 {
     Minecraft::Automation::wait_any_key("Расположите окно майнкрафта так, как вам привычно и удобно");
-    $config = Minecraft::Screenshoter::get_window_size_position();
+    $main::config = Minecraft::Screenshoter::get_window_size_position();
 }
 
 sub get_crafttable_cells
 {
     Minecraft::Automation::wait_any_key("Откройте интерфейс стола крафтинга");
-    $config->{'system'}{'no-interface'} = get_button_coordinates("Кликните вне интерфейса, но в окне майна. Желательно посередине окна, как можно ниже. Эта точка будет использоваться для скрытия мыша и для дропа");
+    $main::config->{'system'}{'no-interface'} = get_button_coordinates("Кликните вне интерфейса, но в окне майна. Желательно посередине окна, как можно ниже. Эта точка будет использоваться для скрытия мыша и для дропа");
     Minecraft::Automation::say("Нумерация ячеек следующая:\n0:0 1:0 2:0\n0:1 1:1 2:1\n0:2 1:2 2:2");
     for my $y (0..2)
     {
         for my $x (0..2)
         {
-            $config->{'system'}{'crafttable'}{$x}{$y} = get_cell_coordinates("Ячейка $x:$y стола крафта");
+            $main::config->{'system'}{'crafttable'}{$x}{$y} = get_cell_coordinates("Ячейка $x:$y стола крафта");
         }
     }
-    $config->{'system'}{'crafttable'}{'result'} = get_cell_coordinates("Ячейка результата стола крафта");
-    $config->{'system'}{'crafttable'}{'clean'} = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую где нибудь под стрелкой, указывающей на результат");
-    Minecraft::Screenshoter::take_screenshot("dont-delete-crafttable-clean", $config->{'system'}{'crafttable'}{'clean'});
+    $main::config->{'system'}{'crafttable'}{'result'} = get_cell_coordinates("Ячейка результата стола крафта");
+    $main::config->{'system'}{'crafttable'}{'clean'} = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую где нибудь под стрелкой, указывающей на результат");
+    Minecraft::Screenshoter::take_screenshot("dont-delete-crafttable-clean", $main::config->{'system'}{'crafttable'}{'clean'});
+    $main::config = Minecraft::Automation::save_system_config($main::config);   
 }
 
 sub get_invertory_cells
@@ -76,40 +77,42 @@ sub get_invertory_cells
     {
         for my $x (0..8)
         {
-            $config->{'system'}{'invertory'}{$x}{$y} = get_cell_coordinates("Ячейка $x:$y инвертаря");
+            $main::config->{'system'}{'invertory'}{$x}{$y} = get_cell_coordinates("Ячейка $x:$y инвертаря");
         }
     }
+    $main::config = Minecraft::Automation::save_system_config($main::config);   
 }
 
 sub get_villager_interface
 {
     Minecraft::Automation::wait_any_key("Откройте интерфейс торговли");
-    $config->{'system'}{'villager'}{'invertory'}{0} = get_cell_coordinates("Левая ячейка инвертаря крестьянина");
-    $config->{'system'}{'villager'}{'invertory'}{1} = get_cell_coordinates("Правая ячейка инвертаря крестьянина");
-    $config->{'system'}{'villager'}{'result'} = get_cell_coordinates("Ячейка результата торговли крестьянина (справа которая)");
-    $config->{'system'}{'villager'}{'clean'} = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую справа, под кнопкой перелистывания страницы вперед");
+    $main::config->{'system'}{'villager'}{'invertory'}{0} = get_cell_coordinates("Левая ячейка инвертаря крестьянина");
+    $main::config->{'system'}{'villager'}{'invertory'}{1} = get_cell_coordinates("Правая ячейка инвертаря крестьянина");
+    $main::config->{'system'}{'villager'}{'result'} = get_cell_coordinates("Ячейка результата торговли крестьянина (справа которая)");
+    $main::config->{'system'}{'villager'}{'clean'} = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую справа, под кнопкой перелистывания страницы вперед");
     Minecraft::Automation::wait_any_key("Теперь переключитесь на страницу торговли, где крестьянин еще может торговать (стрелки не перечеркнуты)");
-    $config->{'system'}{'villager'}{'trade-avialable'} = get_cell_coordinates("Верхняя стрелка");
+    $main::config->{'system'}{'villager'}{'trade-avialable'} = get_cell_coordinates("Верхняя стрелка");
 	Minecraft::Automation::wait_any_key("Теперь надо найти крестьянина минимум с тремя доступными страницами торговли (потребуется дважды жать на кнопки)");
-	$config->{'system'}{'villager'}{'next_page'} = get_cell_coordinates("Кнопка переключения на следующую страницу торговли");
-	$config->{'system'}{'villager'}{'prev_page'} = get_cell_coordinates("Кнопка переключения на предыдущую страницу торговли");
+	$main::config->{'system'}{'villager'}{'next_page'} = get_cell_coordinates("Кнопка переключения на следующую страницу торговли");
+	$main::config->{'system'}{'villager'}{'prev_page'} = get_cell_coordinates("Кнопка переключения на предыдущую страницу торговли");
 	for my $button_name ('next_page', 'prev_page')
 	{
-		Minecraft::Automation::mouse_move_to_button($config->{'system'}{'villager'}{$button_name});
+		Minecraft::Automation::mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
 		for (0..15)
 		{
 			Minecraft::Automation::mouse_left_click();
 		}
 		Minecraft::Automation::mouse_move_to_cell({ 'c' => {'x' => 10, 'y' => 10 } });
 		sleep(0.5);
-		Minecraft::Screenshoter::take_screenshot(sprintf("dont-delete-villager-%s-not-avialable", $button_name), $config->{'system'}{'villager'}{$button_name});
+		Minecraft::Screenshoter::take_screenshot(sprintf("dont-delete-villager-%s-not-avialable", $button_name), $main::config->{'system'}{'villager'}{$button_name});
 	}
 
-    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-trade-avialable", $config->{'system'}{'villager'}{'trade-avialable'});
-    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-0", $config->{'system'}{'villager'}{'invertory'}{0});
-    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-1", $config->{'system'}{'villager'}{'invertory'}{1});
-    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-result-empty", $config->{'system'}{'villager'}{'result'});
-    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-clean", $config->{'system'}{'villager'}{'clean'});
+    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-trade-avialable", $main::config->{'system'}{'villager'}{'trade-avialable'});
+    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-0", $main::config->{'system'}{'villager'}{'invertory'}{0});
+    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-1", $main::config->{'system'}{'villager'}{'invertory'}{1});
+    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-result-empty", $main::config->{'system'}{'villager'}{'result'});
+    Minecraft::Screenshoter::take_screenshot("dont-delete-villager-clean", $main::config->{'system'}{'villager'}{'clean'});
+    $main::config = Minecraft::Automation::save_system_config($main::config);   
 }
 
 sub test_crafttable
@@ -119,11 +122,11 @@ sub test_crafttable
     {
         for my $x (0..2)
         {
-            Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'crafttable'}{$x}{$y});
+            Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'crafttable'}{$x}{$y});
             sleep(0.5);
         }
     }
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'crafttable'}{'result'});
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'crafttable'}{'result'});
     sleep(0.5);
 }
 
@@ -134,7 +137,7 @@ sub test_invertory
     {
         for my $x (0..8)
         {
-            Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'invertory'}{$x}{$y});
+            Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'invertory'}{$x}{$y});
             sleep(0.5);
         }
     }
@@ -143,12 +146,12 @@ sub test_invertory
 sub test_villager_interface
 {
     Minecraft::Automation::wait_any_key("Показываю интерфейс торговли. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки и верхней стрелки");
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'next_page'}); sleep(0.5);
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'prev_page'}); sleep(0.5);
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'invertory'}{0}); sleep(0.5);
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'invertory'}{1}); sleep(0.5);
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'result'}); sleep(0.5);
-    Minecraft::Automation::mouse_move_to_cell($config->{'system'}{'villager'}{'trade-avialable'}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'next_page'}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'prev_page'}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{0}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{1}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'result'}); sleep(0.5);
+    Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'trade-avialable'}); sleep(0.5);
 }
 
 sub train_view_item_invertory_and_crafttable
@@ -156,7 +159,7 @@ sub train_view_item_invertory_and_crafttable
     my ($item, $text) = @_[0..1];
     Minecraft::Automation::wait_any_key("Поместите $text ($item) в ячейку 0:0 инвертаря, откройте интерфейс крафта");
     train_view_item_xy($item, 'invertory', 8, 3);
-    Minecraft::Automation::put_stack_to_cell($config->{'system'}{'crafttable'}{0}{0});
+    Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'crafttable'}{0}{0});
     train_view_item_xy($item, 'crafttable', 2, 2);
 }
 
@@ -170,25 +173,25 @@ sub train_view_empty_invertory_and_crafttable
 sub train_view_item_xy
 {
     my ($item, $where, $max_x, $max_y) = @_[0..3];
-    mkdir(sprintf("%s/items/%s/", $config->{'user'}{'paths'}{'screenshosts'}, $item));
+    mkdir(sprintf("%s/items/%s/", $main::config->{'user'}{'paths'}{'screenshosts'}, $item));
     for my $y (0..$max_y)
     {
         for my $x (0..$max_x)
         {
             if($x>0 || $y>0)
             {
-                Minecraft::Automation::put_stack_to_cell($config->{'system'}{$where}{$x}{$y});
+                Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{$where}{$x}{$y});
             }
             Minecraft::Automation::mouse_hide_from_interface();
-            Minecraft::Screenshoter::take_item_screenshot($item, $where, $x, $y, $config->{'system'}{$where}{$x}{$y});
-            Minecraft::Automation::take_stack_from_cell($config->{'system'}{$where}{$x}{$y});
+            Minecraft::Screenshoter::take_item_screenshot($item, $where, $x, $y, $main::config->{'system'}{$where}{$x}{$y});
+            Minecraft::Automation::take_stack_from_cell($main::config->{'system'}{$where}{$x}{$y});
         }
     }
 }
 
 sub train_view_items
 {
-	mkdir(sprintf("%s/items/", $config->{'user'}{'paths'}{'screenshosts'}));
+	mkdir(sprintf("%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}));
 	train_view_item_invertory_and_crafttable('pumpkin', 'тыкву');
 	train_view_item_invertory_and_crafttable('carrot', 'морковь');
 	train_view_item_invertory_and_crafttable('potato', 'картофель');
@@ -202,13 +205,14 @@ sub train_view_items
 	train_view_item_invertory_and_crafttable('string', 'нить');
 	train_view_item_invertory_and_crafttable('emerald', 'изумруд');
 	train_view_empty_invertory_and_crafttable();
+	$main::config = Minecraft::Automation::save_system_config($main::config);
 }
 
-Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
-get_windowsizeposition();
-Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
-get_crafttable_cells();
-get_invertory_cells();
+# Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
+# get_windowsizeposition();
+# Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
+# get_crafttable_cells();
+# get_invertory_cells();
 train_view_items();
 test_crafttable();
 test_invertory();
@@ -219,5 +223,5 @@ test_villager_interface();
 
 
 
-$config = Minecraft::Automation::save_system_config($config);            
-#print Dumper($config);
+$main::config = Minecraft::Automation::save_system_config($main::config);            
+#print Dumper($main::config);

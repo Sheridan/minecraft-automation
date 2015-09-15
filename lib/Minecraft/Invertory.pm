@@ -6,8 +6,6 @@ use Data::Dumper;
 use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
-my $config = Minecraft::Automation::read_config();
-
 sub map_invertory
 {
     Minecraft::Automation::say("Картографирую инвертарь...");
@@ -53,8 +51,8 @@ sub what_item_at_coordinates
 {
     my ($where, $x, $y) = @_[0..2];
     my $dir_h = undef;
-    my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($config->{'system'}{$where}{$x}{$y});
-    my $items_dir = sprintf("%s/items/", $config->{'user'}{'paths'}{'screenshosts'});
+    my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{$where}{$x}{$y});
+    my $items_dir = sprintf("%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'});
     opendir($dir_h, $items_dir) or die $!;
     while (my $item = readdir($dir_h)) 
     {
@@ -100,8 +98,8 @@ sub put_stack_to_trader_invertory
 	my ($item, $trader_invertory, $invertory) = @_[0..2];
 	my $item_xy = take_first_item($item, $invertory);
 	$invertory->{$item_xy->{'x'}}{$item_xy->{'y'}} = 'empty';
-	Minecraft::Automation::move_stack_between_cells($config->{'system'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}}, 
-													$config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+	Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}}, 
+													$main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
 }
 
 sub dump_invertory

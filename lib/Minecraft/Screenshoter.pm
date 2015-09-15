@@ -7,24 +7,23 @@ use Digest::MD5::File qw(file_md5_base64);
 use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
-my $config = Minecraft::Automation::read_config();
 my $md5_cache = {};
 
 sub get_window_size_position
 {
-	my $cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Position | awk \'{print $2}\'', $config->{'user'}{'minecraft'}{'title'});
+	my $cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Position | awk \'{print $2}\'', $main::config->{'user'}{'minecraft'}{'title'});
 	my @pos = split(/,/, `$cmd`);
-	$cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Geometry | awk \'{print $2}\'', $config->{'user'}{'minecraft'}{'title'});
+	$cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Geometry | awk \'{print $2}\'', $main::config->{'user'}{'minecraft'}{'title'});
 	my @geo = split(/x/, `$cmd`);
-	$config->{'system'}{'window'}{'geometry'} = { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
-	$config = Minecraft::Automation::save_system_config($config);
-	return $config;
+	$main::config->{'system'}{'window'}{'geometry'} = { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
+	$main::config = Minecraft::Automation::save_system_config($main::config);
+	return $main::config;
 }
 
 sub screenshot_full_filename
 {
 	my $name = $_[0];
-	return sprintf("%s/%s.bmp", $config->{'user'}{'paths'}{'screenshosts'}, $name);
+	return sprintf("%s/%s.bmp", $main::config->{'user'}{'paths'}{'screenshosts'}, $name);
 }
 
 sub screenshot_item_name
@@ -39,10 +38,10 @@ sub take_screenshot
 	if($clean)
 	{
 		Minecraft::Automation::mouse_hide_from_interface();
-		sleep($config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
+		sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
 	}
 	system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s', 
-		$config->{'user'}{'minecraft'}{'title'}, 
+		$main::config->{'user'}{'minecraft'}{'title'}, 
 		$coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'}, 
 		$coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'}, 
 		$coordinates->{'tl'}{'x'},
@@ -92,9 +91,9 @@ sub take_temp_item_screenshot
 sub hand_is_empty
 {
 	my $interface = $_[0];
-	Minecraft::Automation::mouse_move_to_cell($config->{'system'}{$interface}{'clean'});
-	sleep($config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
-	my $ssname = take_screenshot('temporally', $config->{'system'}{$interface}{'clean'}, 0);
+	Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$interface}{'clean'});
+	sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
+	my $ssname = take_screenshot('temporally', $main::config->{'system'}{$interface}{'clean'}, 0);
 	return compare_screenshots($ssname, sprintf("dont-delete-%s-clean", $interface));
 }
 
