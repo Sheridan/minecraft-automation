@@ -7,7 +7,7 @@ use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
-my $main::config = Minecraft::Automation::read_config();
+$main::config = Minecraft::Automation::read_config();
 my $total_crafted = 0;
 my $craft = '';
 GetOptions(
@@ -65,9 +65,9 @@ _HELP_
 
 sub move_stack_from_craft_result
 {
-    Minecraft::Automation::take_stack_to_invertory($main::config->{'system'}{'crafttable'}{'result'});
-    $total_crafted++;
-    Minecraft::Automation::say("%d шт. готово.", $total_crafted);
+	Minecraft::Automation::take_stack_to_invertory($main::config->{'system'}{'crafttable'}{'result'});
+	$total_crafted++;
+	Minecraft::Automation::say("%d шт. готово.", $total_crafted);
 }
 
 sub craft_sea_lantern

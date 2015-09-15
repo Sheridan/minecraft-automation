@@ -9,7 +9,7 @@ use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
 use Minecraft::Invertory;
-my $main::config = Minecraft::Automation::read_config();
+$main::config = Minecraft::Automation::read_config();
 my $seller = '';
 my $buy = 'all';
 my $current_trader_page = 1;
@@ -48,11 +48,6 @@ _HELP_
 	exit(0);
 }
 
-# sub move_stack_from_trade_result
-# {
-    # Minecraft::Automation::take_stack_to_invertory($main::config->{'system'}{'villager'}{'result'});
-# }
-
 # ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
 sub switch_to_trader_page
 {
@@ -82,9 +77,9 @@ sub trader_can_sell
 
 sub trader_can_sell_on_page
 {
-    my $page = $_[0];
-    if(switch_to_trader_page($page))
-    {
+	my $page = $_[0];
+	if(switch_to_trader_page($page))
+	{
 		return trader_can_sell();
 	}
 	return 0;
@@ -118,16 +113,16 @@ sub trader_page_avialable
 
 sub wait_for_trader_upgrade
 {
-    my @pages_to_check = @_;
-    Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
-    system(sprintf('xdotool key e sleep %d click --delay %d 3 sleep %d',
+	my @pages_to_check = @_;
+	Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
+	system(sprintf('xdotool key e sleep %d click --delay %d 3 sleep %d',
 					$main::config->{'user'}{'timeouts'}{'villager_upgrade'},
 					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'},
 					$main::config->{'user'}{'timeouts'}{'trade_interface_open'}));
-    $page_avialable_cache = {};
-    $current_trader_page = 1;
-    if(scalar(@pages_to_check) > 0)
-    {
+	$page_avialable_cache = {};
+	$current_trader_page = 1;
+	if(scalar(@pages_to_check) > 0)
+	{
 		my $flag = 0;
 		Minecraft::Automation::say("Проверяем, проапгредился ли торговец...");
 		for my $page (@pages_to_check)
@@ -136,12 +131,11 @@ sub wait_for_trader_upgrade
 		}
 		return $flag > 0;
     }
-    return 1;
+	return 1;
 }
 sub take_to_invertory_or_drop
 {
 	my ($cell, $invertory) = @_[0..1];
-
 	if(Minecraft::Invertory::item_exists_in_invertory('empty', $invertory))
 	{
 		Minecraft::Automation::take_stack_to_invertory($cell);
