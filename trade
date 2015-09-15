@@ -32,13 +32,13 @@ sub help
 				Продаёт:  apple, cake
 			libraryan - Библиотекарь
 				Покупает: бумагу
-				Продаёт: compass,bookshelf,clock,glass
+				Продаёт: compass,bookshelf,clock,glass,name-tag
 			meater - Мясник
 				Покупает: сырую курицу, сырую свинину
 				Продаёт: cooked-porkchop,cooked-chicken
 			priest - Священник
 				Покупает: гнилую плоть
-				Продаёт: redstone,lapis_lazuli,eye_of_ender,glowstone,bottle_of_enchanting
+				Продаёт: redstone,lapis-lazuli,eye-of-ender,glowstone,bottle-of-enchanting
 		--buy=строка  Что можно купить (читайте что продают seller'ы выше)
 				Указывайте через запятую, без пробелов
 				Но есть еще две возможности: 
@@ -276,7 +276,7 @@ sub trade_farmer
 sub trade_libraryan
 {
     trade_with_seller(	{'paper' => 1},
-						filter_buy({'compass' => 4, 'bookshelf' => 5, 'clock' => 7, 'glass' => 8}));
+						filter_buy({'compass' => 4, 'bookshelf' => 5, 'clock' => 7, 'glass' => 8, 'name-tag' => 11}));
 }
 
 sub trade_priest
