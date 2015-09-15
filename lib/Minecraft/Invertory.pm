@@ -6,8 +6,20 @@ use Data::Dumper;
 use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
+my %target_items_to_find_in_invertory = ();
+
+sub prepare_target_items_to_find_in_invertory
+{
+	my $items_to_find = $_[0];
+	%target_items_to_find_in_invertory = %{$items_to_find};
+	$target_items_to_find_in_invertory{'empty'} = -1;
+	$target_items_to_find_in_invertory{'emerald'} = -1;
+}
+
 sub map_invertory
 {
+	my $items_to_find = $_[0];
+	prepare_target_items_to_find_in_invertory($items_to_find);
     Minecraft::Automation::say("Картографирую инвертарь...");
     my $invertory = {};
     for my $y (0..3)
@@ -57,7 +69,7 @@ sub what_item_at_coordinates
     while (my $item = readdir($dir_h)) 
     {
         next if ($item =~ m/^\./);
-        if(-d $items_dir.$item)
+        if(-d $items_dir.$item && exists($target_items_to_find_in_invertory{$item}))
         {
             if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $where, $x, $y), 
                                                                                                           $temp_item_screenshot))

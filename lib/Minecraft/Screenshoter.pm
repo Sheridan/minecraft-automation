@@ -35,9 +35,8 @@ sub screenshot_item_name
 sub take_screenshot
 { 
 	my ($filename, $coordinates, $clean) = @_[0..2];
-	if($clean)
+	if($clean && Minecraft::Automation::mouse_hide_from_interface())
 	{
-		Minecraft::Automation::mouse_hide_from_interface();
 		sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
 	}
 	system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s', 
@@ -52,8 +51,8 @@ sub take_screenshot
 
 sub take_temp_screenshot
 {
-	my $coordinates = $_[0];
-	return take_screenshot('temporally', $coordinates, 1);
+	my ($coordinates, $clean) = @_[0..1];
+	return take_screenshot('temporally', $coordinates, $clean);
 }
 
 sub convert_cell_to_item_coordinates

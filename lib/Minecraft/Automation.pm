@@ -7,6 +7,8 @@ use Data::Dumper;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
+my $mouse_is_hided_from_interface = 0;
+
 sub read_config
 {
     my $c = {
@@ -22,7 +24,8 @@ sub read_config
     
     if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
     if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'})) { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
-    if(!exists($c->{'user'}{'timeouts'}{'trade_interface_open'})) { $c->{'user'}{'timeouts'}{'trade_interface_open'} = 3; }
+    if(!exists($c->{'user'}{'timeouts'}{'trade_interface_open'})) { $c->{'user'}{'timeouts'}{'trade_interface_open'} = 1; }
+    if(!exists($c->{'user'}{'timeouts'}{'max_trade_interface_open'})) { $c->{'user'}{'timeouts'}{'max_trade_interface_open'} = 15; }
     if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'})) { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
     return $c;
 }
@@ -68,6 +71,7 @@ sub mouse_move_to_cell
 					$main::config->{'user'}{'minecraft'}{'title'}, 
 					$to->{'c'}{'x'}, 
 					$to->{'c'}{'y'}));
+	$mouse_is_hided_from_interface = 0;
 }
 
 sub mouse_move_to_button
@@ -77,7 +81,13 @@ sub mouse_move_to_button
 
 sub mouse_hide_from_interface
 {
-    mouse_move_to_cell($main::config->{'system'}{'no-interface'});
+	if(!$mouse_is_hided_from_interface)
+	{
+		mouse_move_to_cell($main::config->{'system'}{'no-interface'});
+		$mouse_is_hided_from_interface = 1;
+		return 0;
+	}
+	return 1;
 }
 
 sub mouse_left_click

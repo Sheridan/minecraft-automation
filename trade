@@ -72,7 +72,7 @@ sub switch_to_trader_page
 sub trader_can_sell
 {
     return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-trade-avialable', 
-														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0));
 }
 
 sub trader_can_sell_on_page
@@ -88,14 +88,14 @@ sub trader_can_sell_on_page
 sub trader_result_is_empty
 {
 	return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-result-empty', 
-														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}, 1));
 }
 
 sub trader_invertory_is_empty
 {
 	my $trader_invertory = $_[0];
 	return Minecraft::Screenshoter::compare_screenshots(sprintf('dont-delete-villager-invertory-%d', $trader_invertory), 
-														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}));
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, 1));
 }
 
 sub trader_page_avialable
@@ -105,20 +105,39 @@ sub trader_page_avialable
 	{
 		$page_avialable_cache->{$button_name}{$page} = 
 								!Minecraft::Screenshoter::compare_screenshots(sprintf("dont-delete-villager-%s-not-avialable", $button_name), 
-													Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}));
+													Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}, 1));
 	}
 	return $page_avialable_cache->{$button_name}{$page};
 }
+
+sub trade_interface_is_open
+{
+	return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-clean', 
+														Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'clean'}, 0)); 
+}
+
 # ---------------------------------------------  элементы торговли ----------------------------------
 
 sub wait_for_trader_upgrade
 {
 	my @pages_to_check = @_;
 	Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
-	system(sprintf('xdotool key e sleep %d click --delay %d 3 sleep %d',
+	system(sprintf('xdotool key e sleep %d click --delay %d 3',
 					$main::config->{'user'}{'timeouts'}{'villager_upgrade'},
-					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'},
-					$main::config->{'user'}{'timeouts'}{'trade_interface_open'}));
+					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+	my $attempt_check_open_interface = int(	$main::config->{'user'}{'timeouts'}{'max_trade_interface_open'}/
+											$main::config->{'user'}{'timeouts'}{'trade_interface_open'});
+	while(!trade_interface_is_open())
+	{
+		sleep($main::config->{'user'}{'timeouts'}{'trade_interface_open'});
+		$attempt_check_open_interface--;
+		if(!$attempt_check_open_interface)
+		{
+			Minecraft::Automation::say("Интерфейс торговли так и не открылся за %d секунд", int(	$main::config->{'user'}{'timeouts'}{'max_trade_interface_open'}/
+																									$main::config->{'user'}{'timeouts'}{'trade_interface_open'}));
+			exit(0);
+		}
+	}
 	$page_avialable_cache = {};
 	$current_trader_page = 1;
 	if(scalar(@pages_to_check) > 0)
@@ -214,7 +233,7 @@ sub buy_from_trader
 sub trade_with_seller
 {
 	my ($items_to_sell, $items_to_buy) = @_[0..1];
-	my $invertory = Minecraft::Invertory::map_invertory();
+	my $invertory = Minecraft::Invertory::map_invertory( $items_to_sell ); 
 	my $unchanged_invertory_dump = "";
 	my $trader_invertory = 0;
 		
