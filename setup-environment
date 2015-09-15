@@ -157,9 +157,9 @@ sub test_villager_interface
 sub train_view_item_invertory_and_crafttable
 {
     my ($item, $text) = @_[0..1];
-    Minecraft::Automation::wait_any_key("Поместите $text ($item) в ячейку 0:0 инвертаря, откройте интерфейс крафта");
+    Minecraft::Automation::wait_any_key("Поместите $text ($item) в ячейку 8:3 инвертаря (нижний правый угол), откройте интерфейс крафта");
     train_view_item_xy($item, 'invertory', 8, 3);
-    Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'crafttable'}{0}{0});
+    Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'crafttable'}{2}{2});
     train_view_item_xy($item, 'crafttable', 2, 2);
 }
 
@@ -174,15 +174,14 @@ sub train_view_item_xy
 {
     my ($item, $where, $max_x, $max_y) = @_[0..3];
     mkdir(sprintf("%s/items/%s/", $main::config->{'user'}{'paths'}{'screenshosts'}, $item));
-    for my $y (0..$max_y)
+    for my $y (reverse 0..$max_y)
     {
-        for my $x (0..$max_x)
+        for my $x (reverse 0..$max_x)
         {
-            if($x>0 || $y>0)
+            if($x<$max_x || $y<$max_y)
             {
                 Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{$where}{$x}{$y});
             }
-            Minecraft::Automation::mouse_hide_from_interface();
             Minecraft::Screenshoter::take_item_screenshot($item, $where, $x, $y, $main::config->{'system'}{$where}{$x}{$y});
             Minecraft::Automation::take_stack_from_cell($main::config->{'system'}{$where}{$x}{$y});
         }
@@ -208,11 +207,11 @@ sub train_view_items
 	$main::config = Minecraft::Automation::save_system_config($main::config);
 }
 
-# Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
-# get_windowsizeposition();
-# Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
-# get_crafttable_cells();
-# get_invertory_cells();
+Minecraft::Automation::say("Начинаем настройку. Следуйте рекомендациям тут.");
+get_windowsizeposition();
+Minecraft::Automation::say("Дальше надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
+get_crafttable_cells();
+get_invertory_cells();
 train_view_items();
 test_crafttable();
 test_invertory();

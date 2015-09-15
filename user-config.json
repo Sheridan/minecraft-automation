@@ -10,7 +10,7 @@
     },
     "timeouts":
     {
-		"between_mouse_hide_and_screenshot": 0.03,
+		"between_mouse_hide_and_screenshot": 0.3,
 		"villager_upgrade": 4,
 		"trade_interface_open": 2,
 		"mouse_click_ms": 80
