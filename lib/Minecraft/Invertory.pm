@@ -54,7 +54,7 @@ sub remap_empty_cells
 sub remap_empty_cell_in_invertory
 {
 	my $invertory = $_[0];
-	Minecraft::Automation::say("Проверяем пустоту в инвертаре...");
+	#Minecraft::Automation::say("Проверяем пустоту в инвертаре...");
 	remap_empty_cells($invertory, 0);
 	remap_empty_cells($invertory, 1);
 }
