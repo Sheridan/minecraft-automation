@@ -12,5 +12,5 @@ Automation vanilla minecraft by emulating user actions. Linux only.
 Установка:
   1. Склонируйте репозиторий
   2. Запустите setup-environment и следуйте указаниям
-  4. Используйте craft для крафта (на подходе торговля)
+  3. Используйте craft для крафта, trade для торговли
   
