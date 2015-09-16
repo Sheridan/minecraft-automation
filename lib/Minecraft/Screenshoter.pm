@@ -29,7 +29,7 @@ sub screenshot_full_filename
 sub screenshot_item_name
 {
 	my ($item, $where, $x, $y) = @_[0..3];
-	return sprintf("items/%s/%s-%d-%d", $item, $where, $x, $y);
+	return sprintf("items/%s/%s/%s-%d-%d", $main::config->{'user'}{'minecraft'}{'texture_pack'}, $item, $where, $x, $y);
 }
 
 sub take_screenshot

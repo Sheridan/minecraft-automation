@@ -57,7 +57,7 @@ sub say
     printf($format."\n", @variables);
 }
 
-sub wait_any_key
+sub wait_press_enter
 {
     my $text = $_[0];
     say($text.". Нажмите тут enter...");

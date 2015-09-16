@@ -125,7 +125,7 @@ sub dump_invertory
 		}
 		print "\n";
 	}
-	Minecraft::Automation::wait_any_key("Жду пока сверите инвертарь");
+	Minecraft::Automation::wait_press_enter("Жду пока сверите инвертарь");
 }
 
 1;
