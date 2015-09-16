@@ -57,13 +57,6 @@ sub say
     printf($format."\n", @variables);
 }
 
-sub wait_press_enter
-{
-    my $text = $_[0];
-    say($text.". Нажмите тут enter...");
-    <STDIN>;
-}
-
 sub mouse_move_to_cell
 {
     my $to = $_[0];
