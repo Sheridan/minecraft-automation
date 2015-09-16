@@ -59,8 +59,12 @@ sub help
 				0:0-2:3 - доски, 3:0-6:6 - булыжник, 
 				7:0-7:3 - красная пыль и 8:0-8:3 - железные слитки
 			hopper - Крафт воронки из железных слитков и брёвен
-				0:0-4:3 - железные слитки, 5:0-6:8 - брёвнау
-				
+				0:0-4:3 - железные слитки, 5:0-6:8 - брёвна
+			slab - Крафт плит
+				0:2-8:3 - исходники, из которых крафтятся плиты
+			decor - Крафт декоративных блоков, которые обычно крафтятся из плит одна над другой
+				0:2-8:3 - исходники, из которых крафтятся плиты
+				То есть для декоративного песчанника нужен обычный песчанник
 _HELP_
 	exit(0);
 }
@@ -449,6 +453,25 @@ sub craft_hopper
 	}
 }
 
+sub craft_slab
+{
+	craft_paper(2, 3);
+}
+
+sub craft_decor
+{
+	craft_slab();
+	for my $x (0..8)
+	{
+		for my $dy (0, 2)
+		{
+			Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'invertory'}{$x}{0+$dy}, $main::config->{'system'}{'crafttable'}{1}{1});
+			Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'invertory'}{$x}{1+$dy}, $main::config->{'system'}{'crafttable'}{1}{2});
+			move_stack_from_craft_result();
+		}
+	}
+}
+
 for ($craft)
 {
 	if		(/cube2x2/)      { craft_cube_2x2();          }
@@ -457,8 +480,10 @@ for ($craft)
 	elsif	(/tnt/) 		 { craft_tnt();               }
 	elsif	(/map/) 		 { craft_map();               }
 	elsif	(/book/) 		 { craft_book();              }
+	elsif	(/slab/) 		 { craft_slab();              }
 	elsif	(/paper/) 		 { craft_paper(0, 3);         }
 	elsif	(/chest/) 		 { craft_chest();             }
+	elsif	(/decor/) 		 { craft_decor();             }
 	elsif	(/piston/) 		 { craft_piston();            }
 	elsif	(/hopper/) 		 { craft_hopper();            }
 	elsif	(/jack_lantern/) { craft_jack_lantern();      }
