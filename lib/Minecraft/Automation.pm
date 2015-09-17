@@ -7,64 +7,24 @@ use Data::Dumper;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
-my $mouse_is_hided_from_interface = 0;
+my $last_mouse_coordinates = { 'c'=> {'x' => 0, 'y' => 0} };
 
-sub read_config
-{
-    my $c = {
-                'user'   => read_config_file('user-config.json'),
-                'system' => -e 'system-config.json' ? read_config_file('system-config.json') : {}
-            };
-    if(!exists($c->{'user'}{'paths'}{'temp'})) { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
-    if(!exists($c->{'user'}{'paths'}{'screenshosts'}))
-    {
-        say("Нет настройки пути сохранения снимков экрана для обратной связи в user-config.json");
-        
-    }
-    
-    if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
-    if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'})) { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
-    if(!exists($c->{'user'}{'timeouts'}{'trade_interface_open'})) { $c->{'user'}{'timeouts'}{'trade_interface_open'} = 1; }
-    if(!exists($c->{'user'}{'timeouts'}{'max_trade_interface_open'})) { $c->{'user'}{'timeouts'}{'max_trade_interface_open'} = 15; }
-    if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'})) { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
-    return $c;
-}
-
-sub read_config_file
-{
-    my $file_name = $_[0];
-    local $/;
-    open( my $fh, '<', $file_name );
-    my $json_text   = <$fh>;
-    my $perl_scalar = decode_json( $json_text );
-    close($fh);
-    return $perl_scalar;
-}
-
-sub save_system_config
-{
-    my $config = $_[0];
-    open( my $fh, '>', 'system-config.json' );
-    print {$fh} encode_json( $config->{'system'} );
-    close($fh);
-    return read_config();
-}
-
-sub say
-{
-    my $format = shift;
-    my @variables = @_;
-    printf($format."\n", @variables);
-}
 
 sub mouse_move_to_cell
 {
     my $to = $_[0];
-    system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
-					$main::config->{'user'}{'minecraft'}{'title'}, 
-					$to->{'c'}{'x'}, 
-					$to->{'c'}{'y'}));
-	$mouse_is_hided_from_interface = 0;
+    if($last_mouse_coordinates->{'c'}{'x'} != $to->{'c'}{'x'} ||
+	   $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
+	{
+		system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
+						$main::config->{'user'}{'minecraft'}{'title'}, 
+						$to->{'c'}{'x'}, 
+						$to->{'c'}{'y'}));
+		return 1;
+		$last_mouse_coordinates->{'c'}{'x'} = $to->{'c'}{'x'};
+		$last_mouse_coordinates->{'c'}{'y'} = $to->{'c'}{'y'};
+	}
+	return 0;
 }
 
 sub mouse_move_to_button
@@ -74,13 +34,7 @@ sub mouse_move_to_button
 
 sub mouse_hide_from_interface
 {
-	if(!$mouse_is_hided_from_interface)
-	{
-		mouse_move_to_cell($main::config->{'system'}{'no-interface'});
-		$mouse_is_hided_from_interface = 1;
-		return 0;
-	}
-	return 1;
+	return mouse_move_to_cell($main::config->{'system'}{'no-interface'});
 }
 
 sub mouse_left_click

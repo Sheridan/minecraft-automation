@@ -5,6 +5,13 @@ use warnings;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
+sub say
+{
+    my $format = shift;
+    my @variables = @_;
+    printf($format."\n", @variables);
+}
+
 sub wait_press_enter
 {
     my $text = $_[0];
@@ -27,3 +34,5 @@ sub prompt_yn
   my $answer = prompt("$query (Y/N): ");
   return lc($answer) eq 'y';
 }
+
+1;

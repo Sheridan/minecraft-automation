@@ -20,17 +20,17 @@ sub map_invertory
 {
 	my $items_to_find = $_[0];
 	prepare_target_items_to_find_in_invertory($items_to_find);
-    Minecraft::Automation::say("Картографирую инвертарь...");
+    Minecraft::UserInteraction::say("Картографирую инвертарь...");
     my $invertory = {};
     for my $y (0..3)
     {
-        Minecraft::Automation::say("Строка %d", $y);
+        Minecraft::UserInteraction::say("Строка %d", $y);
         for my $x (0..8)
         {
 			$invertory->{$x}{$y} = what_item_at_coordinates('invertory', $x, $y);
         }
     }
-    Minecraft::Automation::say("Инвертарь откартографирован.");
+    Minecraft::UserInteraction::say("Инвертарь откартографирован.");
     return $invertory;
 }
 
@@ -54,7 +54,7 @@ sub remap_empty_cells
 sub remap_empty_cell_in_invertory
 {
 	my $invertory = $_[0];
-	#Minecraft::Automation::say("Проверяем пустоту в инвертаре...");
+	#Minecraft::UserInteraction::say("Проверяем пустоту в инвертаре...");
 	remap_empty_cells($invertory, 0);
 	remap_empty_cells($invertory, 1);
 }
@@ -64,7 +64,7 @@ sub what_item_at_coordinates
     my ($where, $x, $y) = @_[0..2];
     my $dir_h = undef;
     my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{$where}{$x}{$y});
-    my $items_dir = sprintf("%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'});
+    my $items_dir = sprintf("%s/%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
     opendir($dir_h, $items_dir) or die $!;
     while (my $item = readdir($dir_h)) 
     {

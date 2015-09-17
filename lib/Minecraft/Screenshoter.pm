@@ -16,20 +16,18 @@ sub get_window_size_position
 	$cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Geometry | awk \'{print $2}\'', $main::config->{'user'}{'minecraft'}{'title'});
 	my @geo = split(/x/, `$cmd`);
 	$main::config->{'system'}{'window'}{'geometry'} = { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
-	$main::config = Minecraft::Automation::save_system_config($main::config);
-	return $main::config;
 }
 
 sub screenshot_full_filename
 {
 	my $name = $_[0];
-	return sprintf("%s/%s.bmp", $main::config->{'user'}{'paths'}{'screenshosts'}, $name);
+	return sprintf("%s/%s/%s.bmp", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'}, $name);
 }
 
 sub screenshot_item_name
 {
 	my ($item, $where, $x, $y) = @_[0..3];
-	return sprintf("items/%s/%s/%s-%d-%d", $main::config->{'user'}{'minecraft'}{'texture_pack'}, $item, $where, $x, $y);
+	return sprintf("items/%s/%s-%d-%d", $item, $where, $x, $y);
 }
 
 sub take_screenshot
@@ -108,13 +106,13 @@ sub get_md5
 	my $name = $_[0];
 	if($name eq 'temporally') 
 	{ 
-		#Minecraft::Automation::say("Считаю md5 от временного файла...");
+		#Minecraft::UserInteraction::say("Считаю md5 от временного файла...");
 		return file_md5_base64(screenshot_full_filename($name)); 
 	}
 	if(!exists($md5_cache->{$name}))
 	{
 		$md5_cache->{$name} = file_md5_base64(screenshot_full_filename($name));
-		#Minecraft::Automation::say("Новый хэш md5 в кэше: [%s:%s]", $name, $md5_cache->{$name});
+		#Minecraft::UserInteraction::say("Новый хэш md5 в кэше: [%s:%s]", $name, $md5_cache->{$name});
 	}
 	return $md5_cache->{$name};
 }

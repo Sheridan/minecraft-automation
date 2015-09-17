@@ -9,7 +9,9 @@ use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
 use Minecraft::Invertory;
-$main::config = Minecraft::Automation::read_config();
+use Minecraft::UserInteraction;
+use Minecraft::Settings;
+$main::config = Minecraft::Settings::read_config();
 my $seller = '';
 my $buy = 'all';
 my $target = 'sell';
@@ -150,7 +152,7 @@ sub trade_interface_is_open
 sub wait_for_trader_upgrade
 {
 	my $items_to_trade = $_[0];
-	Minecraft::Automation::say("Отдыхаем, пока торговец апгредится...");
+	Minecraft::UserInteraction::say("Отдыхаем, пока торговец апгредится...");
 	system(sprintf('xdotool key e sleep %d click --delay %d 3',
 					$main::config->{'user'}{'timeouts'}{'villager_upgrade'},
 					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
@@ -162,7 +164,7 @@ sub wait_for_trader_upgrade
 		$attempt_check_open_interface--;
 		if(!$attempt_check_open_interface)
 		{
-			Minecraft::Automation::say("Интерфейс торговли так и не открылся за %d секунд", int(	$main::config->{'user'}{'timeouts'}{'max_trade_interface_open'}/
+			Minecraft::UserInteraction::say("Интерфейс торговли так и не открылся за %d секунд", int(	$main::config->{'user'}{'timeouts'}{'max_trade_interface_open'}/
 																									$main::config->{'user'}{'timeouts'}{'trade_interface_open'}));
 			exit(0);
 		}
@@ -171,7 +173,7 @@ sub wait_for_trader_upgrade
 	$current_trader_page = 1;
 	if(defined($items_to_trade))
 	{
-		Minecraft::Automation::say("Проверяем, проапгредился ли торговец...");
+		Minecraft::UserInteraction::say("Проверяем, проапгредился ли торговец...");
 		return trader_can_trade_something($items_to_trade);
     }
 	return 1;
@@ -214,7 +216,7 @@ sub trade_item_with_trader
 				$done = 1;
 			}
 		}
-		Minecraft::Automation::say("Забираем обратно остатки");
+		Minecraft::UserInteraction::say("Забираем обратно остатки");
 		if(!trader_invertory_is_empty($trader_invertory))
 		{
 			take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
@@ -236,10 +238,10 @@ sub sell_to_trader
 	
 	for my $item_to_sell (keys(%{$items_to_sell}))
 	{
-		Minecraft::Automation::say("Продаём %s", $item_to_sell);
+		Minecraft::UserInteraction::say("Продаём %s", $item_to_sell);
 		if(trade_item_with_trader($item_to_sell, $items_to_sell->{$item_to_sell}, $trader_invertory, $invertory) && $target eq 'buy') 
 		{
-			Minecraft::Automation::say("Немного продали. Посмотрим, проапгредится ли продавец");
+			Minecraft::UserInteraction::say("Немного продали. Посмотрим, проапгредится ли продавец");
 			last;
 		}
 	}
@@ -249,7 +251,7 @@ sub sell_to_trader
 	{
 		Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
 		return sell_to_trader($items_to_sell, $trader_invertory, $invertory);
-	} else { Minecraft::Automation::say("Продавать больше нечего"); }
+	} else { Minecraft::UserInteraction::say("Продавать больше нечего"); }
 	return $unchanged_invertory_dump eq Dumper(%{$invertory}) && trader_can_trade_all($items_to_sell);
 }
 
@@ -259,10 +261,10 @@ sub buy_from_trader
 	my $unchanged_invertory_dump = Dumper(%{$invertory});
 	for my $item_to_buy (keys(%{$items_to_buy}))
 	{
-		Minecraft::Automation::say("Покупаем %s", $item_to_buy);
+		Minecraft::UserInteraction::say("Покупаем %s", $item_to_buy);
  		if(trade_item_with_trader('emerald', $items_to_buy->{$item_to_buy}, $trader_invertory, $invertory) && $target eq 'sell') 
 		{
-			Minecraft::Automation::say("Немного купили. Посмотрим, проапгредится ли продавец");
+			Minecraft::UserInteraction::say("Немного купили. Посмотрим, проапгредится ли продавец");
 			last;
 		}
 	}
@@ -273,7 +275,7 @@ sub buy_from_trader
 		Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
 		return buy_from_trader($items_to_buy, $trader_invertory, $invertory);
 	} 
-	else { Minecraft::Automation::say("Покупать больше нечего"); }
+	else { Minecraft::UserInteraction::say("Покупать больше нечего"); }
 	return $unchanged_invertory_dump eq Dumper(%{$invertory}) && trader_can_trade_all($items_to_buy);
 }
 
@@ -306,13 +308,13 @@ sub trade_with_trader
 			}
 			else
 			{
-				Minecraft::Automation::say("Вы неверно указали цель торговли. Читайте помощь.");
+				Minecraft::UserInteraction::say("Вы неверно указали цель торговли. Читайте помощь.");
 				help();
 			}
 		}
 	}
 	while($unchanged_invertory_dump ne Dumper(%{$invertory}) && wait_for_trader_upgrade());
-	Minecraft::Automation::say("Торговать больше нечем и не на что. Уходим.");
+	Minecraft::UserInteraction::say("Торговать больше нечем и не на что. Уходим.");
 }
 
 sub filter_sell
