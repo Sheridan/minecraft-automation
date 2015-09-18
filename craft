@@ -7,9 +7,9 @@ use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
-use Minecraft::Settings;
+use Minecraft::FileIO;
 use Minecraft::UserInteraction;
-$main::config = Minecraft::Settings::read_config();
+$main::config = Minecraft::FileIO::read_config();
 my $total_crafted = 0;
 my $craft = '';
 GetOptions(

@@ -10,7 +10,7 @@ use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
 use Minecraft::UserInteraction;
-use Minecraft::Settings;
+use Minecraft::FileIO;
 
 my $test_mouse_timeout = 0.1;
 my $test_turn_timeout = 0.7;
@@ -21,7 +21,7 @@ GetOptions(
     "help"     => \&help
     ) or die("Что то не так с опциями командной строки\n");
 
-$main::config = Minecraft::Settings::read_config();
+$main::config = Minecraft::FileIO::read_config();
 
 sub help
 {
@@ -106,7 +106,7 @@ sub ask_happened
     Minecraft::UserInteraction::say("Нет? Тогда надо повторить...");
     return 0;
   }
-  $main::config = Minecraft::Settings::save_system_config($main::config);   
+  $main::config = Minecraft::FileIO::save_system_config($main::config);   
   return 1;
 }
 
@@ -135,7 +135,7 @@ sub ask_texture_pack
 Если меняете ресурспак обратно - достаточно руками изменить его имя в user-config.json
 TTT
   $main::config->{'user'}{'minecraft'}{'texture_pack'} = prompt_ask($text, $main::config->{'user'}{'minecraft'}{'texture_pack'});
-  $main::config = Minecraft::Settings::save_user_config($main::config);
+  $main::config = Minecraft::FileIO::save_user_config($main::config);
   make_path(sprintf("%s/%s/items", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'}));
 }
 
@@ -146,7 +146,7 @@ sub ask_screenshot_path
 Введите путь.
 TTT
   $main::config->{'user'}{'paths'}{'screenshosts'} = prompt_ask($text, $main::config->{'user'}{'paths'}{'screenshosts'});
-  $main::config = Minecraft::Settings::save_user_config($main::config);
+  $main::config = Minecraft::FileIO::save_user_config($main::config);
   make_path($main::config->{'user'}{'paths'}{'screenshosts'});
 }
 
@@ -156,7 +156,7 @@ sub ask_mc_title
 Введите полностью заголовок окна майна. Не лаунчера!
 TTT
   $main::config->{'user'}{'minecraft'}{'title'} = prompt_ask($text, $main::config->{'user'}{'minecraft'}{'title'});
-  $main::config = Minecraft::Settings::save_user_config($main::config);
+  $main::config = Minecraft::FileIO::save_user_config($main::config);
 }
 
 sub prompt_change_existent
@@ -450,11 +450,11 @@ sub train_view_items
     next if ($chest_file =~ m/^\./);
     if(-f $chests_dir.$chest_file)
     {
-      train_view_items_chest(Minecraft::Settings::read_json_file($chests_dir.$chest_file));
+      train_view_items_chest(Minecraft::FileIO::read_json_file($chests_dir.$chest_file));
     }
   }
   closedir($dir_h);
-  $main::config = Minecraft::Settings::save_system_config($main::config);
+  $main::config = Minecraft::FileIO::save_system_config($main::config);
 }
 
 # -------------------------------------------------- тесты --------------------------------------------
@@ -634,7 +634,7 @@ sub run_setup
 Minecraft::UserInteraction::say("Начинаем настройку. Следуйте рекомендациям тут.");
 Minecraft::UserInteraction::say("Местами надо будет кликать по углам ячеек. Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно. Удобнее будет, если инвертарь будет пуст");
 run_setup($target);
-$main::config = Minecraft::Settings::save_system_config($main::config);            
+$main::config = Minecraft::FileIO::save_system_config($main::config);            
 Minecraft::UserInteraction::say("В user-config.json есть еще настройки таймаутов. При низких лагах можно их подкрутить в лучшую сторону.");
 Minecraft::UserInteraction::wait_press_enter("Настройка окончена. Обратите внимание на то, что при запуске скриптов раскладка должна быть включена английская.");
 

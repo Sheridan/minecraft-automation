@@ -1,4 +1,4 @@
-package Minecraft::Settings;
+package Minecraft::FileIO;
 
 use strict;
 use warnings;
