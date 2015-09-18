@@ -9,22 +9,65 @@ use Time::HiRes qw (sleep);
 
 my $last_mouse_coordinates = { 'c'=> {'x' => 0, 'y' => 0} };
 
+sub open_interface
+{
+  my ($name, $coordinates) = @_[0..1];
+  mouse_rigt_click();
+  my $attempt_check_open_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                         $main::config->{'user'}{'timeouts'}{'interface_open'}    );
+  while(!Minecraft::Screenshoter::interface_is_open($name, $coordinates))
+  {
+    sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
+    $attempt_check_open_interface--;
+    if(!$attempt_check_open_interface)
+    {
+      Minecraft::UserInteraction::say("Интерфейс так и не открылся за %d секунд", int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                                                                      $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
+      exit(0);
+    }
+  }
+}
+
+sub close_interface
+{
+  my ($name, $coordinates) = @_[0..1];
+  use_e();
+  my $attempt_check_close_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                          $main::config->{'user'}{'timeouts'}{'interface_open'}    );
+  while(Minecraft::Screenshoter::interface_is_open($name, $coordinates))
+  {
+    sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
+    $attempt_check_close_interface--;
+    if(!$attempt_check_close_interface)
+    {
+      Minecraft::UserInteraction::say("Интерфейс так и не закрылся за %d секунд", int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                                                                      $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
+      exit(0);
+    }
+  }
+}
+
+sub use_e
+{
+  system(sprintf('xdotool search --name "%s" windowactivate --sync key e', $main::config->{'user'}{'minecraft'}{'title'}));
+}
 
 sub mouse_move_to_cell
 {
     my $to = $_[0];
+    #print Dumper($to);
     if($last_mouse_coordinates->{'c'}{'x'} != $to->{'c'}{'x'} ||
-	   $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
-	{
-		system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
-						$main::config->{'user'}{'minecraft'}{'title'}, 
-						$to->{'c'}{'x'}, 
-						$to->{'c'}{'y'}));
-		return 1;
-		$last_mouse_coordinates->{'c'}{'x'} = $to->{'c'}{'x'};
-		$last_mouse_coordinates->{'c'}{'y'} = $to->{'c'}{'y'};
-	}
-	return 0;
+     $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
+  {
+    system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
+            $main::config->{'user'}{'minecraft'}{'title'}, 
+            $to->{'c'}{'x'}, 
+            $to->{'c'}{'y'}));
+    return 1;
+    $last_mouse_coordinates->{'c'}{'x'} = $to->{'c'}{'x'};
+    $last_mouse_coordinates->{'c'}{'y'} = $to->{'c'}{'y'};
+  }
+  return 0;
 }
 
 sub mouse_move_to_button
@@ -34,7 +77,7 @@ sub mouse_move_to_button
 
 sub mouse_hide_from_interface
 {
-	return mouse_move_to_cell($main::config->{'system'}{'no-interface'});
+  return mouse_move_to_cell($main::config->{'system'}{'no-interface'});
 }
 
 sub mouse_left_click
@@ -50,7 +93,62 @@ sub mouse_rigt_click
 sub mouse_shift_left_click
 {
     system(sprintf('xdotool keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1', 
-					$main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+                                                 $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+}
+
+sub turn_user
+{
+  my ($hor, $ver) = @_[0..1];
+  system(sprintf('xdotool mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor, $ver));
+  sleep($main::config->{'user'}{'timeouts'}{'after_turn'});
+}
+
+sub turn_user_horizontal_points
+{
+  my $hor = $_[0];
+  turn_user($hor, 0);
+}
+
+sub turn_user_vertical_points
+{
+  my $ver = $_[0];
+  turn_user(0, $ver);
+}
+
+sub turn_user_horizontal_deg
+{
+  my $hor = $_[0];
+  turn_user_horizontal_points(int($main::config->{'system'}{'turn'}{'horizontal'} * $hor));
+}
+
+sub turn_user_vertical_deg
+{
+  my $ver = $_[0];
+  turn_user_vertical_points(int($main::config->{'system'}{'turn'}{'vertical'} * $ver));
+}
+
+sub turn_user_up_deg
+{
+  my $value = $_[0];
+  turn_user_vertical_deg(0-$value);
+}
+
+sub turn_user_down_deg
+{
+  my $value = $_[0];
+  turn_user_vertical_deg($value);
+}
+
+sub turn_user_left_deg
+{
+  my $value = $_[0];
+  turn_user_horizontal_deg(0-$value);
+}
+
+sub turn_user_right_deg
+{
+  my $value = $_[0];
+  turn_user_horizontal_deg($value);
 }
 
 sub take_stack_from_cell

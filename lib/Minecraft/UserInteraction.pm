@@ -14,8 +14,9 @@ sub say
 
 sub wait_press_enter
 {
-    my $text = $_[0];
-    say($text.". Нажмите тут enter...");
+    my $format = shift;
+    my @variables = @_;
+    say($format.". Нажмите тут enter...", @variables);
     <STDIN>;
 }
 

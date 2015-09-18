@@ -1,0 +1,7 @@
+{
+ "0": { "0": "pumpkin"       , "1": "carrot"    , "2": "potato"        , "3": "wheat"           , "4": "block-melon"      , "5": "raw-chicken"       , "6": "raw-porkchop"      , "7": "rotten-flesh"    , "8": "coal"       },
+ "1": { "0": "paper"         , "1": "string"    , "2": "emerald"       , "3": "glass"           , "4": "gold-nugget"      , "5": "tripwire-hook"     , "6": "clock"             , "7": "compass"         , "8": "bow"        },
+ "2": { "0": "book"          , "1": "gold-ingot", "2": "redstone-torch", "3": "sand"            , "4": "stick"            , "5": "chest"             , "6": "nether-quartz"     , "7": "rabbit-hide"     , "8": "leather"    },
+ "3": { "0": "cobblestone"   , "1": "stone"     , "2": "redstone"      , "3": "torch"           , "4": "glowstone"        , "5": "gunpowder"         , "6": "prismarine-crystal", "7": "prismarine-shard", "8": "sugar-cane" }, "4": { "0": "iron-ingot"    , "1": "slimeball" , "2": "brick"         , "3": "nether-brick"    , "4": "stone-brick-block", "5": "nether-brick-block", "6": "brick-block"       , "7": "quartz-block"    , "8": "diamond" },
+ "5": { "0": "sandstone-slab", "1": "stone-slab", "2": "quartz-slab"   , "3": "stone-brick-slab", "4": "nether-brick-slab", "5": "cobblestone-slab"  , "6": "quartz-pillar"     , "7": "quartz-chiseled" , "8": "empty"      }
+}
