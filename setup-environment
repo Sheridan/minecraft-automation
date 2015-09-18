@@ -450,7 +450,8 @@ sub train_view_items
     next if ($chest_file =~ m/^\./);
     if(-f $chests_dir.$chest_file)
     {
-      train_view_items_chest(Minecraft::FileIO::read_json_file($chests_dir.$chest_file));
+      Minecraft::UserInteraction::say("Файл %s", $chest_file);
+      train_view_items_chest(Minecraft::FileIO::read_csv_file($chests_dir.$chest_file));
     }
   }
   closedir($dir_h);

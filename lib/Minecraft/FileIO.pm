@@ -32,11 +32,31 @@ sub read_json_file
 {
   my $file_name = $_[0];
   local $/;
-  open( my $fh, '<', $file_name );
-  my $json_text   = <$fh>;
-  my $perl_scalar = from_json($json_text, {utf8 => 1});
+  open( my $fh, '<', $file_name ) or die $!;
+  my $result = from_json(<$fh>, {utf8 => 1});
   close($fh);
-  return $perl_scalar;
+  return $result;
+}
+
+sub read_csv_file
+{
+  my $file_name = $_[0];
+  open(my $fh, '<', $file_name) or die $!;
+  my $row = 0;
+  my $result = {};
+  while (my $line = <$fh>) 
+  {
+    chomp $line;
+    my $column = 0;
+    for my $data (split(/,/, $line))
+    {
+      $result->{$column}{$row} = trim($data);
+      $column++;
+    }    
+    $row++;
+  }
+  close($fh);
+  return $result;
 }
 
 sub read_config_file
@@ -61,6 +81,13 @@ sub save_user_config
   print {$fh} to_json($config->{'user'}, {utf8 => 1, pretty => 1});
   close($fh);
   return read_config();
+}
+
+sub trim 
+{ 
+  my $s = shift; 
+  $s =~ s/^\s+|\s+$//g; 
+  return $s;
 }
 
 1;

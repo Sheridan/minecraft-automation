@@ -1,8 +1,0 @@
-{
-  "0": { "0": "dark-oak-wood"   , "1": "spruce-wood"         , "2": "jungle-wood" , "3": "oak-wood" , "4": "acacia-wood" , "5": "birch-wood"  },
-  "1": { "0": "dark-oak-plank"  , "1": "spruce-plank"        , "2": "jungle-plank", "3": "oak-plank", "4": "acacia-plank", "5": "birch-plank" },
-  "2": { "0": "dark-oak-slab"   , "1": "spruce-slab"         , "2": "jungle-slab" , "3": "oak-slab" , "4": "acacia-slab" , "5": "birch-slab"  },
-  "3": { "0": "end-stone"       , "1": "andesite"            , "2": "granite"     , "3": "diorite"  , "4": "wool"        , "5": "apple"       },
-  "4": { "0": "sandstone"       , "1": "red-sandstone"       , "2": "red-sand"                                                                },
-  "5": { "0": "smooth-sandstone", "1": "smooth-red-sandstone", "2": "red-sandstone-slab"                                                      }
-}
