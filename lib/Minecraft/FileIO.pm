@@ -14,15 +14,17 @@ sub read_config
         'user'   => read_config_file('config/user-config.json'),
         'system' => -e 'config/system-config.json' ? read_config_file('config/system-config.json') : {}
     };
-  if(!exists($c->{'user'}{'paths'}{'temp'})) { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
-  if(!exists($c->{'user'}{'paths'}{'screenshosts'})) { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }
-  if(!exists($c->{'user'}{'minecraft'}{'title'})) { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }
+  if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
+  if(!exists($c->{'user'}{'paths'}{'screenshosts'}))                         { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }
+  if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))                     { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
+  if(!exists($c->{'user'}{'minecraft'}{'title'}))                            { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }
   if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
-  if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'}))     { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
-  if(!exists($c->{'user'}{'timeouts'}{'trade_interface_open'}))   { $c->{'user'}{'timeouts'}{'trade_interface_open'} = 1; }
-  if(!exists($c->{'user'}{'timeouts'}{'max_trade_interface_open'})) { $c->{'user'}{'timeouts'}{'max_trade_interface_open'} = 15; }
-  if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'}))       { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
-  if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))      { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
+  if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'}))                  { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
+  if(!exists($c->{'user'}{'timeouts'}{'interface_open'}))                    { $c->{'user'}{'timeouts'}{'interface_open'} = 1; }
+  if(!exists($c->{'user'}{'timeouts'}{'max_interface_open'}))                { $c->{'user'}{'timeouts'}{'max_interface_open'} = 15; }
+  if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'}))                    { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
+  if(!exists($c->{'user'}{'timeouts'}{'after_turn'}))                        { $c->{'user'}{'timeouts'}{'after_turn'} = 0.5; }
+  
   return $c;
 }
 
