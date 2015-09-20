@@ -8,6 +8,27 @@ use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
 my $last_mouse_coordinates = { 'c'=> {'x' => 0, 'y' => 0} };
+# my $is_first_xdotool_call = 1;
+
+sub call_xdotool
+{
+  my $command = $_[0];
+  my $attempts = 10;
+  $command = sprintf('xdotool search --name "%s" windowactivate --sync %s > %s/xdotool-minecraft-automation.log 2>&1',
+                                    $main::config->{'user'}{'minecraft'}{'title'},
+                                    $command,
+                                    $main::config->{'user'}{'paths'}{'temp'});
+    # print $command."\n";
+  while(system($command) != 0 ||
+        -s sprintf('%s/xdotool-minecraft-automation.log', $main::config->{'user'}{'paths'}{'temp'}))
+  {
+    $attempts--;
+    if ($attempts == 0)
+    {
+      die("xdotool calling failed: $?");
+    }
+  }
+}
 
 sub open_interface
 {
@@ -49,7 +70,7 @@ sub close_interface
 
 sub use_e
 {
-  system(sprintf('xdotool search --name "%s" windowactivate --sync key e', $main::config->{'user'}{'minecraft'}{'title'}));
+  call_xdotool('key e');
 }
 
 sub mouse_move_to_cell
@@ -59,13 +80,12 @@ sub mouse_move_to_cell
     if($last_mouse_coordinates->{'c'}{'x'} != $to->{'c'}{'x'} ||
        $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
   {
-    system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
-            $main::config->{'user'}{'minecraft'}{'title'}, 
-            $to->{'c'}{'x'}, 
-            $to->{'c'}{'y'}));
-    return 1;
     $last_mouse_coordinates->{'c'}{'x'} = $to->{'c'}{'x'};
     $last_mouse_coordinates->{'c'}{'y'} = $to->{'c'}{'y'};
+    call_xdotool(sprintf('mousemove --window %%1 %d %d',
+            $to->{'c'}{'x'},
+            $to->{'c'}{'y'}));
+    return 1;
   }
   return 0;
 }
@@ -82,24 +102,24 @@ sub mouse_hide_from_interface
 
 sub mouse_left_click
 {
-    system(sprintf('xdotool click --delay %d 1', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+    call_xdotool(sprintf('click --delay %d 1', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_rigt_click
 {
-    system(sprintf('xdotool click --delay %d 3', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+    call_xdotool(sprintf('click --delay %d 3', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub mouse_shift_left_click
 {
-    system(sprintf('xdotool keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1', 
+    call_xdotool(sprintf('keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1',
                                                  $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
 sub turn_user
 {
   my ($hor, $ver) = @_[0..1];
-  system(sprintf('xdotool mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor, $ver));
+  call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor, $ver));
   sleep($main::config->{'user'}{'timeouts'}{'after_turn'});
 }
 
@@ -154,14 +174,14 @@ sub turn_user_right_deg
 sub take_stack_from_cell
 {
     my ($from_cell) = $_[0];
-    mouse_move_to_cell($from_cell); 
+    mouse_move_to_cell($from_cell);
     mouse_left_click();
 }
 
 sub take_half_stack_from_cell
 {
     my ($from_cell) = $_[0];
-    mouse_move_to_cell($from_cell); 
+    mouse_move_to_cell($from_cell);
     mouse_rigt_click();
 }
 
@@ -203,7 +223,7 @@ sub drop_item_from_cell
 sub take_stack_to_invertory
 {
     my ($from_cell) = $_[0];
-    mouse_move_to_cell($from_cell);  
+    mouse_move_to_cell($from_cell);
     mouse_shift_left_click();
 }
 

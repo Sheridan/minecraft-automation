@@ -16,11 +16,11 @@ sub wait_press_enter
 {
     my $format = shift;
     my @variables = @_;
-    say($format.". Нажмите тут enter...", @variables);
+    say($format."\nНажмите тут enter...", @variables);
     <STDIN>;
 }
 
-sub prompt 
+sub prompt
 {
   my $query = $_[0];
   local $| = 1;
@@ -29,7 +29,7 @@ sub prompt
   return $answer;
 }
 
-sub prompt_yn 
+sub prompt_yn
 {
   my $query = $_[0];
   my $answer = prompt("$query (Y/N): ");

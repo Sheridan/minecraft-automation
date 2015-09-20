@@ -1,3 +1,4 @@
 *.bmp
 temp
-system-config.json
+config/system-config.json
+config/user-config.json
