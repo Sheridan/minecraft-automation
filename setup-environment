@@ -403,8 +403,11 @@ sub train_view_item_xy
       my $attempts = 10;
       if(! -e sprintf("%s/%s-%d-%d.bmp", $items_path, $where, $x, $y))
       {
-        Minecraft::Automation::move_stack_between_cells($last_cell, $cells->{$x}{$y});
-        $last_cell = $cells->{$x}{$y};
+        if(!($x == $max_x && $y == $max_y))
+        {
+          Minecraft::Automation::move_stack_between_cells($last_cell, $cells->{$x}{$y});
+          $last_cell = $cells->{$x}{$y};
+        }
         do
         {
           Minecraft::Screenshoter::take_item_screenshot($item, $where, $x, $y, $cells->{$x}{$y});

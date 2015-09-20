@@ -1,0 +1,13 @@
+pumpkin    ,block-melon   ,carrot    ,potato   ,wheat         ,apple  ,raw-porkchop ,raw-chicken       ,rotten-flesh
+sugar-cane ,paper         ,book      ,string   ,wool          ,emerald,diamond      ,clock             ,compass
+gold-nugget,gold-ingot    ,iron-ingot,stick    ,bow           ,chest  ,torch        ,rabbit-hide       ,leather
+coal       ,redstone-torch,redstone  ,gunpowder,glowstone-dust,sugar  ,nether-quartz,prismarine-crystal,prismarine-shard
+slimeball  ,tripwire-hook ,empty     ,empty    ,glowstone     ,empty  ,empty        ,empty             ,empty
+empty      ,empty         ,empty     ,empty    ,empty         ,empty  ,empty        ,empty             ,empty
+
+                  ,          ,
+         ,    ,       ,glass           ,      
+          ,,sand                 ,chest             ,     ,
+cobblestone   ,stone               ,                 ,,
+   , ,brick         ,nether-brick    ,stone-brick-block,nether-brick-block,brick-block       ,quartz-block    ,
+sandstone-slab,stone-slab,quartz-slab   ,stone-brick-slab,nether-brick-slab,cobblestone-slab  ,quartz-pillar     ,quartz-chiseled ,empty

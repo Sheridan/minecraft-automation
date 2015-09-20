@@ -1,0 +1,6 @@
+sand            ,red-sand            ,stone     ,stone-brick-block,cobblestone     ,nether-brick      ,brick      ,glass     ,quartz-block
+sandstone       ,red-sandstone       ,stone-slab,stone-brick-slab ,cobblestone-slab,nether-brick-block,brick-block,glass-pane,quartz-chiseled
+smooth-sandstone,smooth-red-sandstone,empty     ,empty            ,empty           ,nether-brick-slab ,brick-slab ,empty     ,quartz-pillar
+sandstone-slab  ,red-sandstone-slab  ,empty     ,empty            ,empty           ,empty             ,empty      ,empty     ,quartz-slab
+empty           ,empty               ,empty     ,empty            ,empty           ,empty             ,empty      ,empty     ,empty
+end-stone       ,andesite            ,granite   ,diorite          ,empty           ,empty             ,empty      ,empty     ,empty
