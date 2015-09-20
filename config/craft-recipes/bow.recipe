@@ -1,0 +1,5 @@
+empty,stick,string
+stick,empty,string
+empty,stick,string
+result:1
+take:1

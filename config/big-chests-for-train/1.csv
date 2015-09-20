@@ -1,6 +1,6 @@
-dark-oak-wood   ,spruce-wood         ,jungle-wood           ,oak-wood ,acacia-wood ,birch-wood ,,,
-dark-oak-plank  ,spruce-plank        ,jungle-plank          ,oak-plank,acacia-plank,birch-plank,,,
-dark-oak-slab   ,spruce-slab         ,jungle-slab           ,oak-slab ,acacia-slab ,birch-slab ,,,
-end-stone       ,andesite            ,granite               ,diorite  ,wool        ,apple      ,,,
-sandstone       ,red-sandstone       ,red-sand              ,         ,            ,           ,,,
-smooth-sandstone,smooth-red-sandstone,red-sandstone-slab    ,         ,            ,           ,,,
+dark-oak-wood   ,spruce-wood         ,jungle-wood           ,oak-wood ,acacia-wood ,birch-wood ,empty,empty,empty
+dark-oak-plank  ,spruce-plank        ,jungle-plank          ,oak-plank,acacia-plank,birch-plank,empty,empty,empty
+dark-oak-slab   ,spruce-slab         ,jungle-slab           ,oak-slab ,acacia-slab ,birch-slab ,empty,empty,empty
+end-stone       ,andesite            ,granite               ,diorite  ,wool        ,apple      ,empty,empty,empty
+sandstone       ,red-sandstone       ,red-sand              ,empty    ,empty       ,empty      ,empty,empty,empty
+smooth-sandstone,smooth-red-sandstone,red-sandstone-slab    ,empty    ,empty       ,empty      ,empty,empty,empty

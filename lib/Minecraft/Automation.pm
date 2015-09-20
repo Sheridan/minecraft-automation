@@ -57,7 +57,7 @@ sub mouse_move_to_cell
     my $to = $_[0];
     #print Dumper($to);
     if($last_mouse_coordinates->{'c'}{'x'} != $to->{'c'}{'x'} ||
-     $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
+       $last_mouse_coordinates->{'c'}{'y'} != $to->{'c'}{'y'})
   {
     system(sprintf('xdotool search --name "%s" windowactivate --sync mousemove --window %%1 %d %d', 
             $main::config->{'user'}{'minecraft'}{'title'}, 

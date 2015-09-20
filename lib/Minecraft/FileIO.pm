@@ -47,15 +47,18 @@ sub read_csv_file
   while (my $line = <$fh>) 
   {
     chomp $line;
+    if(substr($line, 0, 1) eq '#') { next; }
     my $column = 0;
     for my $data (split(/,/, $line))
     {
       $result->{$column}{$row} = trim($data);
+      #print $data."\n";
       $column++;
     }    
     $row++;
   }
   close($fh);
+  #print Dumper($result);
   return $result;
 }
 
