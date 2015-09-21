@@ -18,7 +18,7 @@ sub call_xdotool
                                     $main::config->{'user'}{'minecraft'}{'title'},
                                     $command,
                                     $main::config->{'user'}{'paths'}{'temp'});
-    # print $command."\n";
+  #print $command."\n";
   while(system($command) != 0 ||
         -s sprintf('%s/xdotool-minecraft-automation.log', $main::config->{'user'}{'paths'}{'temp'}))
   {
@@ -32,11 +32,11 @@ sub call_xdotool
 
 sub open_interface
 {
-  my ($name, $coordinates) = @_[0..1];
+  my $name = $_[0];
   mouse_rigt_click();
   my $attempt_check_open_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
                                          $main::config->{'user'}{'timeouts'}{'interface_open'}    );
-  while(!Minecraft::Screenshoter::interface_is_open($name, $coordinates))
+  while(!Minecraft::Screenshoter::interface_is_open($name, $main::config->{'system'}{$name}{'is_open'}))
   {
     sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
     $attempt_check_open_interface--;
@@ -51,11 +51,11 @@ sub open_interface
 
 sub close_interface
 {
-  my ($name, $coordinates) = @_[0..1];
+  my $name = $_[0];
   use_e();
   my $attempt_check_close_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
                                           $main::config->{'user'}{'timeouts'}{'interface_open'}    );
-  while(Minecraft::Screenshoter::interface_is_open($name, $coordinates))
+  while(Minecraft::Screenshoter::interface_is_open($name, $main::config->{'system'}{$name}{'is_open'}))
   {
     sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
     $attempt_check_close_interface--;

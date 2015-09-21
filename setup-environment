@@ -293,7 +293,7 @@ sub get_big_chest_cells
 {
   Minecraft::UserInteraction::wait_press_enter("Откройте пустой большой сундук");
   print_cells_numbers(8,5);
-  if(prompt_change_existent(exists($main::config->{'system'}{'big_chest'}{'chest'})))
+  if(prompt_change_existent(exists($main::config->{'system'}{'big-chest'}{'chest'})))
   {
     my $params = calculate_cell_params( get_cell_coordinates("Ячейка 0:0 большого сундука"),
                                         get_cell_coordinates("Ячейка 1:0 большого сундука"),
@@ -302,14 +302,14 @@ sub get_big_chest_cells
     {
       for my $x (0..8)
       {
-        $main::config->{'system'}{'big_chest'}{'chest'}{$x}{$y} = calculate_cell($params, $x, $y);
+        $main::config->{'system'}{'big-chest'}{'chest'}{$x}{$y} = calculate_cell($params, $x, $y);
       }
     }
   }
-  $main::config->{'system'}{'big_chest'}{'is_open'} = get_cell_coordinates("Заголовок сундука ('Большой сундук')");
-  Minecraft::Screenshoter::take_screenshot("dont-delete-big-chest-is-open", $main::config->{'system'}{'big_chest'}{'is_open'});
+  $main::config->{'system'}{'big-chest'}{'is_open'} = get_cell_coordinates("Заголовок сундука ('Большой сундук')");
+  Minecraft::Screenshoter::take_screenshot("dont-delete-big-chest-is-open", $main::config->{'system'}{'big-chest'}{'is_open'});
   if(!ask_happened() || !test_big_chest()) { get_big_chest_cells(); }
-  get_invertory_cells("большой сундук", 'big_chest');
+  get_invertory_cells("большой сундук", 'big-chest');
 }
 
 sub get_villager_interface
@@ -322,6 +322,7 @@ sub get_villager_interface
     $main::config->{'system'}{'villager'}{'invertory'}{1} = get_cell_coordinates("Правая ячейка инвертаря крестьянина");
     $main::config->{'system'}{'villager'}{'result'} = get_cell_coordinates("Ячейка результата торговли крестьянина (справа которая)");
     $main::config->{'system'}{'villager'}{'clean'} = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую справа, под кнопкой перелистывания страницы вперед");
+    $main::config->{'system'}{'villager'}{'is_open'} = get_cell_coordinates("Половина заголовка инвертаря в режиме торговли ('Инвен').");
     Minecraft::UserInteraction::wait_press_enter("Теперь переключитесь на страницу торговли, где крестьянин еще может торговать (стрелки не перечеркнуты)");
     $main::config->{'system'}{'villager'}{'trade-avialable'} = get_cell_coordinates("Верхняя стрелка");
     Minecraft::UserInteraction::wait_press_enter("Теперь надо найти крестьянина минимум с тремя доступными страницами торговли (потребуется дважды жать на кнопки)");
@@ -344,6 +345,7 @@ sub get_villager_interface
     Minecraft::Screenshoter::take_screenshot(sprintf("dont-delete-villager-%s-not-avialable", $button_name), $main::config->{'system'}{'villager'}{$button_name});
   }
 
+  Minecraft::Screenshoter::take_screenshot("dont-delete-villager-is-open", $main::config->{'system'}{'villager'}{'is_open'});
   Minecraft::Screenshoter::take_screenshot("dont-delete-villager-trade-avialable", $main::config->{'system'}{'villager'}{'trade-avialable'});
   Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-0", $main::config->{'system'}{'villager'}{'invertory'}{0});
   Minecraft::Screenshoter::take_screenshot("dont-delete-villager-invertory-1", $main::config->{'system'}{'villager'}{'invertory'}{1});
@@ -376,18 +378,18 @@ sub train_view_item_invertory_and_crafttable
   {
     Minecraft::UserInteraction::say("Тренирую %s", $item);
     my $deg = 10;
-    Minecraft::Automation::move_stack_between_cells($chest_cell, $main::config->{'system'}{'big_chest'}{'invertory'}{8}{3});
-    Minecraft::Automation::close_interface('big-chest', $main::config->{'system'}{'big_chest'}{'is_open'});
+    Minecraft::Automation::move_stack_between_cells($chest_cell, $main::config->{'system'}{'big-chest'}{'invertory'}{8}{3});
+    Minecraft::Automation::close_interface('big-chest');
     Minecraft::Automation::turn_user_down_deg($deg);
-    Minecraft::Automation::open_interface('crafttable', $main::config->{'system'}{'crafttable'}{'is_open'});
+    Minecraft::Automation::open_interface('crafttable');
     train_view_item_xy($item, 'invertory', $main::config->{'system'}{'default'}{'invertory'}, 8, 3);
     Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'crafttable'}{2}{2});
     train_view_item_xy($item, 'crafttable', $main::config->{'system'}{'crafttable'}, 2, 2);
     Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'default'}{'invertory'}{8}{3});
-    Minecraft::Automation::close_interface('crafttable', $main::config->{'system'}{'crafttable'}{'is_open'});
+    Minecraft::Automation::close_interface('crafttable');
     Minecraft::Automation::turn_user_up_deg($deg);
-    Minecraft::Automation::open_interface('big-chest', $main::config->{'system'}{'big_chest'}{'is_open'});
-    Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'big_chest'}{'invertory'}{8}{3}, $chest_cell);
+    Minecraft::Automation::open_interface('big-chest');
+    Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'big-chest'}{'invertory'}{8}{3}, $chest_cell);
   }
 }
 
@@ -460,7 +462,7 @@ TEXT
     {
       if(exists($items->{$x}{$y}))
       {
-        train_view_item_invertory_and_crafttable($items->{$x}{$y}, $main::config->{'system'}{'big_chest'}{'chest'}{$x}{$y});
+        train_view_item_invertory_and_crafttable($items->{$x}{$y}, $main::config->{'system'}{'big-chest'}{'chest'}{$x}{$y});
       }
     }
   }
@@ -476,19 +478,11 @@ sub train_view_items
 Для этого надо в папке скриншотов удалить папку имя_текстурпака/items/
 TEXT
 );
-  my $dir_h = undef;
-  my $chests_dir = "config/big-chests-for-train/";
-  opendir($dir_h, $chests_dir) or die $!;
-  while (my $chest_file = readdir($dir_h))
+  for my $chest_file (Minecraft::FileIO::get_train_chests())
   {
-    next if ($chest_file =~ m/^\./);
-    if(-f $chests_dir.$chest_file)
-    {
       Minecraft::UserInteraction::say("Файл %s", $chest_file);
-      train_view_items_chest(Minecraft::FileIO::read_csv_file($chests_dir.$chest_file));
-    }
+      train_view_items_chest(Minecraft::FileIO::read_csv_file($chest_file));
   }
-  closedir($dir_h);
   $main::config = Minecraft::FileIO::save_system_config($main::config);
 }
 
@@ -531,7 +525,7 @@ sub test_big_chest
   {
     for my $x (0..8)
     {
-      Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'big_chest'}{'chest'}{$x}{$y});
+      Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'big-chest'}{'chest'}{$x}{$y});
       sleep($test_mouse_timeout);
     }
   }
@@ -665,6 +659,7 @@ sub run_setup
   }
 
 }
+
 Minecraft::UserInteraction::say(<<TEXT
 Начинаем настройку. Следуйте рекомендациям тут.
 Местами надо будет кликать по углам ячеек.

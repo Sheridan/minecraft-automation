@@ -31,6 +31,7 @@ sub map_invertory
         }
     }
     Minecraft::UserInteraction::say("Инвертарь откартографирован.");
+    # print Dumper ($invertory);
     return $invertory;
 }
 
@@ -63,15 +64,15 @@ sub what_item_at_coordinates
 {
     my ($where, $x, $y) = @_[0..2];
     my $dir_h = undef;
-    my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{$where}{$x}{$y});
+    my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{'default'}{$where}{$x}{$y});
     my $items_dir = sprintf("%s/%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
     opendir($dir_h, $items_dir) or die $!;
-    while (my $item = readdir($dir_h)) 
+    while (my $item = readdir($dir_h))
     {
         next if ($item =~ m/^\./);
         if(-d $items_dir.$item && exists($target_items_to_find_in_invertory{$item}))
         {
-            if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $where, $x, $y), 
+            if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $where, $x, $y),
                                                                                                           $temp_item_screenshot))
             {
                 closedir($dir_h);
@@ -110,8 +111,9 @@ sub put_stack_to_trader_invertory
   my ($item, $trader_invertory, $invertory) = @_[0..2];
   my $item_xy = take_first_item($item, $invertory);
   $invertory->{$item_xy->{'x'}}{$item_xy->{'y'}} = 'empty';
-  Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'default'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}}, 
-                          $main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+  #print Dumper($main::config->{'system'}{'default'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}});
+  Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'default'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}},
+                                                  $main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
 }
 
 sub dump_invertory

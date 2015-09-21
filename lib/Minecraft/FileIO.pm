@@ -4,37 +4,29 @@ use strict;
 use warnings;
 use JSON;
 use Data::Dumper;
+use File::Basename;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
-sub read_config
-{
-  my $c = 
-    {
-        'user'   => read_config_file('config/user-config.json'),
-        'system' => -e 'config/system-config.json' ? read_config_file('config/system-config.json') : {}
-    };
-  if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
-  if(!exists($c->{'user'}{'paths'}{'screenshosts'}))                         { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }
-  if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))                     { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
-  if(!exists($c->{'user'}{'minecraft'}{'title'}))                            { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }
-  if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
-  if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'}))                  { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
-  if(!exists($c->{'user'}{'timeouts'}{'interface_open'}))                    { $c->{'user'}{'timeouts'}{'interface_open'} = 1; }
-  if(!exists($c->{'user'}{'timeouts'}{'max_interface_open'}))                { $c->{'user'}{'timeouts'}{'max_interface_open'} = 15; }
-  if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'}))                    { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
-  if(!exists($c->{'user'}{'timeouts'}{'after_turn'}))                        { $c->{'user'}{'timeouts'}{'after_turn'} = 0.5; }
-  
-  return $c;
-}
-
-sub read_json_file
+sub read_trader_file
 {
   my $file_name = $_[0];
-  local $/;
-  open( my $fh, '<', $file_name ) or die $!;
-  my $result = from_json(<$fh>, {utf8 => 1});
+  open(my $fh, '<', $file_name) or die $!;
+  my $row = 0;
+  my $result = {'name' => basename($file_name, '.trader')};
+  while (my $line = <$fh>)
+  {
+    chomp $line;
+    if(substr($line, 0, 1) eq '#') { next; }
+    for my $data (split(/,/, $line))
+    {
+      my @page = split(/:/, trim($data));
+      $result->{$row>0?'buy':'sell'}{trim($page[0])} = trim($page[1]);
+    }
+    $row++;
+  }
   close($fh);
+  #print Dumper($result);
   return $result;
 }
 
@@ -44,7 +36,7 @@ sub read_csv_file
   open(my $fh, '<', $file_name) or die $!;
   my $row = 0;
   my $result = {};
-  while (my $line = <$fh>) 
+  while (my $line = <$fh>)
   {
     chomp $line;
     if(substr($line, 0, 1) eq '#') { next; }
@@ -54,11 +46,44 @@ sub read_csv_file
       $result->{$column}{$row} = trim($data);
       #print $data."\n";
       $column++;
-    }    
+    }
     $row++;
   }
   close($fh);
   #print Dumper($result);
+  return $result;
+}
+
+# ---------------------------------  списки файлов ---------------------------------
+
+sub get_files_list
+{
+  my ($path, $extention) = @_[0..1];
+  opendir(my $dir_h, $path) or die $!;
+  my @files = map { $path.$_} grep(/\.$extention$/, readdir($dir_h));
+  closedir($dir_h);
+  return @files;
+}
+
+sub get_train_chests
+{
+  return get_files_list('config/big-chests-for-train/', 'csv');
+}
+
+sub get_traders
+{
+  return get_files_list('config/traders/', 'trader');
+}
+
+# ---------------------------------  конфиг ---------------------------------
+
+sub read_json_file
+{
+  my $file_name = $_[0];
+  local $/;
+  open( my $fh, '<', $file_name ) or die $!;
+  my $result = from_json(<$fh>, {utf8 => 1});
+  close($fh);
   return $result;
 }
 
@@ -86,10 +111,33 @@ sub save_user_config
   return read_config();
 }
 
-sub trim 
-{ 
-  my $s = shift; 
-  $s =~ s/^\s+|\s+$//g; 
+sub read_config
+{
+  my $c =
+    {
+        'user'   => read_config_file('config/user-config.json'),
+        'system' => -e 'config/system-config.json' ? read_config_file('config/system-config.json') : {}
+    };
+  if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
+  if(!exists($c->{'user'}{'paths'}{'screenshosts'}))                         { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }
+  if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))                     { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
+  if(!exists($c->{'user'}{'minecraft'}{'title'}))                            { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }
+  if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
+  if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'}))                  { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
+  if(!exists($c->{'user'}{'timeouts'}{'interface_open'}))                    { $c->{'user'}{'timeouts'}{'interface_open'} = 1; }
+  if(!exists($c->{'user'}{'timeouts'}{'max_interface_open'}))                { $c->{'user'}{'timeouts'}{'max_interface_open'} = 15; }
+  if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'}))                    { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
+  if(!exists($c->{'user'}{'timeouts'}{'after_turn'}))                        { $c->{'user'}{'timeouts'}{'after_turn'} = 0.5; }
+  if(!exists($c->{'user'}{'timeouts'}{'villager_page_switch'}))              { $c->{'user'}{'timeouts'}{'villager_page_switch'} = 0.1; }
+
+  return $c;
+}
+
+# ---------------------------------  всякие мелочи ---------------------------------
+sub trim
+{
+  my $s = shift;
+  $s =~ s/^\s+|\s+$//g;
   return $s;
 }
 

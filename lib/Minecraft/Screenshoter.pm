@@ -3,7 +3,7 @@ package Minecraft::Screenshoter;
 use strict;
 use warnings;
 use Data::Dumper;
-use Digest::MD5::File qw(file_md5_base64); 
+use Digest::MD5::File qw(file_md5_base64);
 use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
@@ -31,16 +31,16 @@ sub screenshot_item_name
 }
 
 sub take_screenshot
-{ 
+{
   my ($filename, $coordinates, $clean) = @_[0..2];
   if($clean && Minecraft::Automation::mouse_hide_from_interface())
   {
     sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
   }
-  system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s', 
-    $main::config->{'user'}{'minecraft'}{'title'}, 
-    $coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'}, 
-    $coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'}, 
+  system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s',
+    $main::config->{'user'}{'minecraft'}{'title'},
+    $coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'},
+    $coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'},
     $coordinates->{'tl'}{'x'},
     $coordinates->{'tl'}{'y'},
     screenshot_full_filename($filename)));
@@ -59,12 +59,12 @@ sub convert_cell_to_item_coordinates
   my $dx = int(($coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'})/4);
   my $dy = int(($coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'})/3);
   return {
-      'tl' => 
+      'tl' =>
       {
         'x' => $coordinates->{'tl'}{'x'}+$dx,
         'y' => $coordinates->{'tl'}{'y'}+$dy
       },
-      'br' => 
+      'br' =>
       {
         'x' => $coordinates->{'br'}{'x'}-$dx,
         'y' => $coordinates->{'br'}{'y'}-$dy
@@ -110,10 +110,10 @@ sub compare_screenshots_no_cache
 sub get_md5
 {
   my $name = $_[0];
-  if($name eq 'temporally') 
-  { 
+  if($name eq 'temporally')
+  {
     #Minecraft::UserInteraction::say("Считаю md5 от временного файла...");
-    return file_md5_base64(screenshot_full_filename($name)); 
+    return file_md5_base64(screenshot_full_filename($name));
   }
   if(!exists($md5_cache->{$name}))
   {
