@@ -37,7 +37,7 @@ sub help
     items       Настройка распознавания шмота
     options     Настройка опций пользователя
     window      Настройка размеров и положения окна
-    turn        Настройка поворотов
+    turn        Настройка поворотов  
 
 _HELP_
   exit(0);
@@ -627,7 +627,8 @@ sub run_setup
   my $real_target = $_[0];
   for ($real_target)
   {
-    if     (/invertory/)    { get_invertory_cells('интерфейс стола крафта', 'default'); }
+    if     (/default-uc/)   { last; }
+    elsif  (/invertory/)    { get_invertory_cells('интерфейс стола крафта', 'default'); }
     elsif  (/crafttable/)   { get_crafttable_cells();                                   }
     elsif  (/villager/)     { get_villager_interface();                                 }
     elsif  (/items/)        { train_view_items();                                       }
@@ -668,7 +669,8 @@ Minecraft::UserInteraction::say(<<TEXT
 TEXT
 );
 run_setup($target);
-$main::config = Minecraft::FileIO::save_system_config($main::config);
+Minecraft::FileIO::save_system_config($main::config);
+Minecraft::FileIO::save_user_config($main::config);
 Minecraft::UserInteraction::wait_press_enter(<<TEXT
 В user-config.json есть еще настройки таймаутов. При низких лагах можно их подкрутить в лучшую сторону.
 Настройка окончена. Обратите внимание на то, что при запуске скриптов раскладка должна быть включена английская.

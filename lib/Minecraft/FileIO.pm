@@ -176,7 +176,7 @@ sub read_config
 {
   my $c =
     {
-        'user'   => read_config_file('config/user-config.json'),
+        'user'   => -e 'config/user-config.json'   ? read_config_file('config/user-config.json'  ) : {},
         'system' => -e 'config/system-config.json' ? read_config_file('config/system-config.json') : {}
     };
   if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
