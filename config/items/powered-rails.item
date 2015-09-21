@@ -1,4 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
 gold-ingot,empty   ,gold-ingot
 gold-ingot,stick   ,gold-ingot
 gold-ingot,redstone,gold-ingot
-6
+result:stack,6

@@ -1,5 +1,7 @@
+craftable:yes
+stackable:no
+craft-reciepts:1
 empty,stick,string
 stick,empty,string
 empty,stick,string
-result:1
-take:1
+result:one

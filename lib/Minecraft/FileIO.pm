@@ -8,6 +8,62 @@ use File::Basename;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
+sub read_item_file
+{
+  my $file_name = $_[0];
+  open(my $fh, '<', $file_name) or die $!;
+  my $result = {'name' => basename($file_name, '.item')};
+  my $is_reciept = 0;
+  my $reciept_number = 0;
+  my $crafttable_row = 0;
+  while (my $line = <$fh>)
+  {
+    chomp $line;
+    if(substr($line, 0, 1) eq '#') { next; }
+    if(!$is_reciept)
+    {
+      my @option = split(/:/, $line);
+      if($option[0] eq 'craft-reciepts')
+      {
+        $is_reciept = 1;
+      }
+      if($option[0] eq 'result')
+      {
+        $is_reciept = 1;
+        if($option[0] eq 'one')
+        {
+          $result->{'reciepts'}{$reciept_number}{'result'}{'units'} = 'one';
+        }
+        else
+        {
+          my @reciept_result = split(/,/, $option[1]);
+          $result->{'reciepts'}{$reciept_number}{'result'}{'units'} = 'stack';
+          $result->{'reciepts'}{$reciept_number}{'result'}{'quantity'} = $reciept_result[1];
+        }
+        $reciept_number++;
+        next;
+      }
+      $result->{$option[0]} = $option[1];
+    }
+    else
+    {
+      my @crafttable_items = split(/,/, $line);
+      for my $x (0..2)
+      {
+        $result->{'reciepts'}{$reciept_number}{'crafttable'}{$x}{$crafttable_row} = $crafttable_items[$x];
+      }
+      $crafttable_row++;
+      if($crafttable_row > 2)
+      {
+        $is_reciept = 0;
+        $crafttable_row = 0;
+      }
+    }
+  }
+  close($fh);
+  return $result;
+}
+
 sub read_trader_file
 {
   my $file_name = $_[0];
@@ -73,6 +129,11 @@ sub get_train_chests
 sub get_traders
 {
   return get_files_list('config/traders/', 'trader');
+}
+
+sub get_items
+{
+  return get_files_list('config/items/', 'item');
 }
 
 # ---------------------------------  конфиг ---------------------------------

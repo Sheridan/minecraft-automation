@@ -1,4 +1,8 @@
-empty,empty,empty
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty ,empty
 empty,string,string
 empty,string,string
-1
+result:stack,1

@@ -1,4 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
 stick,empty,stick
 stick,stick,stick
 stick,empty,stick
-3
+result:stack,3
