@@ -24,11 +24,12 @@ sub map_invertory
   my $invertory = {};
   for my $y (0..3)
   {
-    Minecraft::UserInteraction::say("Строка %d", $y);
     for my $x (0..8)
     {
-      $invertory->{$x}{$y} = what_item_at_coordinates('invertory', $x, $y);
+      $invertory->{$x}{$y} = what_item_at_coordinates('villager', 'self-invertory', $x, $y);
+      printf("[%s]", $invertory->{$x}{$y});
     }
+    print ("\n");
   }
   Minecraft::UserInteraction::say("Инвертарь откартографирован.");
   # print Dumper ($invertory);
@@ -44,7 +45,7 @@ sub remap_empty_cells
     {
       if($invertory->{$x}{$y} eq 'empty')
       {
-        my $item = what_item_at_coordinates('invertory', $x, $y);
+        my $item = what_item_at_coordinates('villager', 'self-invertory', $x, $y);
         if($item eq 'empty') { return; }
         $invertory->{$x}{$y} = $item;
       }
@@ -62,9 +63,9 @@ sub remap_empty_cell_in_invertory
 
 sub what_item_at_coordinates
 {
-  my ($where, $x, $y) = @_[0..2];
+  my ($interface, $cells, $x, $y) = @_[0..3];
   my $dir_h = undef;
-  my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{'default'}{$where}{$x}{$y});
+  my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{$interface}{$cells}{$x}{$y});
   my $items_dir = sprintf("%s/%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
   opendir($dir_h, $items_dir) or die $!;
   while (my $item = readdir($dir_h))
@@ -72,7 +73,7 @@ sub what_item_at_coordinates
     next if ($item =~ m/^\./);
     if(-d $items_dir.$item && exists($target_items_to_find_in_invertory{$item}))
     {
-      if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $where, $x, $y),
+      if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $interface, $cells, $x, $y),
                                                                                                     $temp_item_screenshot))
       {
         closedir($dir_h);
@@ -112,7 +113,7 @@ sub put_stack_to_trader_invertory
   my $item_xy = take_first_item($item, $invertory);
   $invertory->{$item_xy->{'x'}}{$item_xy->{'y'}} = 'empty';
   #print Dumper($main::config->{'system'}{'default'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}});
-  Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'default'}{'invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}},
+  Minecraft::Automation::move_stack_between_cells($main::config->{'system'}{'villager'}{'self-invertory'}{$item_xy->{'x'}}{$item_xy->{'y'}},
                                                   $main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
 }
 

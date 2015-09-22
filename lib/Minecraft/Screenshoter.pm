@@ -15,19 +15,30 @@ sub get_window_size_position
   my @pos = split(/,/, `$cmd`);
   $cmd = sprintf('xdotool search --name "%s" getwindowgeometry | grep Geometry | awk \'{print $2}\'', $main::config->{'user'}{'minecraft'}{'title'});
   my @geo = split(/x/, `$cmd`);
-  $main::config->{'system'}{'window'}{'geometry'} = { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
+  return { 'x' => $pos[0]+0, 'y' => $pos[1]+0, 'w' => $geo[0]+0, 'h' => $geo[1]+0 };
+}
+
+sub screenshots_path
+{
+  return sprintf("%s/%s", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
 }
 
 sub screenshot_full_filename
 {
   my $name = $_[0];
-  return sprintf("%s/%s/%s.bmp", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'}, $name);
+  return sprintf("%s/%s.bmp", screenshots_path(), $name);
+}
+
+sub screenshot_item_path
+{
+  my ($item, $interface, $cells) = @_[0..3];
+  return sprintf("items/%s/%s/%s", $item, $interface, $cells);
 }
 
 sub screenshot_item_name
 {
-  my ($item, $where, $x, $y) = @_[0..3];
-  return sprintf("items/%s/%s-%d-%d", $item, $where, $x, $y);
+  my ($item, $interface, $cells, $x, $y) = @_[0..4];
+  return sprintf("%s/%d-%d", screenshot_item_path($item, $interface, $cells), $x, $y);
 }
 
 sub take_screenshot
@@ -74,9 +85,8 @@ sub convert_cell_to_item_coordinates
 
 sub take_item_screenshot
 {
-  my ($item, $where, $x, $y, $coordinates) = @_[0..4];
-  my $filename = sprintf("items/%s/%s-%d-%d", $item, $where, $x, $y);
-  return take_screenshot($filename, convert_cell_to_item_coordinates($coordinates), 1);
+  my ($item, $interface, $cells, $x, $y) = @_[0..4];
+  return take_screenshot(screenshot_item_name($item, $interface, $cells, $x, $y), convert_cell_to_item_coordinates($main::config->{'system'}{$interface}{$cells}{$x}{$y}), 1);
 }
 
 sub take_temp_item_screenshot
@@ -98,13 +108,21 @@ sub compare_screenshots
 {
     my ($f0, $f1) = @_[0..1];
     #print sprintf("%s == %s : %s\n",file_md5_base64($f0), file_md5_base64($f1) ,file_md5_base64($f0) eq file_md5_base64($f1));
-    return get_md5($f0) eq get_md5($f1);
+    #return get_md5($f0) eq get_md5($f1);
+    system("cmp", "--silent", screenshot_full_filename($f0), screenshot_full_filename($f1));
+    if ($? == -1) { die "Не могу запустить cmp: $!\n"; }
+    elsif ($? & 127) { die sprintf("cmp издох с сигналом %d, %s\n", ($? & 127),  ($? & 128) ? 'с корой' : 'без коры') ; }
+    my $ret = $? >> 8;
+    if($ret == 2) { die "Проблема с cmp: $!\n"; }
+    # print $ret;
+    return $ret == 0;
 }
 
 sub compare_screenshots_no_cache
 {
   my ($f0, $f1) = @_[0..1];
-  return file_md5_base64(screenshot_full_filename($f0)) eq file_md5_base64(screenshot_full_filename($f1));
+  return compare_screenshots($f0, $f1);
+  #return file_md5_base64(screenshot_full_filename($f0)) eq file_md5_base64(screenshot_full_filename($f1));
 }
 
 sub get_md5

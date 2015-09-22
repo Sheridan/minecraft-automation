@@ -10,6 +10,7 @@ use Time::HiRes qw (sleep);
 my $last_mouse_coordinates = { 'c'=> {'x' => 0, 'y' => 0} };
 # my $is_first_xdotool_call = 1;
 
+
 sub call_xdotool
 {
   my $command = $_[0];
@@ -28,6 +29,15 @@ sub call_xdotool
       die("xdotool calling failed: $?");
     }
   }
+}
+
+sub restore_window
+{
+  call_xdotool(sprintf('windowsize --sync %d %d windowmove --sync %d %d',
+    $main::config->{'system'}{'window'}{'geometry'}{'w'},
+    $main::config->{'system'}{'window'}{'geometry'}{'h'},
+    $main::config->{'system'}{'window'}{'geometry'}{'x'},
+    $main::config->{'system'}{'window'}{'geometry'}{'y'}));
 }
 
 sub open_interface
@@ -70,7 +80,7 @@ sub close_interface
 
 sub use_e
 {
-  call_xdotool('key e');
+  call_xdotool('type e');
 }
 
 sub mouse_move_to_cell
@@ -119,7 +129,10 @@ sub mouse_shift_left_click
 sub turn_user
 {
   my ($hor, $ver) = @_[0..1];
-  call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor, $ver));
+  for (0..7)
+  {
+    call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor/7, $ver/7));
+  }
   sleep($main::config->{'user'}{'timeouts'}{'after_turn'});
 }
 
