@@ -8,6 +8,7 @@ use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
 my $last_mouse_coordinates = { 'c'=> {'x' => 0, 'y' => 0} };
+my $turn_steps = 7;
 # my $is_first_xdotool_call = 1;
 
 
@@ -129,9 +130,13 @@ sub mouse_shift_left_click
 sub turn_user
 {
   my ($hor, $ver) = @_[0..1];
-  for (0..7)
+  if(($hor != 0 && abs($hor) <= $turn_steps) || ($ver != 0 && abs($ver) <= $turn_steps))
   {
-    call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor/7, $ver/7));
+    call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor, $ver));
+  }
+  for (0..$turn_steps)
+  {
+    call_xdotool(sprintf('mousemove_relative --sync %s %d %d', $hor < 0 || $ver < 0 ? "--" : "", $hor/$turn_steps, $ver/$turn_steps));
   }
   sleep($main::config->{'user'}{'timeouts'}{'after_turn'});
 }

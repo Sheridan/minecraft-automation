@@ -48,7 +48,7 @@ sub take_screenshot
   {
     sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
   }
-  system(sprintf('import -silent -window "%s" -crop %dx%d+%d+%d %s',
+  system(sprintf('import -silent -compress None -window "%s" -crop %dx%d+%d+%d %s',
     $main::config->{'user'}{'minecraft'}{'title'},
     $coordinates->{'br'}{'x'} - $coordinates->{'tl'}{'x'},
     $coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'},
