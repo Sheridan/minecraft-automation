@@ -39,7 +39,7 @@ sub add_items_to_items_to_find
   my ($self, $items_to_find) = @_[0..1];
   for my $item_to_find (keys(%{$items_to_find}))
   {
-    add_item_to_items_to_find($self, $item_to_find);
+    $self->add_item_to_items_to_find($item_to_find);
   }
 }
 
@@ -55,7 +55,7 @@ sub delete_items_from_items_to_find
   my ($self, $items_to_find) = @_[0..1];
   for my $item_to_find (keys(%{$items_to_find}))
   {
-    delete_item_from_items_to_find($self, $item_to_find);
+    $self->delete_item_from_items_to_find($item_to_find);
   }
 }
 
@@ -75,26 +75,48 @@ sub add_item_to_data
 
 sub remove_item_from_data
 {
-  my ($self, $item, $x, $y) = @_[0..3];
+  my ($self, $x, $y) = @_[0..2];
+  $self->{'items-count'}{$self->{'data'}{$x}{$y}}--;
   $self->{'data'}{$x}{$y} = 'empty';
-  $self->{'items-count'}{$item}--;
 }
+
+sub empty_count
+{
+  my ($self) = $_[0];
+  return $self->items_count('empty');
+}
+
+sub items_count
+{
+  my ($self, $item) = @_[0..1];
+  if($item eq 'any-plank')
+  {
+    return $self->items_count('dark-oak-plank') +
+           $self->items_count('spruce-plank') +
+           $self->items_count('jungle-plank') +
+           $self->items_count('oak-plank') +
+           $self->items_count('acacia-plank') +
+           $self->items_count('birch-plank');
+  }
+  return exists($self->{'items-count'}{$item}) ? $self->{'items-count'}{$item} : 0;
+}
+
 
 sub map_cells
 {
   my $self = $_[0];
-  Minecraft::UserInteraction::say("Картографирую инвертарь...");
+  #Minecraft::UserInteraction::say("Картографирую %s:%s...", $self->{'interface'}, $self->{'interface_target'});
+  delete($self->{'items-count'});
   for my $y (0..$self->{'dimension'}{'y'})
   {
     for my $x (0..$self->{'dimension'}{'x'})
     {
-      my $item = what_item_at_coordinates($self, $x, $y);
-      add_item_to_data($self, $item, $x, $y);
-      printf("[%s]", $self->{'data'}{$x}{$y});
+      my $item = $self->what_item_at_coordinates($x, $y);
+      $self->add_item_to_data($item, $x, $y);
+      #printf("[%s]", $item);
     }
-    print ("\n");
+    #print ("\n");
   }
-  Minecraft::UserInteraction::say("Инвертарь откартографирован.");
 }
 
 sub remap_empty_cells
@@ -106,20 +128,22 @@ sub remap_empty_cells
     {
       if($self->{'data'}{$x}{$y} eq 'empty')
       {
-        my $item = what_item_at_coordinates($self, $x, $y);
+        my $item = $self->what_item_at_coordinates($x, $y);
         if($item eq 'empty') { return; }
-        add_item_to_data($self, $item, $x, $y);
+        $self->add_item_to_data($item, $x, $y);
+        #printf("[%s]", $item);
       }
     }
   }
 }
 
-sub remap_empty_cell_in_invertory
+sub remap
 {
   my $self = $_[0];
   #Minecraft::UserInteraction::say("Проверяем пустоту в инвертаре...");
-  remap_empty_cells($self, 0);
-  remap_empty_cells($self, 1);
+  $self->remap_empty_cells(0);
+  $self->remap_empty_cells(1);
+  #print ("\n");
 }
 
 sub what_item_at_coordinates
@@ -132,7 +156,13 @@ sub what_item_at_coordinates
   while (my $item = readdir($dir_h))
   {
     next if ($item =~ m/^\./);
-    if(-d $items_dir.$item && (exists($self->{'items_to_find'}{$item}) || scalar(keys(%{$self->{'items_to_find'}})) == 1))
+    if(
+        -d $items_dir.$item && 
+        (
+          (exists($self->{'items_to_find'}{$item}) || scalar(keys(%{$self->{'items_to_find'}})) == 1) ||
+          (exists($self->{'items_to_find'}{'any-plank'}) && $item=~/plank/)
+        )
+      )
     {
       if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $self->{'interface'}, $self->{'interface_target'}, $x, $y),
                                                                                                     $temp_item_screenshot))
@@ -153,7 +183,10 @@ sub get_first_item_coordinates
   {
     for my $x (0..$self->{'dimension'}{'x'})
     {
-      if($self->{'data'}{$x}{$y} eq $item)
+      if(
+          ($self->{'data'}{$x}{$y} eq $item) || 
+          ($item eq 'any-plank' && $self->{'data'}{$x}{$y} =~ /plank/)
+        )
       {
         return {'x' => $x, 'y' => $y};
       }
@@ -165,14 +198,14 @@ sub get_first_item_coordinates
 sub item_exists
 {
   my ($self, $item) = @_[0..1];
-  return get_first_item_coordinates($self, $item)->{'x'} != -1;
+  return $self->get_first_item_coordinates($item)->{'x'} != -1;
 }
 
 sub take_item
 {
   my ($self, $item) = @_[0..1];
-  my $coordinates = get_first_item_coordinates($self, $item);
-  remove_item_from_data($self, $item, $coordinates->{'x'}, $coordinates->{'y'});
+  my $coordinates = $self->get_first_item_coordinates($item);
+  $self->remove_item_from_data($coordinates->{'x'}, $coordinates->{'y'});
   Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
   Minecraft::Automation::mouse_left_click();
 }

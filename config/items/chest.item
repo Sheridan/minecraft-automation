@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+any-plank,any-plank,any-plank
+any-plank,empty    ,any-plank
+any-plank,any-plank,any-plank
+result:stack,1

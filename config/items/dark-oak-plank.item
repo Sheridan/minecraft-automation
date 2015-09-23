@@ -2,7 +2,7 @@ craftable:yes
 stackable:yes
 ietms-in-stack:64
 craft-reciepts:1
-empty,empty    ,empty
-empty,any-plank,empty
-empty,any-plank,empty
+empty,empty        ,empty
+empty,dark-oak-wood,empty
+empty,empty        ,empty
 result:stack,4

@@ -60,13 +60,13 @@ sub read_item_file
         $result->{'reciepts'}{$reciept_number}{'crafttable'}{$x}{$crafttable_row} = $crafttable_item;
         if($crafttable_item ne 'empty')
         {
-          if(exists($result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item}))
+          if(exists($result->{'reciepts'}{$reciept_number}{'ingridients'}{$crafttable_item}))
           {
-            $result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item}++;
+            $result->{'reciepts'}{$reciept_number}{'ingridients'}{$crafttable_item}++;
           }
           else
           {
-            $result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item} = 1;
+            $result->{'reciepts'}{$reciept_number}{'ingridients'}{$crafttable_item} = 1;
           }
         }
       }

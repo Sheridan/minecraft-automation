@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+my @woods = qw(dark-oak-wood spruce-wood jungle-wood oak-wood acacia-wood birch-wood);
+#print Dumper @woods;
+
+open( my $fh, '>', 'any-plank.item' );
+print  {$fh} ("craftable:yes\n");
+print  {$fh} ("stackable:yes\n");
+print  {$fh} ("ietms-in-stack:64\n");
+printf {$fh} ("craft-reciepts:%d\n", scalar(@woods));
+for my $wood (@woods)
+{
+    printf {$fh} ("empty,empty,empty\nempty,%s,empty\nempty,empty,empty\n", $wood);
+    print  {$fh} ("result:stack,4\n");
+}
+
+
+close($fh);

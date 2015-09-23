@@ -11,12 +11,12 @@ use Minecraft::FileIO;
 use Minecraft::UserInteraction;
 use Minecraft::Screenshoter;
 use Minecraft::ItemsReader;
+use Minecraft::Interfaces::Crafttable;
 $main::config = Minecraft::FileIO::read_config();
-my $total_crafted = 0;
 my $target_item = '';
 my $reciepts = {};
 my $self_invertory = Minecraft::ItemsReader->new('crafttable', 'self-invertory');
-my $crafttable = Minecraft::ItemsReader->new('crafttable', 'cells');
+my $crafttable = Minecraft::Interfaces::Crafttable->new();
 GetOptions(
     "craft=s" => \$target_item,
     "help"    => \&help
@@ -39,9 +39,9 @@ _HELP_
     {
       printf("\t\t\tРецепт %d: ", $reciept_number+1);
       my @data = ();
-      for my $reciept_item (keys(%{$reciept->{'reciepts'}{$reciept_number}{'used-items'}}))
+      for my $reciept_item (keys(%{$reciept->{'reciepts'}{$reciept_number}{'ingridients'}}))
       {
-        push(@data, sprintf("%s:%d", $reciept_item, $reciept->{'reciepts'}{$reciept_number}{'used-items'}{$reciept_item}));
+        push(@data, sprintf("%s:%d", $reciept_item, $reciept->{'reciepts'}{$reciept_number}{'ingridients'}{$reciept_item}));
       }
       printf("%s\n", join(',', @data));
     }
@@ -50,13 +50,8 @@ _HELP_
   exit(0);
 }
 
-# sub move_stack_from_craft_result
-# {
-#   Minecraft::Automation::take_stack_to_invertory($main::config->{'system'}{'crafttable'}{'result'});
-#   $total_crafted++;
-#   Minecraft::UserInteraction::say("%d шт. готово.", $total_crafted);
-# }
-#
+
+
 # for my $reciept_file (Minecraft::FileIO::get_items())
 # {
 #   print Dumper (Minecraft::FileIO::read_item_file($reciept_file))
@@ -69,11 +64,11 @@ sub load_reciept
     $reciepts->{$item} = Minecraft::FileIO::read_item($item);
     for my $reciept_number (keys(%{$reciepts->{$item}{'reciepts'}}))
     {
-      for my $reciept_item (keys(%{$reciepts->{$item}{'reciepts'}{$reciept_number}{'used-items'}}))
+      for my $ingridient (keys(%{$reciepts->{$item}{'reciepts'}{$reciept_number}{'ingridients'}}))
       {
-        load_reciept($reciept_item);
-        $self_invertory->add_item_to_items_to_find($reciept_item);
-        $crafttable->add_item_to_items_to_find($reciept_item);
+        load_reciept($ingridient);
+        $self_invertory->add_item_to_items_to_find($ingridient);
+        $crafttable->add_item_to_items_to_find($ingridient);
       }
     }
     return 1;
@@ -81,12 +76,101 @@ sub load_reciept
   return 0;
 }
 
+sub self_invertory_has_ingridients
+{
+  my ($item_to_craft, $reciept_number) = @_[0..1];
+  for my $ingridient (keys(%{$reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}}))
+  {
+    if($self_invertory->items_count($ingridient) < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}{$ingridient})
+    {
+      Minecraft::UserInteraction::say("Материалы для %s закончились", $item_to_craft);
+      return 0;
+    }
+  }
+  return 1;
+}
+
+sub self_invertory_has_cells_for_result
+{
+  my ($item_to_craft, $reciept_number) = @_[0..1];
+  my $total_ingridients_count = 0;
+  for my $ingridient (keys(%{$reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}}))
+  {
+    $total_ingridients_count += $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}{$ingridient};
+  }
+  if($self_invertory->empty_count() < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count)
+  {
+    Minecraft::UserInteraction::say("Место в инвентаре при крафте %s закончилось. Не хватило %d ячеек.", 
+                      $item_to_craft,
+                      $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count-$self_invertory->empty_count());
+    return 0;
+  }
+  return 1;
+}
+
+sub craft
+{
+  my ($item_to_craft, $reciept_number) = @_[0..1];
+  
+  if(self_invertory_has_ingridients($item_to_craft, $reciept_number))
+  {
+    Minecraft::UserInteraction::say("Крафт %s", $item_to_craft);
+    for my $crafttable_y (0..2)
+    {
+      for my $crafttable_x (0..2)
+      {
+        my $current_ingridient = $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'crafttable'}{$crafttable_x}{$crafttable_y};
+        if($current_ingridient ne 'empty')
+        {
+          $self_invertory->take_item($current_ingridient);
+          $crafttable->put_item($current_ingridient, $crafttable_x, $crafttable_y);
+        }
+      }
+    }
+    $crafttable->take_all_craft_result();
+    $self_invertory->remap();
+    if($item_to_craft eq $target_item)
+    {
+      craft($item_to_craft, $reciept_number);
+    }
+    return 1;
+  }
+  else
+  {
+    for my $ingridient (keys(%{$reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}}))
+    {
+      if(exists($reciepts->{$ingridient}))
+      {
+        for my $ingridient_reciept_number (keys(%{$reciepts->{$ingridient}{'reciepts'}}))
+        {
+          if(craft($ingridient, $ingridient_reciept_number) && craft($item_to_craft, $reciept_number))
+          {
+            return 1;
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 if(load_reciept($target_item))
 {
   Minecraft::Automation::restore_window();
-  print Dumper($reciepts);
   $self_invertory->map_cells();
-  print Dumper($self_invertory);
+  $self_invertory->dump();
+  for my $reciept_number (keys(%{$reciepts->{$target_item}{'reciepts'}}))
+  {
+    craft($target_item, $reciept_number);
+  }
+  # Minecraft::UserInteraction::say("Материалы закончились, готово.");
+  #print Dumper($reciepts);
+  #print Dumper($self_invertory);
+  # print Dumper($crafttable);
+}
+else
+{
+  help();
 }
 
 # Minecraft::Automation::restore_window();
