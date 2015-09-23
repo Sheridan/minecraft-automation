@@ -1,6 +1,6 @@
-pumpkin    ,block-melon   ,carrot    ,potato   ,wheat         ,apple  ,raw-porkchop ,raw-chicken       ,rotten-flesh
-sugar-cane ,paper         ,book      ,string   ,wool          ,emerald,diamond      ,piston            ,hay-bale
+pumpkin    ,melon-block   ,carrot    ,potato   ,wheat         ,apple  ,raw-porkchop ,raw-chicken       ,rotten-flesh
+sugar-cane ,melon         ,book      ,string   ,paper         ,emerald,diamond      ,piston            ,hay-bale
 gold-nugget,gold-ingot    ,iron-ingot,stick    ,bow           ,chest  ,torch        ,rabbit-hide       ,leather
 coal       ,redstone-torch,redstone  ,gunpowder,glowstone-dust,sugar  ,nether-quartz,prismarine-crystal,prismarine-shard
-slimeball  ,tripwire-hook ,empty     ,empty    ,glowstone     ,empty  ,empty        ,empty             ,empty
+slimeball  ,tripwire-hook ,empty     ,empty    ,glowstone     ,wool   ,empty        ,empty             ,empty
 empty      ,empty         ,empty     ,empty    ,empty         ,empty  ,empty        ,empty             ,empty

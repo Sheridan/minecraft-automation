@@ -8,7 +8,7 @@ use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
 use Minecraft::Screenshoter;
-use Minecraft::Invertory;
+use Minecraft::ItemsReader;
 use Minecraft::UserInteraction;
 use Minecraft::FileIO;
 $main::config = Minecraft::FileIO::read_config();
@@ -165,10 +165,10 @@ sub wait_for_trader_upgrade
 sub take_to_invertory_or_drop
 {
   my ($cell, $invertory) = @_[0..1];
-  if(Minecraft::Invertory::item_exists_in_invertory('empty', $invertory))
+  if(Minecraft::ItemsReader::item_exists_in_invertory('empty', $invertory))
   {
     Minecraft::Automation::take_stack_to_invertory($cell);
-    Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
+    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
   }
   else
   {
@@ -184,11 +184,11 @@ sub trade_item_with_trader
   my $done = 0;
   if(switch_to_trader_page($trader_page))
   {
-    while(trader_can_sell() && Minecraft::Invertory::item_exists_in_invertory($item_to_trade, $invertory))
+    while(trader_can_sell() && Minecraft::ItemsReader::item_exists_in_invertory($item_to_trade, $invertory))
     {
       if(Minecraft::Screenshoter::hand_is_empty('villager'))
       {
-        Minecraft::Invertory::put_stack_to_trader_invertory($item_to_trade, $trader_invertory, $invertory);
+        Minecraft::ItemsReader::put_stack_to_trader_invertory($item_to_trade, $trader_invertory, $invertory);
       }
       else
       {
@@ -233,7 +233,7 @@ sub sell_to_trader
     $unchanged_invertory_dump ne Dumper(%{$invertory}) &&
     wait_for_trader_upgrade($items_to_sell))
   {
-    Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
+    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
     return sell_to_trader($items_to_sell, $trader_invertory, $invertory);
   } else { Minecraft::UserInteraction::say("Продавать больше нечего"); }
   return $unchanged_invertory_dump eq Dumper(%{$invertory}) && trader_can_trade_all($items_to_sell);
@@ -256,7 +256,7 @@ sub buy_from_trader
     $unchanged_invertory_dump ne Dumper(%{$invertory}) &&
     wait_for_trader_upgrade($items_to_buy))
   {
-    Minecraft::Invertory::remap_empty_cell_in_invertory($invertory);
+    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
     return buy_from_trader($items_to_buy, $trader_invertory, $invertory);
   }
   else { Minecraft::UserInteraction::say("Покупать больше нечего"); }
@@ -266,7 +266,7 @@ sub buy_from_trader
 sub trade_with_trader
 {
   my ($items_to_sell, $items_to_buy) = @_[0..1];
-  my $invertory = Minecraft::Invertory::map_invertory( $items_to_sell );
+  my $invertory = Minecraft::ItemsReader::map_invertory( $items_to_sell );
   $items_to_sell = filter_sell($items_to_sell, $invertory);
   my $unchanged_invertory_dump = "";
   my $trader_invertory = 0;
@@ -307,7 +307,7 @@ sub filter_sell
   my $filtered_items_to_sell = {};
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
-    if(Minecraft::Invertory::item_exists_in_invertory($item_to_sell, $invertory))
+    if(Minecraft::ItemsReader::item_exists_in_invertory($item_to_sell, $invertory))
     {
       $filtered_items_to_sell->{$item_to_sell} = $items_to_sell->{$item_to_sell};
     }

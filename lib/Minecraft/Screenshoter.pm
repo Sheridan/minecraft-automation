@@ -8,6 +8,7 @@ use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
 my $md5_cache = {};
+my $compare_method = 1; # 0:md5, 1:cmp
 
 sub get_window_size_position
 {
@@ -104,25 +105,37 @@ sub hand_is_empty
   return compare_screenshots($ssname, sprintf("dont-delete-%s-clean", $interface));
 }
 
+sub compare_with_cmp
+{
+  my ($f0, $f1) = @_[0..1];
+  system("cmp", "--silent", screenshot_full_filename($f0), screenshot_full_filename($f1));
+  if ($? == -1) { die "Не могу запустить cmp: $!\n"; }
+  elsif ($? & 127) { die sprintf("cmp издох с сигналом %d, %s\n", ($? & 127),  ($? & 128) ? 'с корой' : 'без коры') ; }
+  my $ret = $? >> 8;
+  if($ret == 2) { die "Проблема с cmp: $!\n"; }
+  # print $ret;
+  return $ret == 0;
+}
+
+sub compare_with_md5
+{
+  my ($f0, $f1) = @_[0..1];
+  #print sprintf("%s == %s : %s\n",file_md5_base64($f0), file_md5_base64($f1) ,file_md5_base64($f0) eq file_md5_base64($f1));
+  return get_md5($f0) eq get_md5($f1);
+}
+
 sub compare_screenshots
 {
     my ($f0, $f1) = @_[0..1];
-    #print sprintf("%s == %s : %s\n",file_md5_base64($f0), file_md5_base64($f1) ,file_md5_base64($f0) eq file_md5_base64($f1));
-    #return get_md5($f0) eq get_md5($f1);
-    system("cmp", "--silent", screenshot_full_filename($f0), screenshot_full_filename($f1));
-    if ($? == -1) { die "Не могу запустить cmp: $!\n"; }
-    elsif ($? & 127) { die sprintf("cmp издох с сигналом %d, %s\n", ($? & 127),  ($? & 128) ? 'с корой' : 'без коры') ; }
-    my $ret = $? >> 8;
-    if($ret == 2) { die "Проблема с cmp: $!\n"; }
-    # print $ret;
-    return $ret == 0;
+    if($compare_method == 0) { return compare_with_md5($f0, $f1); }
+    if($compare_method == 1) { return compare_with_cmp($f0, $f1); }
 }
 
 sub compare_screenshots_no_cache
 {
   my ($f0, $f1) = @_[0..1];
-  return compare_screenshots($f0, $f1);
-  #return file_md5_base64(screenshot_full_filename($f0)) eq file_md5_base64(screenshot_full_filename($f1));
+  if($compare_method == 0) { return file_md5_base64(screenshot_full_filename($f0)) eq file_md5_base64(screenshot_full_filename($f1)); }
+  if($compare_method == 1) { return compare_with_cmp($f0, $f1); }
 }
 
 sub get_md5

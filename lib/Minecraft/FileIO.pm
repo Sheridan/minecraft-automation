@@ -8,6 +8,12 @@ use File::Basename;
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 
+sub read_item
+{
+  my $item = $_[0];
+  return read_item_file( sprintf("config/items/%s.item", $item));
+}
+
 sub read_item_file
 {
   my $file_name = $_[0];
@@ -50,7 +56,19 @@ sub read_item_file
       my @crafttable_items = split(/,/, $line);
       for my $x (0..2)
       {
-        $result->{'reciepts'}{$reciept_number}{'crafttable'}{$x}{$crafttable_row} = $crafttable_items[$x];
+        my $crafttable_item = trim($crafttable_items[$x]);
+        $result->{'reciepts'}{$reciept_number}{'crafttable'}{$x}{$crafttable_row} = $crafttable_item;
+        if($crafttable_item ne 'empty')
+        {
+          if(exists($result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item}))
+          {
+            $result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item}++;
+          }
+          else
+          {
+            $result->{'reciepts'}{$reciept_number}{'used-items'}{$crafttable_item} = 1;
+          }
+        }
       }
       $crafttable_row++;
       if($crafttable_row > 2)
@@ -108,6 +126,14 @@ sub read_csv_file
   close($fh);
   #print Dumper($result);
   return $result;
+}
+
+# --------------------------------- проверки на существование -----------------------
+
+sub item_description_exists
+{
+  my $item_name = $_[0];
+  return -e sprintf("config/items/%s.item", $item_name);
 }
 
 # ---------------------------------  списки файлов ---------------------------------
