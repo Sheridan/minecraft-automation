@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty,empty
+acacia-plank,stick,acacia-plank
+acacia-plank,stick,acacia-plank
+result:stack,3

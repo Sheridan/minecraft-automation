@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+dark-oak-plank,dark-oak-plank,empty
+dark-oak-plank,dark-oak-plank,empty
+dark-oak-plank,dark-oak-plank,empty
+result:stack,3

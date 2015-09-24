@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty,empty
+stick,jungle-plank,stick
+stick,jungle-plank,stick
+result:stack,3

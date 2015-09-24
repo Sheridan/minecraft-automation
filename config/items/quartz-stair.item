@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+quartz-block,empty,empty
+quartz-block,quartz-block,empty
+quartz-block,quartz-block,quartz-block
+result:stack,4

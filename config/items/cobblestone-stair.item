@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+cobblestone,empty,empty
+cobblestone,cobblestone,empty
+cobblestone,cobblestone,cobblestone
+result:stack,4

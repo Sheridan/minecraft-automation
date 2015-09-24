@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+birch-plank,birch-plank,empty
+birch-plank,birch-plank,empty
+birch-plank,birch-plank,empty
+result:stack,3

@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+
+
+#print Dumper @woods;
+sub generate
+{
+    my ($filename, $craftable, $stackable, $instack, $rccount, $reciept) = @_[0..5];
+    open( my $fh, '>', $filename );
+    printf  {$fh} ("craftable:%s\nstackable:%s\nietms-in-stack:%s\ncraft-reciepts:%d\n%s", $craftable, $stackable, $instack, $rccount, $reciept);
+    close($fh);
+}
+
+sub generate_any_planks
+{
+    my @src = qw(dark-oak-wood spruce-wood jungle-wood oak-wood acacia-wood birch-wood);
+    my $reciept = '';
+    for my $item (@src)
+    {
+        $reciept = sprintf ("%sempty,empty,empty\nempty,%s,empty\nempty,empty,empty\nresult:stack,4\n", $reciept, $item);
+    }
+    generate('any-plank.item','yes','yes',64, scalar(@src), $reciept);
+}
+
+sub generate_stairs
+{
+    my @src = qw(brick-block cobblestone nether-brick-block stone-brick-block quartz-block sandstone red-sandstone dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
+    for my $item (@src)
+    {
+	my $name = $item;
+	$name =~ s/-(block|plank)//g;
+	$name = $name.'-stair.item';
+	generate($name,'yes','yes',64,1,sprintf("%s,empty,empty\n%s,%s,empty\n%s,%s,%s\nresult:stack,4", $item,$item,$item,$item,$item,$item));
+    }
+}
+
+sub generate_slabs
+{
+    my @src = qw(brick-block cobblestone nether-brick-block stone-brick-block quartz-block sandstone red-sandstone dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
+    for my $item (@src)
+    {
+	my $name = $item;
+	$name =~ s/-(block|plank)//g;
+	$name = $name.'-slab.item';
+	generate($name,'yes','yes',64,1,sprintf("empty,empty,empty\n%s,%s,%s\nempty,empty,empty\nresult:stack,6", $item,$item,$item));
+    }
+}
+
+sub generate_fences
+{
+    my @src = qw(dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
+    for my $item (@src)
+    {
+	my $name = $item;
+	$name =~ s/-plank//g;
+	$name = $name.'-fence.item';
+	generate($name,'yes','yes',64,1,sprintf("empty,empty,empty\n%s,stick,%s\n%s,stick,%s\nresult:stack,3", $item,$item,$item,$item));
+    }
+}
+
+sub generate_fences_gates
+{
+    my @src = qw(dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
+    for my $item (@src)
+    {
+	my $name = $item;
+	$name =~ s/-plank//g;
+	$name = $name.'-fence-gate.item';
+	generate($name,'yes','yes',64,1,sprintf("empty,empty,empty\nstick,%s,stick\nstick,%s,stick\nresult:stack,3", $item,$item));
+    }
+}
+
+sub generate_walls
+{
+    my @src = qw(cobblestone mossy-cobblestone nether-brick-block iron-ingot);
+    for my $item (@src)
+    {
+	my $name = $item;
+	if($name =~/nether/) { $name =~ s/-block//g; $name = $name.'-fence.item'; }
+	elsif($name =~/iron/) { $name =~ s/-ingot//g; $name = $name.'-bar.item'; }
+	else { $name = $name.'-wall.item'; }
+	generate($name,'yes','yes',64,1,sprintf("empty,empty,empty\n%s,%s,%s\n%s,%s,%s\nresult:stack,6", $item,$item,$item,$item,$item,$item));
+    }
+}
+
+sub generate_doors
+{
+    my @src = qw(dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank iron-ingot);
+    for my $item (@src)
+    {
+	my $name = $item;
+	$name =~ s/-(ingot|plank)//g;
+	$name = $name.'-door.item';
+	generate($name,'yes','yes',64,1,sprintf("%s,%s,empty\n%s,%s,empty\n%s,%s,empty\nresult:stack,3", $item,$item,$item,$item,$item,$item));
+    }
+}
+
+generate_any_planks();
+generate_stairs();
+generate_slabs();
+generate_fences();
+generate_walls();
+generate_doors();
+generate_fences_gates();

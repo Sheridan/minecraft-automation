@@ -24,6 +24,7 @@ sub read_item_file
   my $crafttable_row = 0;
   while (my $line = <$fh>)
   {
+    # print $line;
     chomp $line;
     if(substr($line, 0, 1) eq '#') { next; }
     if(!$is_reciept)
