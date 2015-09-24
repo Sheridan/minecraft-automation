@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+glass        ,glass        ,glass
+nether-quartz,nether-quartz,nether-quartz
+any-wood-slab,any-wood-slab,any-wood-slab
+result:stack,1

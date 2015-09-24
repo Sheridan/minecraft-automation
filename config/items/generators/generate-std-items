@@ -24,6 +24,18 @@ sub generate_any_planks
     generate('any-plank.item','yes','yes',64, scalar(@src), $reciept);
 }
 
+sub generate_any_wood_slabs
+{
+    my @src = qw(dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
+    my $reciept = '';
+    for my $item (@src)
+    {
+        $reciept = sprintf ("%sempty,empty,empty\n%s,%s,%s\nempty,empty,empty\nresult:stack,6\n", $reciept, $item, $item, $item);
+    }
+    generate('any-wood-slab.item','yes','yes',64, scalar(@src), $reciept);
+}
+
+
 sub generate_stairs
 {
     my @src = qw(brick-block cobblestone nether-brick-block stone-brick-block quartz-block sandstone red-sandstone dark-oak-plank spruce-plank jungle-plank oak-plank acacia-plank birch-plank);
@@ -104,3 +116,4 @@ generate_fences();
 generate_walls();
 generate_doors();
 generate_fences_gates();
+generate_any_wood_slabs();
