@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+
+
+#print Dumper @woods;
+sub generate3x3
+{
+    my ($name, $item) = @_[0..1];
+    open( my $fh, '>>', $name.'.item' );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\n%s,%s,%s\n%s,%s,%s\n%s,%s,%s\nresult:stack,1", 
+			    $item,$item,$item,$item,$item,$item,$item,$item,$item);
+    close($fh);
+}
+
+sub generate2x2
+{
+    my ($name, $item, $count) = @_[0..2];
+    open( my $fh, '>>', $name.'.item' );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\nempty,empty,empty\nempty,%s,%s\nempty,%s,%s\nresult:stack,%d", 
+			    $item,$item,$item,$item, $count);
+    close($fh);
+}
+
+sub generate_back
+{
+    my ($name, $item) = @_[0..1];
+    open( my $fh, '>>', $name.'.item' );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\nempty,empty,empty\nempty,%s,empty\nempty,empty,empty\nresult:stack,9", $item);
+    close($fh);
+}
+
+sub do3x3
+{
+    my $src3x3 = 
+    {
+	'melon-block'        => {'item' => 'melon'           , 'can-back' => 0},
+        'gold-block'         => {'item' => 'gold-ingot'      , 'can-back' => 1}, # я не стал делать проверку на 2 рецепта
+        'gold-ingot'         => {'item' => 'gold-nugget'     , 'can-back' => 1}, # для слитка золота. Просто после выполнения надо поправить файл
+        'iron-block'         => {'item' => 'iron-ingot'      , 'can-back' => 1},
+        'redstone-block'     => {'item' => 'redstone'        , 'can-back' => 1},
+        'lapis-lazuri-block' => {'item' => 'lapis-lazuri'    , 'can-back' => 1},
+        'emerald-block'      => {'item' => 'emerald'         , 'can-back' => 1},
+        'diamond-block'      => {'item' => 'diamond'         , 'can-back' => 1},
+        'prismarine-brick'   => {'item' => 'prismarine-shard', 'can-back' => 0},
+        'slime-block'        => {'item' => 'slimeball'       , 'can-back' => 0},
+        'hay-bale'           => {'item' => 'wheat'           , 'can-back' => 1}
+    };
+    
+    for my $item (keys(%{$src3x3}))
+    {
+        generate3x3($item, $src3x3->{$item}{'item'});
+        if($src3x3->{$item}{'can-back'})
+        {
+    	    generate_back($src3x3->{$item}{'item'}, $item);
+	}
+    }
+}
+
+sub go2x2
+{
+    my $src2x2 = 
+    {
+        'brick-block'          => {'item' => 'brick'           , 'count' => 1 },
+        'nether-brick-block'   => {'item' => 'nether-brick'    , 'count' => 1 },
+        'stone-brick-block'    => {'item' => 'stone'           , 'count' => 4 },
+        'polished-andesite'    => {'item' => 'andesite'        , 'count' => 4 },
+        'polished-granite'     => {'item' => 'granite'         , 'count' => 4 },
+        'polished-diorite'     => {'item' => 'diorite'         , 'count' => 4 },
+        'crafting-table'       => {'item' => 'any-plank'       , 'count' => 1 },
+        'prismarine'           => {'item' => 'prismarine-shard', 'count' => 1 },
+        'quartz-block'         => {'item' => 'nether-quartz'   , 'count' => 1 },
+        'sandstone'            => {'item' => 'sand'            , 'count' => 1 },
+        'smooth-sandstone'     => {'item' => 'sandstone'       , 'count' => 4 },
+        'red-sandstone'        => {'item' => 'red-sand'        , 'count' => 1 },
+        'red-smooth-sandstone' => {'item' => 'red-sandstone'   , 'count' => 4 },
+        'clay-block'           => {'item' => 'clay'            , 'count' => 1 },
+        'snow-block'           => {'item' => 'snowball'        , 'count' => 1 },
+        'iron-trapdoor'        => {'item' => 'iron-ingot'      , 'count' => 1 },
+    };
+    for my $item (keys(%{$src2x2}))
+    {
+        generate2x2($item, $src2x2->{$item}{'item'}, $src2x2->{$item}{'count'});
+    }
+}
+
+go2x2();

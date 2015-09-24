@@ -2,7 +2,7 @@ craftable:yes
 stackable:yes
 ietms-in-stack:64
 craft-reciepts:1
-melon,melon,melon
-melon,melon,melon
-melon,melon,melon
+emerald,emerald,emerald
+emerald,emerald,emerald
+emerald,emerald,emerald
 result:stack,1

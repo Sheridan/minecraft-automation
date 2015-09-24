@@ -1,8 +1,12 @@
 craftable:yes
 stackable:yes
 ietms-in-stack:64
-craft-reciepts:1
+craft-reciepts:2
 gold-nugget,gold-nugget,gold-nugget
 gold-nugget,gold-nugget,gold-nugget
 gold-nugget,gold-nugget,gold-nugget
 result:stack,1
+empty,empty,empty
+empty,gold-block,empty
+empty,empty,empty
+result:stack,9

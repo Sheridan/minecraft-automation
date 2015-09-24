@@ -3,6 +3,6 @@ stackable:yes
 ietms-in-stack:64
 craft-reciepts:1
 empty,empty,empty
-empty,redstone-block,empty
+empty,gold-ingot,empty
 empty,empty,empty
 result:stack,9
