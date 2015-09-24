@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+glass,glass,glass
+glass,gray-dye,glass
+glass,glass,glass
+result:stack,8

@@ -40,7 +40,7 @@ sub do3x3
         'gold-ingot'         => {'item' => 'gold-nugget'     , 'can-back' => 1}, # для слитка золота. Просто после выполнения надо поправить файл
         'iron-block'         => {'item' => 'iron-ingot'      , 'can-back' => 1},
         'redstone-block'     => {'item' => 'redstone'        , 'can-back' => 1},
-        'lapis-lazuri-block' => {'item' => 'lapis-lazuri'    , 'can-back' => 1},
+        'lapis-lazuli-block' => {'item' => 'lapis-lazuli'    , 'can-back' => 1},
         'emerald-block'      => {'item' => 'emerald'         , 'can-back' => 1},
         'diamond-block'      => {'item' => 'diamond'         , 'can-back' => 1},
         'prismarine-brick'   => {'item' => 'prismarine-shard', 'can-back' => 0},

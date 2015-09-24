@@ -25,32 +25,52 @@ GetOptions(
 sub help
 {
   print <<_HELP_;
-Использование: craft <options>
+Использование:
+  craft --craft=item для крафта
+  craft --craft=item --help для помощи по крафту (поддерживаются неполные имена)
+  craft --help - полный список шмота, который можно скрафтить
 Подразумевается, что мы работаем с полными стэками, если шмот стэкуется.
 Опции:
   --craft=строка  Что надо скрафтить.
     Можно выбрать одно из:
 _HELP_
-  for my $reciept_file (sort(Minecraft::FileIO::get_items()))
+  if(!$target_item)
   {
-    my $reciept = Minecraft::FileIO::read_item_file($reciept_file);
-    if($reciept->{'craftable'} eq 'no') {next;}
-    printf("\t\t%s, рецептов: %d\n", $reciept->{'name'}, $reciept->{'craft-reciepts'});
-    for my $reciept_number (sort keys(%{$reciept->{'reciepts'}}))
+    $target_item = '.*';
+  }
+  for my $item (sort(Minecraft::FileIO::get_items()))
+  {
+    if($item =~ /$target_item/)
     {
-      printf("\t\t\tРецепт %d: ", $reciept_number+1);
-      my @data = ();
-      for my $reciept_item (keys(%{$reciept->{'reciepts'}{$reciept_number}{'ingridients'}}))
-      {
-        push(@data, sprintf("%s:%d", $reciept_item, $reciept->{'reciepts'}{$reciept_number}{'ingridients'}{$reciept_item}));
-      }
-      printf("%s\n", join(',', @data));
+      reciept_help($item);
     }
-    # print Dumper ($reciept);
   }
   exit(0);
 }
 
+sub reciept_help
+{
+  my $item = $_[0];
+  # if(!Minecraft::FileIO::item_description_exists($item))
+  # {
+  #   Minecraft::UserInteraction::say("Рецепта для %s нет", $item);
+  #   exit(0);
+  # }
+  my $reciept = Minecraft::FileIO::read_item_file($item);
+  if($reciept->{'craftable'} eq 'no') {return;}
+  printf("\t\t%s, рецептов: %d\n", $reciept->{'name'}, $reciept->{'craft-reciepts'});
+  for my $reciept_number (sort keys(%{$reciept->{'reciepts'}}))
+  {
+    printf("\t\t\tРецепт %d: ", $reciept_number+1);
+    my @data = ();
+    for my $reciept_item (keys(%{$reciept->{'reciepts'}{$reciept_number}{'ingridients'}}))
+    {
+      push(@data, sprintf("%s:%d", $reciept_item, $reciept->{'reciepts'}{$reciept_number}{'ingridients'}{$reciept_item}));
+    }
+    printf("%s\n", join(',', @data));
+  }
+  # print Dumper ($reciept);
+}
 
 
 # for my $reciept_file (Minecraft::FileIO::get_items())

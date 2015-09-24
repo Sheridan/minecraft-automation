@@ -44,7 +44,7 @@ sub restore_window
 sub open_interface
 {
   my $name = $_[0];
-  mouse_rigt_click();
+  mouse_right_click();
   my $attempt_check_open_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
                                          $main::config->{'user'}{'timeouts'}{'interface_open'}    );
   while(!Minecraft::Screenshoter::interface_is_open($name, $main::config->{'system'}{$name}{'is_open'}))
@@ -200,7 +200,7 @@ sub take_half_stack_from_cell
 {
     my ($from_cell) = $_[0];
     mouse_move_to_cell($from_cell);
-    mouse_rigt_click();
+    mouse_right_click();
 }
 
 sub put_stack_to_cell

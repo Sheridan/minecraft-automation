@@ -1,0 +1,12 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:2
+empty,empty,empty
+empty,orange-tulip,empty
+empty,empty,empty
+result:stack,1
+empty,empty,empty
+rose-red,dandelion-yellow,empty
+empty,empty,empty
+result:stack,2

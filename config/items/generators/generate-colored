@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+
+
+#print Dumper @woods;
+sub generate_colored_border
+{
+    my ($name, $item, $dye) = @_[0..2];
+    open( my $fh, '>>', $name );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\n%s,%s,%s\n%s,%s,%s\n%s,%s,%s\nresult:stack,8", 
+			    $item,$item,$item,$item,$dye,$item,$item,$item,$item);
+    close($fh);
+}
+
+sub generate_colored_one
+{
+    my ($name, $item, $dye) = @_[0..2];
+    open( my $fh, '>>', $name );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\nempty,empty,empty\nempty,%s,%s\nempty,empty,empty\nresult:stack,1", 
+			    $dye,$item);
+    close($fh);
+}
+
+my $dyes = 
+    {
+	'bone-meal'        => 'white',
+	'light-gray-dye'   => 'light-gray',
+	'gray-dye'         => 'gray',
+	'ink-sac'          => 'black',
+	'cocoa-beans'      => 'brown',
+	'rose-red'         => 'red',
+	'orange-dye'       => 'orange',
+	'dandelion-yellow' => 'yellow',
+	'lime-dye'         => 'lime',
+	'cactus-green'     => 'green',
+	'cyan-dye'         => 'cyan',
+	'light-blue-dye'   => 'light-blue',
+	'lapis-lazuli'     => 'blue',
+	'purple-dye'       => 'purple',
+	'magenta-dye'      => 'magenta',
+	'pink-dye'         => 'pink'
+};
+my $border_items = 
+{
+    'glass'         => 'stained-glass',
+    'hardened-clay' => 'stained-clay'
+};
+
+my $one_items = 
+{
+    'wool'         => 'wool'
+};
+
+for my $dye (keys(%{$dyes}))
+{
+    for my $item (keys(%{$border_items}))
+    {
+	generate_colored_border(sprintf("%s-%s.item", $dyes->{$dye}, $border_items->{$item}), $item, $dye);
+    }
+    for my $item (keys(%{$one_items}))
+    {
+	generate_colored_one(sprintf("%s-%s.item", $dyes->{$dye}, $one_items->{$item}), $item, $dye);
+    }
+}

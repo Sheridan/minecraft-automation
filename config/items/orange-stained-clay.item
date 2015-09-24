@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+hardened-clay,hardened-clay,hardened-clay
+hardened-clay,orange-dye,hardened-clay
+hardened-clay,hardened-clay,hardened-clay
+result:stack,8
