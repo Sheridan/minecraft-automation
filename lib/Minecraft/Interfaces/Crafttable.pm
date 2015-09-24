@@ -4,6 +4,7 @@ use base Minecraft::ItemsReader;
 use strict;
 use warnings;
 use Data::Dumper;
+use Minecraft::Screenshoter;
 use Time::HiRes qw (sleep);
 
 
@@ -26,6 +27,11 @@ sub put_item
   my ($self, $item, $x, $y) = @_[0..3];
   $self->add_item_to_items_to_find($item);
   Minecraft::ItemsReader::put_item($self, $item, $x, $y);
+}
+
+sub hand_is_empty
+{
+  return Minecraft::Screenshoter::hand_is_empty('crafttable');
 }
 
 1;

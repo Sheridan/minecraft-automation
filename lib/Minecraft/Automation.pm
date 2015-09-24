@@ -116,7 +116,7 @@ sub mouse_left_click
     call_xdotool(sprintf('click --delay %d 1', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }
 
-sub mouse_rigt_click
+sub mouse_right_click
 {
     call_xdotool(sprintf('click --delay %d 3', $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
 }

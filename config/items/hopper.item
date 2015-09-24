@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+iron-ingot,empty     ,iron-ingot
+iron-ingot,chest     ,iron-ingot
+empty     ,iron-ingot,empty
+result:stack,1

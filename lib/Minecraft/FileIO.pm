@@ -36,7 +36,7 @@ sub read_item_file
       if($option[0] eq 'result')
       {
         $is_reciept = 1;
-        if($option[0] eq 'one')
+        if($option[1] eq 'one')
         {
           $result->{'reciepts'}{$reciept_number}{'result'}{'units'} = 'one';
         }

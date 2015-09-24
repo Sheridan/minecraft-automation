@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+iron-ingot,empty               ,iron-ingot
+iron-ingot,stone-pressure-plate,iron-ingot
+iron-ingot,redstone            ,iron-ingot
+result:stack,6

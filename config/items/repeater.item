@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty         ,empty   ,empty
+redstone-torch,redstone,redstone-torch
+stone         ,stone   ,stone
+result:stack,1

@@ -157,7 +157,7 @@ sub what_item_at_coordinates
   {
     next if ($item =~ m/^\./);
     if(
-        -d $items_dir.$item && 
+        -d $items_dir.$item &&
         (
           (exists($self->{'items_to_find'}{$item}) || scalar(keys(%{$self->{'items_to_find'}})) == 1) ||
           (exists($self->{'items_to_find'}{'any-plank'}) && $item=~/plank/)
@@ -184,7 +184,7 @@ sub get_first_item_coordinates
     for my $x (0..$self->{'dimension'}{'x'})
     {
       if(
-          ($self->{'data'}{$x}{$y} eq $item) || 
+          ($self->{'data'}{$x}{$y} eq $item) ||
           ($item eq 'any-plank' && $self->{'data'}{$x}{$y} =~ /plank/)
         )
       {
@@ -201,21 +201,30 @@ sub item_exists
   return $self->get_first_item_coordinates($item)->{'x'} != -1;
 }
 
-sub take_item
+sub take_stack_of_items
 {
   my ($self, $item) = @_[0..1];
   my $coordinates = $self->get_first_item_coordinates($item);
   $self->remove_item_from_data($coordinates->{'x'}, $coordinates->{'y'});
   Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
   Minecraft::Automation::mouse_left_click();
+  return $coordinates;
 }
 
-sub put_item
+sub put_stack_of_items
 {
   my ($self, $item, $x, $y) = @_[0..3];
   add_item_to_data($self, $item, $x, $y);
   Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
   Minecraft::Automation::mouse_left_click();
+}
+
+sub put_one_item
+{
+  my ($self, $item, $x, $y) = @_[0..3];
+  add_item_to_data($self, $item, $x, $y);
+  Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
+  Minecraft::Automation::mouse_right_click();
 }
 
 sub dump
