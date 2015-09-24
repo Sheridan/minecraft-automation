@@ -5,6 +5,7 @@ use JSON;
 use Time::HiRes qw (sleep);
 use File::Path qw(make_path);
 use Data::Dumper;
+use File::Copy;
 use Getopt::Long;
 use lib './lib';
 use Minecraft::Automation;
@@ -342,7 +343,7 @@ sub get_villager_interface
   for my $button_name ('next_page', 'prev_page')
   {
     Minecraft::Automation::mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
-    for (0..15)
+    for (0..20)
     {
       Minecraft::Automation::mouse_left_click();
     }
@@ -493,6 +494,35 @@ TEXT
       train_view_items_chest(Minecraft::FileIO::read_csv_file($chest_file));
   }
   $main::config = Minecraft::FileIO::save_system_config($main::config);
+  copy_items_images();
+}  
+  
+sub copy_items_images
+{
+  
+  my $items_dir = sprintf("%s/%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
+  opendir(my $dir_h, $items_dir) or die $!;
+  while (my $item = readdir($dir_h))
+  {
+    next if ($item =~ m/^\./);
+    if(-d $items_dir.$item)
+    {
+      make_path($items_dir.$item."/villager/self-invertory");
+      Minecraft::UserInteraction::say("Копирую %s", $item);
+      for my $y (0..3)
+      {
+        for my $x (0..8)
+        {
+          copy
+            (
+              Minecraft::Screenshoter::screenshot_full_filename(Minecraft::Screenshoter::screenshot_item_name($item, 'crafttable', 'self-invertory', $x, $y)),
+              Minecraft::Screenshoter::screenshot_full_filename(Minecraft::Screenshoter::screenshot_item_name($item, 'villager', 'self-invertory', $x, $y))
+            );
+        }
+      }
+    }
+  }
+  closedir($dir_h);  
 }
 
 # -------------------------------------------------- тесты --------------------------------------------

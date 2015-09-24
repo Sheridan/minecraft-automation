@@ -11,7 +11,10 @@ use Minecraft::Screenshoter;
 use Minecraft::ItemsReader;
 use Minecraft::UserInteraction;
 use Minecraft::FileIO;
+use Minecraft::Interfaces::Villager;
 $main::config = Minecraft::FileIO::read_config();
+my $self_invertory = Minecraft::ItemsReader->new('villager', 'self-invertory');
+my $villager = Minecraft::Interfaces::Villager->new();
 my $seller = '';
 my $buy = 'all';
 my $target = 'sell';
@@ -51,124 +54,14 @@ _HELP_
   exit(0);
 }
 
-# ---------------------------------------------  навигация по страницам крестьянина ----------------------------------
-sub switch_to_trader_page
+
+sub take_to_self_invertory_or_drop # take_to_invertory_or_drop
 {
-    my $page = $_[0];
-  my $button_name = $page > $current_trader_page ? 'next_page' : 'prev_page';
-  while($page != $current_trader_page)
-  {
-    if(!trader_page_avialable($button_name, $current_trader_page))
-    {
-      return 0;
-    }
-    Minecraft::Automation::mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
-    Minecraft::Automation::mouse_left_click();
-    sleep($main::config->{'user'}{'timeouts'}{'villager_page_switch'});
-    $current_trader_page += $page > $current_trader_page ? 1 : -1;
-  }
-  return 1;
-
-}
-
-# ---------------------------------------------  обратная связь, скриншоты ----------------------------------
-sub trader_can_sell
-{
-    return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-trade-avialable',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0));
-}
-
-sub trader_can_trade_on_page
-{
-  my $page = $_[0];
-  if(switch_to_trader_page($page))
-  {
-    return trader_can_sell();
-  }
-  return 0;
-}
-
-sub trader_can_trade_something
-{
-  my $items_to_trade = $_[0];
-  for my $item_to_trade (keys(%{$items_to_trade}))
-  {
-    if(trader_can_trade_on_page($items_to_trade->{$item_to_trade}))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-sub trader_can_trade_all
-{
-  my $items_to_trade = $_[0];
-  my $flag = 0;
-  for my $item_to_trade (keys(%{$items_to_trade}))
-  {
-    $flag += trader_can_trade_on_page($items_to_trade->{$item_to_trade});
-  }
-  return $flag == scalar(keys(%{$items_to_trade}));
-}
-
-sub trader_result_is_empty
-{
-  return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-result-empty',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}, 1));
-}
-
-sub trader_invertory_is_empty
-{
-  my $trader_invertory = $_[0];
-  return Minecraft::Screenshoter::compare_screenshots(sprintf('dont-delete-villager-invertory-%d', $trader_invertory),
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, 1));
-}
-
-sub trader_page_avialable
-{
-  my ($button_name, $page) = @_[0..1];
-  if(!exists($page_avialable_cache->{$button_name}{$page}))
-  {
-    $page_avialable_cache->{$button_name}{$page} =
-                !Minecraft::Screenshoter::compare_screenshots(sprintf("dont-delete-villager-%s-not-avialable", $button_name),
-                          Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}, 1));
-  }
-  return $page_avialable_cache->{$button_name}{$page};
-}
-
-sub trade_interface_is_open
-{
-  return Minecraft::Screenshoter::compare_screenshots('dont-delete-villager-clean',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'clean'}, 0));
-}
-
-# ---------------------------------------------  элементы торговли ----------------------------------
-
-sub wait_for_trader_upgrade
-{
-  my $items_to_trade = $_[0];
-  Minecraft::UserInteraction::say("Отдыхаем, пока торговец апгредится...");
-  Minecraft::Automation::close_interface('villager');
-  sleep($main::config->{'user'}{'timeouts'}{'villager_upgrade'});
-  Minecraft::Automation::open_interface('villager');
-  $page_avialable_cache = {};
-  $current_trader_page = 1;
-  if(defined($items_to_trade))
-  {
-    Minecraft::UserInteraction::say("Проверяем, проапгредился ли торговец...");
-    return trader_can_trade_something($items_to_trade);
-  }
-  return 1;
-}
-
-sub take_to_invertory_or_drop
-{
-  my ($cell, $invertory) = @_[0..1];
-  if(Minecraft::ItemsReader::item_exists_in_invertory('empty', $invertory))
+  my $cell = $_[0];
+  if($self_invertory->empty_count())
   {
     Minecraft::Automation::take_stack_to_invertory($cell);
-    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
+    $self_invertory->remap();
   }
   else
   {
@@ -176,118 +69,124 @@ sub take_to_invertory_or_drop
   }
 }
 
-# --------------------------------------------- торговля с деревенскими ----------------------------------
-
-sub trade_item_with_trader
+sub trade_item_with_villager
 {
-  my ($item_to_trade, $trader_page, $trader_invertory, $invertory) = @_[0..3];
+  my ($item_to_trade, $trader_page, $villager_invertory) = @_[0..2];
   my $done = 0;
-  if(switch_to_trader_page($trader_page))
+  if($villager->switch_to_page($trader_page))
   {
-    while(trader_can_sell() && Minecraft::ItemsReader::item_exists_in_invertory($item_to_trade, $invertory))
+    while($villager->can_trade() && $self_invertory->item_exists($item_to_trade))
     {
-      if(Minecraft::Screenshoter::hand_is_empty('villager'))
+      if($villager->hand_is_empty())
       {
-        Minecraft::ItemsReader::put_stack_to_trader_invertory($item_to_trade, $trader_invertory, $invertory);
+        $self_invertory->take_stack_of_items($item_to_trade);
+        $villager->put_stack_to_invertory($villager_invertory);
       }
       else
       {
-        Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
+        $villager->put_stack_to_invertory($villager_invertory);
       }
-      if(!trader_result_is_empty())
+      if(!$villager->result_is_empty())
       {
-        take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'result'}, $invertory);
+        take_to_self_invertory_or_drop($main::config->{'system'}{'villager'}{'result'});
         $done = 1;
       }
     }
     Minecraft::UserInteraction::say("Забираем обратно остатки");
-    if(!trader_invertory_is_empty($trader_invertory))
+    if(!$villager->invertory_is_empty($villager_invertory))
     {
-      take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+      take_to_self_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory});
     }
-    if(!Minecraft::Screenshoter::hand_is_empty('villager'))
+    if(!$villager->hand_is_empty())
     {
-      Minecraft::Automation::put_stack_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory});
-      take_to_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$trader_invertory}, $invertory);
+      $villager->put_stack_to_invertory($villager_invertory);
+      take_to_self_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory});
     }
   }
   return $done;
 }
 
-sub sell_to_trader
+sub sell_to_villager
 {
-  my ($items_to_sell, $trader_invertory, $invertory) = @_[0..2];
+  my ($items_to_sell, $villager_invertory) = @_[0..1];
   my @sell_pages;
-  my $unchanged_invertory_dump = Dumper(%{$invertory});
+  $self_invertory->save_state('before_sell');
 
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
     Minecraft::UserInteraction::say("Продаём %s", $item_to_sell);
-    if(trade_item_with_trader($item_to_sell, $items_to_sell->{$item_to_sell}, $trader_invertory, $invertory) && $target eq 'buy')
+    if(trade_item_with_villager($item_to_sell, $items_to_sell->{$item_to_sell}, $villager_invertory) && $target eq 'buy')
     {
       Minecraft::UserInteraction::say("Немного продали. Посмотрим, проапгредится ли продавец");
       last;
     }
   }
-  if(  $target eq 'sell' &&
-    $unchanged_invertory_dump ne Dumper(%{$invertory}) &&
-    wait_for_trader_upgrade($items_to_sell))
+  if(  
+      $target eq 'sell' &&
+      !$self_invertory->state_is_unchanged('before_sell') &&
+      $villager->wait_for_upgrade($items_to_sell)
+    )
   {
-    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
-    return sell_to_trader($items_to_sell, $trader_invertory, $invertory);
+    $self_invertory->remap();
+    return sell_to_villager($items_to_sell, $villager_invertory);
   } else { Minecraft::UserInteraction::say("Продавать больше нечего"); }
-  return $unchanged_invertory_dump eq Dumper(%{$invertory}) && trader_can_trade_all($items_to_sell);
+  return $self_invertory->state_is_unchanged('before_sell') && $villager->can_trade_all($items_to_sell);
 }
 
-sub buy_from_trader
+sub buy_from_villager
 {
-  my ($items_to_buy, $trader_invertory, $invertory) = @_[0..2];
-  my $unchanged_invertory_dump = Dumper(%{$invertory});
+  my ($items_to_buy, $villager_invertory) = @_[0..1];
+  $self_invertory->save_state('before_buy');
+  
   for my $item_to_buy (keys(%{$items_to_buy}))
   {
     Minecraft::UserInteraction::say("Покупаем %s", $item_to_buy);
-     if(trade_item_with_trader('emerald', $items_to_buy->{$item_to_buy}, $trader_invertory, $invertory) && $target eq 'sell')
+     if(trade_item_with_villager('emerald', $items_to_buy->{$item_to_buy}, $villager_invertory) && $target eq 'sell')
     {
       Minecraft::UserInteraction::say("Немного купили. Посмотрим, проапгредится ли продавец");
       last;
     }
   }
-  if(  $target eq 'buy' &&
-    $unchanged_invertory_dump ne Dumper(%{$invertory}) &&
-    wait_for_trader_upgrade($items_to_buy))
+  if(  
+      $target eq 'buy' &&
+      !$self_invertory->state_is_unchanged('before_buy') &&
+      $villager->wait_for_upgrade($items_to_buy)
+    )
   {
-    Minecraft::ItemsReader::remap_empty_cell_in_invertory($invertory);
-    return buy_from_trader($items_to_buy, $trader_invertory, $invertory);
+    $self_invertory->remap();
+    return buy_from_villager($items_to_buy, $villager_invertory);
   }
   else { Minecraft::UserInteraction::say("Покупать больше нечего"); }
-  return $unchanged_invertory_dump eq Dumper(%{$invertory}) && trader_can_trade_all($items_to_buy);
+  return $self_invertory->state_is_unchanged('before_buy') && $villager->can_trade_all($items_to_buy);
 }
 
 sub trade_with_trader
 {
   my ($items_to_sell, $items_to_buy) = @_[0..1];
-  my $invertory = Minecraft::ItemsReader::map_invertory( $items_to_sell );
-  $items_to_sell = filter_sell($items_to_sell, $invertory);
+  $self_invertory->add_items_to_items_to_find($items_to_sell);
+  $self_invertory->map_cells();
+  
+  $items_to_sell = filter_sell($items_to_sell);
   my $unchanged_invertory_dump = "";
-  my $trader_invertory = 0;
+  my $villager_invertory = 0;
 
   do
   {
-    $unchanged_invertory_dump = Dumper(%{$invertory});
+    $self_invertory->save_state('trade');
     for ($target)
     {
       if(/buy/)
       {
-        if(!buy_from_trader($items_to_buy, $trader_invertory, $invertory))
+        if(!buy_from_villager($items_to_buy, $villager_invertory))
         {
-          sell_to_trader ($items_to_sell, $trader_invertory, $invertory);
+          sell_to_villager ($items_to_sell, $villager_invertory);
         }
       }
       elsif(/sell/)
       {
-        if(!sell_to_trader ($items_to_sell, $trader_invertory, $invertory))
+        if(!sell_to_villager ($items_to_sell, $villager_invertory))
         {
-          buy_from_trader($items_to_buy, $trader_invertory, $invertory);
+          buy_from_villager($items_to_buy, $villager_invertory);
         }
       }
       else
@@ -297,17 +196,17 @@ sub trade_with_trader
       }
     }
   }
-  while($unchanged_invertory_dump ne Dumper(%{$invertory}) && wait_for_trader_upgrade());
+  while(!$self_invertory->state_is_unchanged('trade') && $villager->wait_for_upgrade());
   Minecraft::UserInteraction::say("Торговать больше нечем и не на что. Уходим.");
 }
 
 sub filter_sell
 {
-  my ($items_to_sell, $invertory) = @_[0..1];
+  my ($items_to_sell) = $_[0];
   my $filtered_items_to_sell = {};
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
-    if(Minecraft::ItemsReader::item_exists_in_invertory($item_to_sell, $invertory))
+    if($self_invertory->item_exists($item_to_sell))
     {
       $filtered_items_to_sell->{$item_to_sell} = $items_to_sell->{$item_to_sell};
     }

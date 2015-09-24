@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Time::HiRes qw (sleep);
+use Digest::MD5 qw(md5_hex);
 
 sub new
 {
@@ -11,6 +12,7 @@ sub new
   my $self =
   {
     'data' => {},
+    'states' => {},
     'items_to_find' =>
     {
       'empty' => 1
@@ -225,6 +227,18 @@ sub put_one_item
   add_item_to_data($self, $item, $x, $y);
   Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
   Minecraft::Automation::mouse_right_click();
+}
+
+sub save_state
+{
+  my ($self, $state_name) = @_[0..1];
+  $self->{'states'}{$state_name} = md5_hex(Dumper($self->{'data'}));
+}
+
+sub state_is_unchanged
+{
+  my ($self, $state_name) = @_[0..1];
+  return $self->{'states'}{$state_name} eq md5_hex(Dumper($self->{'data'}));
 }
 
 sub dump

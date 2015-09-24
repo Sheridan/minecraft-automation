@@ -8,7 +8,7 @@ use Time::HiRes qw (sleep);
 use Exporter qw(import);
 
 my $md5_cache = {};
-my $compare_method = 1; # 0:md5, 1:cmp
+my $compare_method = 0; # 0:md5, 1:cmp
 
 sub get_window_size_position
 {
