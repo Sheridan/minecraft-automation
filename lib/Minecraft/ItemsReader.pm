@@ -13,6 +13,7 @@ sub new
   {
     'data' => {},
     'states' => {},
+    'items-count' => {},
     'items_to_find' =>
     {
       'empty' => 1
@@ -103,6 +104,17 @@ sub items_count
   return exists($self->{'items-count'}{$item}) ? $self->{'items-count'}{$item} : 0;
 }
 
+sub empty
+{
+  my $self = $_[0];
+  for my $y (0..$self->{'dimension'}{'y'})
+  {
+    for my $x (0..$self->{'dimension'}{'x'})
+    {
+      $self->add_item_to_data('empty', $x, $y);
+    }
+  }
+}
 
 sub map_cells
 {

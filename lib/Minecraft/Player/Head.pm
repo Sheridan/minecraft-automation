@@ -6,16 +6,28 @@ use warnings;
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_base64);
 use Time::HiRes qw (sleep);
-
+use Minecraft::FileIO;
 
 sub new
 {
   my $class = $_[0];
   my $self = Minecraft::Player::Soul::new($class);
-  $self->{'md5_cache'} = {  };
   $self->{'compare_method'} = 0; # 0:md5, 1:cmp
+  if(!$self->{'compare_method'})
+  {
+    $self->{'md5_cache'} = Minecraft::FileIO::read_json_file($self->screenshots_path()."/md5.cache");
+  }
   # print Dumper $self, $class;
   return $self;
+}
+
+sub DESTROY
+{
+  my $self = $_[0];
+  if(!$self->{'compare_method'})
+  {
+    Minecraft::FileIO::save_json_file($self->screenshots_path()."/md5.cache", $self->{'md5_cache'});
+  }
 }
 
 sub screenshots_path

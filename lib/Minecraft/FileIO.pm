@@ -168,11 +168,20 @@ sub get_items
 sub read_json_file
 {
   my $file_name = $_[0];
+  if(! -e $file_name) { return {}; }
   local $/;
   open( my $fh, '<', $file_name ) or die $!;
   my $result = from_json(<$fh>, {utf8 => 1});
   close($fh);
   return $result;
+}
+
+sub save_json_file
+{
+  my ($file_name, $data) = @_[0..1];
+  open( my $fh, '>', $file_name );
+  print {$fh} to_json($data, {utf8 => 1, pretty => 1});
+  close($fh);
 }
 
 sub read_config_file
@@ -184,18 +193,14 @@ sub read_config_file
 sub save_system_config
 {
   my $config = $_[0];
-  open( my $fh, '>', 'config/system-config.json' );
-  print {$fh} to_json($config->{'system'}, {utf8 => 1, pretty => 1});
-  close($fh);
+  save_json_file($config->{'system'}, {utf8 => 1, pretty => 1});
   return read_config();
 }
 
 sub save_user_config
 {
   my $config = $_[0];
-  open( my $fh, '>', 'config/user-config.json' );
-  print {$fh} to_json($config->{'user'}, {utf8 => 1, pretty => 1});
-  close($fh);
+  save_json_file($config->{'user'}, {utf8 => 1, pretty => 1});
   return read_config();
 }
 
@@ -203,8 +208,8 @@ sub read_config
 {
   my $c =
     {
-        'user'   => -e 'config/user-config.json'   ? read_config_file('config/user-config.json'  ) : {},
-        'system' => -e 'config/system-config.json' ? read_config_file('config/system-config.json') : {}
+        'user'   => read_config_file('config/user-config.json'  ),
+        'system' => read_config_file('config/system-config.json')
     };
   if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
   if(!exists($c->{'user'}{'paths'}{'screenshosts'}))                         { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }

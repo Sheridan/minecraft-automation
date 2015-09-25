@@ -16,12 +16,18 @@ sub new
   return $self;
 }
 
+sub mouse_coordinates_is_changed
+{
+  my ($self, $current) = @_[0..1];
+  return $self->{'last_mouse_coordinates'}{'c'}{'x'} != $current->{'c'}{'x'} ||
+         $self->{'last_mouse_coordinates'}{'c'}{'y'} != $current->{'c'}{'y'}
+}
+
 sub mouse_move_to_cell
 {
-    my ($self, $to) = @_[0..1];
-    #print Dumper($to);
-    if($self->{'last_mouse_coordinates'}{'c'}{'x'} != $to->{'c'}{'x'} ||
-       $self->{'last_mouse_coordinates'}{'c'}{'y'} != $to->{'c'}{'y'})
+  my ($self, $to) = @_[0..1];
+  #print Dumper($to);
+  if($self->mouse_coordinates_is_changed($to))
   {
     $self->{'last_mouse_coordinates'}{'c'}{'x'} = $to->{'c'}{'x'};
     $self->{'last_mouse_coordinates'}{'c'}{'y'} = $to->{'c'}{'y'};
