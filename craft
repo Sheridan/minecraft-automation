@@ -15,7 +15,6 @@ use Minecraft::Interfaces::Crafttable;
 $main::config = Minecraft::FileIO::read_config();
 my $target_item = '';
 my $reciepts = {};
-my $self_invertory = Minecraft::ItemsReader->new('crafttable', 'self-invertory');
 my $crafttable = Minecraft::Interfaces::Crafttable->new();
 GetOptions(
     "craft=s" => \$target_item,
@@ -88,7 +87,6 @@ sub load_reciept
       for my $ingridient (keys(%{$reciepts->{$item}{'reciepts'}{$reciept_number}{'ingridients'}}))
       {
         load_reciept($ingridient);
-        $self_invertory->add_item_to_items_to_find($ingridient);
         $crafttable->add_item_to_items_to_find($ingridient);
       }
     }
@@ -119,10 +117,10 @@ sub what_ingridient_i_must_craft
             $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'units'} eq 'stack' &&
             $reciepts->{$item_to_craft}{'stackable'} eq 'yes'
           ) &&
-          $self_invertory->items_count($ingridient) < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}{$ingridient}
+          $crafttable->self_invertory()->items_count($ingridient) < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'ingridients'}{$ingridient}
         ) ||
         (
-          $self_invertory->items_count($ingridient) == 0
+          $crafttable->self_invertory()->items_count($ingridient) == 0
         )
       )
     {
@@ -143,17 +141,17 @@ sub self_invertory_has_cells_for_result
   if(
       (
         $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'units'} eq 'stack' &&
-        $self_invertory->empty_count() < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count
+        $crafttable->self_invertory()->empty_count() < $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count
       ) ||
       (
         $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'units'} eq 'one' &&
-        $self_invertory->empty_count() == 0
+        $crafttable->self_invertory()->empty_count() == 0
       )
     )
   {
     Minecraft::UserInteraction::say("Место в инвентаре при крафте %s закончилось. Не хватило %d ячеек.",
                       $item_to_craft,
-                      $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count-$self_invertory->empty_count());
+                      $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count-$crafttable->self_invertory()->empty_count());
     return 0;
   }
   return 1;
@@ -174,19 +172,19 @@ sub craft
           my $current_ingridient = $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'crafttable'}{$crafttable_x}{$crafttable_y};
           if($current_ingridient ne 'empty')
           {
-            my $coordinates_from = $self_invertory->take_stack_of_items($current_ingridient);
+            my $coordinates_from = $crafttable->self_invertory()->take_stack_of_items($current_ingridient);
             if($reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'units'} eq 'stack')
             {
-              $crafttable->put_stack_of_items($current_ingridient, $crafttable_x, $crafttable_y);
+              $crafttable->crafttable()->put_stack_of_items($current_ingridient, $crafttable_x, $crafttable_y);
             }
             else
             {
-                $crafttable->put_one_item($current_ingridient, $crafttable_x, $crafttable_y);
+                $crafttable->crafttable()->put_one_item($current_ingridient, $crafttable_x, $crafttable_y);
                 if($reciepts->{$current_ingridient}{'stackable'} eq 'yes')
                 {
                   if(!$crafttable->hand_is_empty())
                   {
-                    $self_invertory->put_stack_of_items($current_ingridient, $coordinates_from->{'x'}, $coordinates_from->{'y'});
+                    $crafttable->self_invertory()->put_stack_of_items($current_ingridient, $coordinates_from->{'x'}, $coordinates_from->{'y'});
                   }
                 }
             }
@@ -194,7 +192,6 @@ sub craft
         }
       }
       $crafttable->take_all_craft_result();
-      $self_invertory->remap();
       craft($target_item);
     }
     else
@@ -207,8 +204,8 @@ sub craft
 if(load_reciept($target_item))
 {
   Minecraft::Automation::restore_window();
-  $self_invertory->map_cells();
-  $self_invertory->dump();
+  $crafttable->self_invertory()->map_cells();
+  # $crafttable->dump();
   craft($target_item);
   # Minecraft::UserInteraction::say("Материалы закончились, готово.");
   # print Dumper($reciepts);

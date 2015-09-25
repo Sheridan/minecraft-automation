@@ -170,11 +170,17 @@ sub what_item_at_coordinates
                                                                                                     $temp_item_screenshot))
       {
         closedir($dir_h);
+        print $self->{'interface_target'}."->".$item."\n";
         return $item;
+      }
+      else
+      {
+        print $self->{'interface_target'}." ".$item."\n";
       }
     }
   }
   closedir($dir_h);
+  print $self->{'interface_target'}." ---------------------------\n";
   return 'unknown';
 }
 
