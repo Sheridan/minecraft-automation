@@ -226,8 +226,7 @@ sub take_stack_of_items
   my ($self, $item) = @_[0..1];
   my $coordinates = $self->get_first_item_coordinates($item);
   $self->remove_item_from_data($coordinates->{'x'}, $coordinates->{'y'});
-  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
-  $main::player->hand()->mouse_left_click();
+  $main::player->hand()->take_stack_from_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
   return $coordinates;
 }
 
@@ -235,16 +234,14 @@ sub put_stack_of_items
 {
   my ($self, $item, $x, $y) = @_[0..3];
   add_item_to_data($self, $item, $x, $y);
-  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
-  $main::player->hand()->mouse_left_click();
+  $main::player->hand()->put_stack_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
 }
 
 sub put_one_item
 {
   my ($self, $item, $x, $y) = @_[0..3];
   add_item_to_data($self, $item, $x, $y);
-  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
-  $main::player->hand()->mouse_right_click();
+  $main::player->hand()->put_one_item_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
 }
 
 sub save_state

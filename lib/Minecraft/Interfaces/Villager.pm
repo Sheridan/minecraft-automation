@@ -1,4 +1,5 @@
 package Minecraft::Interfaces::Villager;
+use base Minecraft::Interfaces::Interface;
 
 use strict;
 use warnings;
@@ -9,8 +10,8 @@ use Time::HiRes qw (sleep);
 sub new
 {
   my $class = $_[0];
-  my $self = { };
-  bless($self, $class);
+  my $self = Minecraft::Interfaces::Interface::new($class, 'villager');
+  $self->self_invertory()->add_item_to_items_to_find('emerald');
   $self->clear_state();
   return $self;
 }
@@ -21,26 +22,13 @@ sub clear_state
   $self->{'pages'} = { 'current' => 1, 'cache'   => {} };
 }
 
-sub hand_is_empty
-{
-  return $main::player->hand()->is_empty('villager');
-}
 
-sub can_trade # trader_can_sell
+sub can_trade
 {
     return $main::player->head()->compare_screenshots
                         (
                             'dont-delete-villager-trade-avialable',
                             $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0)
-                        );
-}
-
-sub result_is_empty
-{
-  return $main::player->head()->compare_screenshots
-                        (
-                            'dont-delete-villager-result-empty',
-                            $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}, 1)
                         );
 }
 
@@ -52,11 +40,6 @@ sub invertory_is_empty
                             sprintf('dont-delete-villager-invertory-%d', $villager_invertory),
                             $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory}, 1)
                         );
-}
-
-sub trade_interface_is_open
-{
-  return $main::player->head()->interface_is_open('villager');
 }
 
 sub can_trade_on_page
@@ -103,8 +86,7 @@ sub switch_to_page
     {
       return 0;
     }
-    $main::player->hand()->mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
-    $main::player->hand()->mouse_left_click();
+    $main::player->hand()->press_button($main::config->{'system'}{'villager'}{$button_name});
     sleep($main::config->{'user'}{'timeouts'}{'villager_page_switch'});
     $self->{'pages'}{'current'} += $page > $self->{'pages'}{'current'} ? 1 : -1;
   }
@@ -144,9 +126,8 @@ sub wait_for_upgrade
 
 sub put_stack_to_invertory
 {
-  my ($self, $cell_number) = @_[0..1];
-  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$cell_number});
-  $main::player->hand()->mouse_left_click();
+  my ($self, $villager_invertory) = @_[0..1];
+  $main::player->hand()->put_stack_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory});
 }
 
 1;

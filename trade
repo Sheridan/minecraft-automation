@@ -11,9 +11,9 @@ use Minecraft::ItemsReader;
 use Minecraft::UserInteraction;
 use Minecraft::FileIO;
 use Minecraft::Interfaces::Villager;
+use Minecraft::Window;
 $main::config = Minecraft::FileIO::read_config();
 $main::player = Minecraft::Player->new();
-my $self_invertory = Minecraft::ItemsReader->new('villager', 'self-invertory');
 my $villager = Minecraft::Interfaces::Villager->new();
 my $seller = '';
 my $buy = 'all';
@@ -55,16 +55,18 @@ _HELP_
 }
 
 
-sub take_to_self_invertory_or_drop # take_to_invertory_or_drop
+sub take_to_self_invertory_or_drop
 {
   my $cell = $_[0];
-  if($self_invertory->empty_count())
+  if($villager->self_invertory()->empty_count())
   {
+    # print "take\n";
     $main::player->hand()->take_stack_to_invertory($cell);
-    $self_invertory->remap();
+    $villager->self_invertory()->remap();
   }
   else
   {
+    # print "drop\n";
     $main::player->hand()->drop_item_from_cell($cell);
   }
 }
@@ -75,11 +77,11 @@ sub trade_item_with_villager
   my $done = 0;
   if($villager->switch_to_page($trader_page))
   {
-    while($villager->can_trade() && $self_invertory->item_exists($item_to_trade))
+    while($villager->can_trade() && $villager->self_invertory()->item_exists($item_to_trade))
     {
       if($villager->hand_is_empty())
       {
-        $self_invertory->take_stack_of_items($item_to_trade);
+        $villager->self_invertory()->take_stack_of_items($item_to_trade);
         $villager->put_stack_to_invertory($villager_invertory);
       }
       else
@@ -110,7 +112,7 @@ sub sell_to_villager
 {
   my ($items_to_sell, $villager_invertory) = @_[0..1];
   my @sell_pages;
-  $self_invertory->save_state('before_sell');
+  $villager->self_invertory()->save_state('before_sell');
 
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
@@ -123,20 +125,20 @@ sub sell_to_villager
   }
   if(
       $target eq 'sell' &&
-      !$self_invertory->state_is_unchanged('before_sell') &&
+      !$villager->self_invertory()->state_is_unchanged('before_sell') &&
       $villager->wait_for_upgrade($items_to_sell)
     )
   {
-    $self_invertory->remap();
+    $villager->self_invertory()->remap();
     return sell_to_villager($items_to_sell, $villager_invertory);
   } else { Minecraft::UserInteraction::say("Продавать больше нечего"); }
-  return $self_invertory->state_is_unchanged('before_sell') && $villager->can_trade_all($items_to_sell);
+  return $villager->self_invertory()->state_is_unchanged('before_sell') && $villager->can_trade_all($items_to_sell);
 }
 
 sub buy_from_villager
 {
   my ($items_to_buy, $villager_invertory) = @_[0..1];
-  $self_invertory->save_state('before_buy');
+  $villager->self_invertory()->save_state('before_buy');
 
   for my $item_to_buy (keys(%{$items_to_buy}))
   {
@@ -149,30 +151,30 @@ sub buy_from_villager
   }
   if(
       $target eq 'buy' &&
-      !$self_invertory->state_is_unchanged('before_buy') &&
+      !$villager->self_invertory()->state_is_unchanged('before_buy') &&
       $villager->wait_for_upgrade($items_to_buy)
     )
   {
-    $self_invertory->remap();
+    $villager->self_invertory()->remap();
     return buy_from_villager($items_to_buy, $villager_invertory);
   }
   else { Minecraft::UserInteraction::say("Покупать больше нечего"); }
-  return $self_invertory->state_is_unchanged('before_buy') && $villager->can_trade_all($items_to_buy);
+  return $villager->self_invertory()->state_is_unchanged('before_buy') && $villager->can_trade_all($items_to_buy);
 }
 
 sub trade_with_trader
 {
   my ($items_to_sell, $items_to_buy) = @_[0..1];
-  $self_invertory->add_items_to_items_to_find($items_to_sell);
-  $self_invertory->map_cells();
+  $villager->self_invertory()->add_items_to_items_to_find($items_to_sell);
+  $villager->self_invertory()->map_cells();
+  # print Dumper $villager;
 
   $items_to_sell = filter_sell($items_to_sell);
-  my $unchanged_invertory_dump = "";
   my $villager_invertory = 0;
 
   do
   {
-    $self_invertory->save_state('trade');
+    $villager->self_invertory()->save_state('trade');
     for ($target)
     {
       if(/buy/)
@@ -196,7 +198,7 @@ sub trade_with_trader
       }
     }
   }
-  while(!$self_invertory->state_is_unchanged('trade') && $villager->wait_for_upgrade());
+  while(!$villager->self_invertory()->state_is_unchanged('trade') && $villager->wait_for_upgrade());
   Minecraft::UserInteraction::say("Торговать больше нечем и не на что. Уходим.");
 }
 
@@ -206,7 +208,7 @@ sub filter_sell
   my $filtered_items_to_sell = {};
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
-    if($self_invertory->item_exists($item_to_sell))
+    if($villager->self_invertory()->item_exists($item_to_sell))
     {
       $filtered_items_to_sell->{$item_to_sell} = $items_to_sell->{$item_to_sell};
     }
@@ -241,6 +243,7 @@ sub filter_buy
 
 for ($seller)
 {
+  Minecraft::Window::restore_size_and_position();
   my $traders = {};
   for my $trader_file (Minecraft::FileIO::get_traders())
   {

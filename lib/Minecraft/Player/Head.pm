@@ -74,7 +74,7 @@ sub take_screenshot
 sub take_temp_screenshot
 {
   my ($self, $coordinates, $clean) = @_[0..2];
-  return take_screenshot('temporally', $coordinates, $clean);
+  return $self->take_screenshot('temporally', $coordinates, $clean);
 }
 
 sub convert_cell_to_item_coordinates
@@ -121,6 +121,26 @@ sub hand_is_empty
   sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
   my $ssname = $self->take_screenshot('temporally', $main::config->{'system'}{$interface}{'clean'}, 0);
   return $self->compare_screenshots($ssname, sprintf("dont-delete-%s-clean", $interface));
+}
+
+sub result_is_empty
+{
+  my ($self, $interface) = @_[0..1];
+  return $self->compare_screenshots
+                        (
+                            sprintf('dont-delete-%s-result-empty', $interface),
+                            $self->take_temp_screenshot($main::config->{'system'}{$interface}{'result'}, 1)
+                        );
+}
+
+sub interface_is_open
+{
+  my ($self, $interface) = @_[0..1];
+  return $self->compare_screenshots
+              (
+                sprintf('dont-delete-%s-is-open', $interface),
+                $self->take_temp_screenshot($main::config->{'system'}{$interface}{'is_open'})
+              );
 }
 
 sub compare_with_cmp
@@ -172,10 +192,6 @@ sub get_md5
   return $self->{'md5_cache'}{$name};
 }
 
-sub interface_is_open
-{
-  my ($self, $name, $coordinates) = @_[0..2];
-  return $self->compare_screenshots(sprintf("dont-delete-%s-is-open", $name), $self->take_temp_screenshot($coordinates));
-}
+
 
 1;

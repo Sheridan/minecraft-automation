@@ -23,7 +23,7 @@ sub call_xdotool
                                     $main::config->{'user'}{'minecraft'}{'title'},
                                     $command,
                                     $main::config->{'user'}{'paths'}{'temp'});
-  #print $command."\n";
+  # print $command."\n";
   while(system($command) != 0 ||
         -s sprintf('%s/xdotool-minecraft-automation.log', $main::config->{'user'}{'paths'}{'temp'}))
   {

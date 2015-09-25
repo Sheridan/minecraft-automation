@@ -256,8 +256,9 @@ sub get_crafttable_cells
   {
     Minecraft::UserInteraction::wait_press_enter("Всё равно откройте интерфейс стода крафта. Сделаем скриншоты для обратной связи");
   }
-  $main::player->head()->take_screenshot("dont-delete-crafttable-clean"  , $main::config->{'system'}{'crafttable'}{'clean'});
-  $main::player->head()->take_screenshot("dont-delete-crafttable-is-open", $main::config->{'system'}{'crafttable'}{'is_open'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-clean"       , $main::config->{'system'}{'crafttable'}{'clean'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-result-empty", $main::config->{'system'}{'crafttable'}{'result'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-is-open"     , $main::config->{'system'}{'crafttable'}{'is_open'});
   if(!ask_happened() || !test_crafttable()) { get_crafttable_cells(); }
   get_self_invertory_cells("стол крафта", 'crafttable');
 }
@@ -667,7 +668,7 @@ sub run_setup
   my $real_target = $_[0];
   if(exists($main::config->{'system'}{'window'}{'geometry'}))
   {
-    $main::player->hand()->restore_window();
+    Minecraft::Window::restore_size_and_position();
   }
   for ($real_target)
   {

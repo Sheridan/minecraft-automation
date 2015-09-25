@@ -66,8 +66,12 @@ sub mouse_right_click
 sub mouse_shift_left_click
 {
   my $self = $_[0];
-  $self->call_xdotool(sprintf('keydown shift sleep 0.1 click --delay %d 1 sleep 0.2 keyup shift sleep 0.1',
-                                                 $main::config->{'user'}{'timeouts'}{'mouse_click_ms'}));
+  $self->call_xdotool(sprintf('keydown shift sleep %s click --delay %d 1 sleep %s keyup shift',
+                                                 $main::config->{'user'}{'timeouts'}{'between_keypress_and_click'},
+                                                 $main::config->{'user'}{'timeouts'}{'mouse_click_ms'},
+                                                 $main::config->{'user'}{'timeouts'}{'between_keypress_and_click'}
+                                                 ));
+                                                #  print "!"; exit 0;
 }
 
 sub take_stack_from_cell
@@ -88,6 +92,12 @@ sub put_stack_to_cell
 {
   my ($self, $to_cell) = @_[0..1];
   $self->take_stack_from_cell($to_cell);
+}
+
+sub put_one_item_to_cell
+{
+  my ($self, $to_cell) = @_[0..1];
+  $self->take_half_stack_from_cell($to_cell);
 }
 
 sub move_stack_between_cells
@@ -126,6 +136,12 @@ sub take_stack_to_invertory
   $self->mouse_shift_left_click();
 }
 
+sub press_button
+{
+  my ($self, $button) = @_[0..1];
+  $self->mouse_move_to_button($button);
+  $self->mouse_left_click();
+}
 
 sub use
 {
@@ -141,11 +157,11 @@ sub is_empty
 
 sub open_interface
 {
-  my ($self, $name) = @_[0..1];
+  my ($self, $interface) = @_[0..1];
   $self->mouse_right_click();
   my $attempt_check_open_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
                                          $main::config->{'user'}{'timeouts'}{'interface_open'}    );
-  while(!$main::player->head()->interface_is_open($name, $main::config->{'system'}{$name}{'is_open'}))
+  while(!$main::player->head()->interface_is_open($interface))
   {
     sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
     $attempt_check_open_interface--;
@@ -160,11 +176,11 @@ sub open_interface
 
 sub close_interface
 {
-  my ($self, $name) = @_[0..1];
+  my ($self, $interface) = @_[0..1];
   $self->use();
   my $attempt_check_close_interface = int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
                                           $main::config->{'user'}{'timeouts'}{'interface_open'}    );
-  while($main::player->head()->interface_is_open($name, $main::config->{'system'}{$name}{'is_open'}))
+  while($main::player->head()->interface_is_open($interface))
   {
     sleep($main::config->{'user'}{'timeouts'}{'interface_open'});
     $attempt_check_close_interface--;

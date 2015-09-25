@@ -193,14 +193,14 @@ sub read_config_file
 sub save_system_config
 {
   my $config = $_[0];
-  save_json_file($config->{'system'}, {utf8 => 1, pretty => 1});
+  save_json_file('config/system-config.json', $config->{'system'});
   return read_config();
 }
 
 sub save_user_config
 {
   my $config = $_[0];
-  save_json_file($config->{'user'}, {utf8 => 1, pretty => 1});
+  save_json_file('config/user-config.json', $config->{'user'});
   return read_config();
 }
 
@@ -216,6 +216,7 @@ sub read_config
   if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))                     { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
   if(!exists($c->{'user'}{'minecraft'}{'title'}))                            { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }
   if(!exists($c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'})) { $c->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'} = 0.1; }
+  if(!exists($c->{'user'}{'timeouts'}{'between_keypress_and_click'}))        { $c->{'user'}{'timeouts'}{'between_keypress_and_click'} = 0.2; }
   if(!exists($c->{'user'}{'timeouts'}{'villager_upgrade'}))                  { $c->{'user'}{'timeouts'}{'villager_upgrade'} = 5; }
   if(!exists($c->{'user'}{'timeouts'}{'interface_open'}))                    { $c->{'user'}{'timeouts'}{'interface_open'} = 1; }
   if(!exists($c->{'user'}{'timeouts'}{'max_interface_open'}))                { $c->{'user'}{'timeouts'}{'max_interface_open'} = 15; }
