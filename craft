@@ -6,13 +6,13 @@ use Time::HiRes qw (sleep);
 use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
-use Minecraft::Automation;
+use Minecraft::Player;
+use Minecraft::Window;
 use Minecraft::FileIO;
 use Minecraft::UserInteraction;
-use Minecraft::Screenshoter;
-use Minecraft::ItemsReader;
 use Minecraft::Interfaces::Crafttable;
 $main::config = Minecraft::FileIO::read_config();
+$main::player = Minecraft::Player->new();
 my $target_item = '';
 my $reciepts = {};
 my $crafttable = Minecraft::Interfaces::Crafttable->new();
@@ -203,7 +203,7 @@ sub craft
 
 if(load_reciept($target_item))
 {
-  Minecraft::Automation::restore_window();
+  Minecraft::Window::restore_size_and_position();
   $crafttable->self_invertory()->map_cells();
   # $crafttable->dump();
   craft($target_item);
@@ -216,9 +216,3 @@ else
 {
   help();
 }
-
-# Minecraft::Automation::restore_window();
-# my $self_invertory = Minecraft::ItemsReader->new('crafttable', 'self-invertory');
-# $self_invertory->map_cells();
-# my $crafttable = Minecraft::ItemsReader->new('crafttable', 'cells');
-# $crafttable->map_cells();

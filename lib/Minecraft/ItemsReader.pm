@@ -152,7 +152,7 @@ sub what_item_at_coordinates
 {
   my ($self, $x, $y) = @_[0..2];
   my $dir_h = undef;
-  my $temp_item_screenshot = Minecraft::Screenshoter::take_temp_item_screenshot($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
+  my $temp_item_screenshot = $main::player->head()->take_temp_item_screenshot($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
   my $items_dir = sprintf("%s/%s/items/", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'});
   opendir($dir_h, $items_dir) or die $!;
   while (my $item = readdir($dir_h))
@@ -166,21 +166,21 @@ sub what_item_at_coordinates
         )
       )
     {
-      if(Minecraft::Screenshoter::compare_screenshots(Minecraft::Screenshoter::screenshot_item_name($item, $self->{'interface'}, $self->{'interface_target'}, $x, $y),
-                                                                                                    $temp_item_screenshot))
+      if($main::player->head()->compare_screenshots($main::player->head()->screenshot_item_name($item, $self->{'interface'}, $self->{'interface_target'}, $x, $y),
+                                                    $temp_item_screenshot))
       {
         closedir($dir_h);
-        print $self->{'interface_target'}."->".$item."\n";
+        # print $self->{'interface_target'}."->".$item."\n";
         return $item;
       }
       else
       {
-        print $self->{'interface_target'}." ".$item."\n";
+        # print $self->{'interface_target'}." ".$item."\n";
       }
     }
   }
   closedir($dir_h);
-  print $self->{'interface_target'}." ---------------------------\n";
+  # print $self->{'interface_target'}." ---------------------------\n";
   return 'unknown';
 }
 
@@ -214,8 +214,8 @@ sub take_stack_of_items
   my ($self, $item) = @_[0..1];
   my $coordinates = $self->get_first_item_coordinates($item);
   $self->remove_item_from_data($coordinates->{'x'}, $coordinates->{'y'});
-  Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
-  Minecraft::Automation::mouse_left_click();
+  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$coordinates->{'x'}}{$coordinates->{'y'}});
+  $main::player->hand()->mouse_left_click();
   return $coordinates;
 }
 
@@ -223,16 +223,16 @@ sub put_stack_of_items
 {
   my ($self, $item, $x, $y) = @_[0..3];
   add_item_to_data($self, $item, $x, $y);
-  Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
-  Minecraft::Automation::mouse_left_click();
+  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
+  $main::player->hand()->mouse_left_click();
 }
 
 sub put_one_item
 {
   my ($self, $item, $x, $y) = @_[0..3];
   add_item_to_data($self, $item, $x, $y);
-  Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
-  Minecraft::Automation::mouse_right_click();
+  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$self->{'interface'}}{$self->{'interface_target'}}{$x}{$y});
+  $main::player->hand()->mouse_right_click();
 }
 
 sub save_state

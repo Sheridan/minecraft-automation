@@ -6,13 +6,13 @@ use Time::HiRes qw (sleep);
 use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
-use Minecraft::Automation;
-use Minecraft::Screenshoter;
+use Minecraft::Player;
 use Minecraft::ItemsReader;
 use Minecraft::UserInteraction;
 use Minecraft::FileIO;
 use Minecraft::Interfaces::Villager;
 $main::config = Minecraft::FileIO::read_config();
+$main::player = Minecraft::Player->new();
 my $self_invertory = Minecraft::ItemsReader->new('villager', 'self-invertory');
 my $villager = Minecraft::Interfaces::Villager->new();
 my $seller = '';
@@ -60,12 +60,12 @@ sub take_to_self_invertory_or_drop # take_to_invertory_or_drop
   my $cell = $_[0];
   if($self_invertory->empty_count())
   {
-    Minecraft::Automation::take_stack_to_invertory($cell);
+    $main::player->hand()->take_stack_to_invertory($cell);
     $self_invertory->remap();
   }
   else
   {
-    Minecraft::Automation::drop_item_from_cell($cell);
+    $main::player->hand()->drop_item_from_cell($cell);
   }
 }
 
@@ -121,7 +121,7 @@ sub sell_to_villager
       last;
     }
   }
-  if(  
+  if(
       $target eq 'sell' &&
       !$self_invertory->state_is_unchanged('before_sell') &&
       $villager->wait_for_upgrade($items_to_sell)
@@ -137,7 +137,7 @@ sub buy_from_villager
 {
   my ($items_to_buy, $villager_invertory) = @_[0..1];
   $self_invertory->save_state('before_buy');
-  
+
   for my $item_to_buy (keys(%{$items_to_buy}))
   {
     Minecraft::UserInteraction::say("Покупаем %s", $item_to_buy);
@@ -147,7 +147,7 @@ sub buy_from_villager
       last;
     }
   }
-  if(  
+  if(
       $target eq 'buy' &&
       !$self_invertory->state_is_unchanged('before_buy') &&
       $villager->wait_for_upgrade($items_to_buy)
@@ -165,7 +165,7 @@ sub trade_with_trader
   my ($items_to_sell, $items_to_buy) = @_[0..1];
   $self_invertory->add_items_to_items_to_find($items_to_sell);
   $self_invertory->map_cells();
-  
+
   $items_to_sell = filter_sell($items_to_sell);
   my $unchanged_invertory_dump = "";
   my $villager_invertory = 0;

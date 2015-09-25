@@ -3,7 +3,6 @@ package Minecraft::Interfaces::Villager;
 use strict;
 use warnings;
 use Data::Dumper;
-use Minecraft::Screenshoter;
 use Time::HiRes qw (sleep);
 
 
@@ -24,47 +23,43 @@ sub clear_state
 
 sub hand_is_empty
 {
-  return Minecraft::Screenshoter::hand_is_empty('villager');
+  return $main::player->hand()->is_empty('villager');
 }
 
 sub can_trade # trader_can_sell
 {
-    return Minecraft::Screenshoter::compare_screenshots
+    return $main::player->head()->compare_screenshots
                         (
                             'dont-delete-villager-trade-avialable',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0)
+                            $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0)
                         );
 }
 
-sub result_is_empty # trader_result_is_empty
+sub result_is_empty
 {
-  return Minecraft::Screenshoter::compare_screenshots
+  return $main::player->head()->compare_screenshots
                         (
                             'dont-delete-villager-result-empty',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}, 1)
+                            $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'result'}, 1)
                         );
 }
 
-sub invertory_is_empty # trader_invertory_is_empty
+sub invertory_is_empty
 {
   my ($self, $villager_invertory) = @_[0..1];
-  return Minecraft::Screenshoter::compare_screenshots
+  return $main::player->head()->compare_screenshots
                         (
                             sprintf('dont-delete-villager-invertory-%d', $villager_invertory),
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory}, 1)
+                            $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory}, 1)
                         );
 }
 
-sub trade_interface_is_open # trade_interface_is_open
+sub trade_interface_is_open
 {
-  return Minecraft::Screenshoter::compare_screenshots
-                        (
-                            'dont-delete-villager-clean',
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{'clean'}, 0)
-                        );
+  return $main::player->head()->interface_is_open('villager');
 }
 
-sub can_trade_on_page # trader_can_trade_on_page
+sub can_trade_on_page
 {
   my ($self, $page) = @_[0..1];
   if($self->switch_to_page($page))
@@ -74,7 +69,7 @@ sub can_trade_on_page # trader_can_trade_on_page
   return 0;
 }
 
-sub can_trade_something # trader_can_trade_something
+sub can_trade_something
 {
   my ($self, $items_to_trade) = @_[0..1];
   for my $item_to_trade (keys(%{$items_to_trade}))
@@ -87,7 +82,7 @@ sub can_trade_something # trader_can_trade_something
   return 0;
 }
 
-sub can_trade_all # trader_can_trade_all
+sub can_trade_all
 {
   my ($self, $items_to_trade) = @_[0..1];
   my $flag = 0;
@@ -98,7 +93,7 @@ sub can_trade_all # trader_can_trade_all
   return $flag == scalar(keys(%{$items_to_trade}));
 }
 
-sub switch_to_page # switch_to_trader_page
+sub switch_to_page
 {
   my ($self, $page) = @_[0..1];
   my $button_name = $page > $self->{'pages'}{'current'} ? 'next_page' : 'prev_page';
@@ -108,36 +103,36 @@ sub switch_to_page # switch_to_trader_page
     {
       return 0;
     }
-    Minecraft::Automation::mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
-    Minecraft::Automation::mouse_left_click();
+    $main::player->hand()->mouse_move_to_button($main::config->{'system'}{'villager'}{$button_name});
+    $main::player->hand()->mouse_left_click();
     sleep($main::config->{'user'}{'timeouts'}{'villager_page_switch'});
     $self->{'pages'}{'current'} += $page > $self->{'pages'}{'current'} ? 1 : -1;
   }
   return 1;
 }
 
-sub page_avialable # trader_page_avialable
+sub page_avialable
 {
   my ($self, $button_name, $page) = @_[0..2];
   if(!exists($self->{'pages'}{'cache'}{$button_name}{$page}))
   {
     $self->{'pages'}{'cache'}{$button_name}{$page} =
-                !Minecraft::Screenshoter::compare_screenshots
+                !$main::player->head()->compare_screenshots
                           (
                             sprintf("dont-delete-villager-%s-not-avialable", $button_name),
-                            Minecraft::Screenshoter::take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}, 1)
+                            $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}, 1)
                           );
   }
   return $self->{'pages'}{'cache'}{$button_name}{$page};
 }
 
-sub wait_for_upgrade # wait_for_trader_upgrade
+sub wait_for_upgrade
 {
   my ($self, $items_to_trade) = @_[0..1];
   Minecraft::UserInteraction::say("Отдыхаем, пока торговец апгредится...");
-  Minecraft::Automation::close_interface('villager');
+  $main::player->hand()->close_interface('villager');
   sleep($main::config->{'user'}{'timeouts'}{'villager_upgrade'});
-  Minecraft::Automation::open_interface('villager');
+  $main::player->hand()->open_interface('villager');
   $self->clear_state();
   if(defined($items_to_trade))
   {
@@ -150,8 +145,8 @@ sub wait_for_upgrade # wait_for_trader_upgrade
 sub put_stack_to_invertory
 {
   my ($self, $cell_number) = @_[0..1];
-  Minecraft::Automation::mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$cell_number});
-  Minecraft::Automation::mouse_left_click();
+  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{$cell_number});
+  $main::player->hand()->mouse_left_click();
 }
 
 1;
