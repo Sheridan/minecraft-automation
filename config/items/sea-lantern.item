@@ -3,6 +3,6 @@ stackable:yes
 ietms-in-stack:64
 craft-reciepts:1
 prismarine-shard  ,prismarine-crystal,prismarine-shard
-prismarine-crystal,prismarine-shard  ,prismarine-crystal
+prismarine-crystal,prismarine-crystal,prismarine-crystal
 prismarine-shard  ,prismarine-crystal,prismarine-shard
 result:stack,1
