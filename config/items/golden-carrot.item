@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+gold-nugget,gold-nugget,gold-nugget
+gold-nugget,carrot     ,gold-nugget
+gold-nugget,gold-nugget,gold-nugget
+result:stack,1
