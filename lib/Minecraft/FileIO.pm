@@ -211,7 +211,7 @@ sub read_config
         'user'   => read_config_file('config/user-config.json'  ),
         'system' => read_config_file('config/system-config.json')
     };
-  if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp'; }
+  if(!exists($c->{'user'}{'paths'}{'temp'}))                                 { $c->{'user'}{'paths'}{'temp'} = '/tmp/minecraft-automation'; }
   if(!exists($c->{'user'}{'paths'}{'screenshosts'}))                         { $c->{'user'}{'paths'}{'screenshosts'} = './screenshots'; }
   if(!exists($c->{'user'}{'minecraft'}{'texture_pack'}))                     { $c->{'user'}{'minecraft'}{'texture_pack'} = "default"; }
   if(!exists($c->{'user'}{'minecraft'}{'title'}))                            { $c->{'user'}{'minecraft'}{'title'} = 'Minecraft 1.8.8'; }

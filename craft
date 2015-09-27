@@ -210,7 +210,7 @@ if(load_reciept($target_item))
   # Minecraft::UserInteraction::say("Материалы закончились, готово.");
   # print Dumper($reciepts);
   # print Dumper($self_invertory);
-  # print Dumper($crafttable);
+#   print Dumper($crafttable);
 }
 else
 {

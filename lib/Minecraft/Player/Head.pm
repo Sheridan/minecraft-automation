@@ -4,8 +4,9 @@ use base Minecraft::Player::Soul;
 use strict;
 use warnings;
 use Data::Dumper;
+use File::Path qw(make_path);
 use Digest::MD5::File qw(file_md5_base64);
-use Time::HiRes qw (sleep);
+use Time::HiRes qw (sleep gettimeofday);
 use Minecraft::FileIO;
 
 sub new
@@ -13,11 +14,16 @@ sub new
   my $class = $_[0];
   my $self = Minecraft::Player::Soul::new($class);
   $self->{'compare_method'} = 0; # 0:md5, 1:cmp
+  $self->{'temporally_screenshots'} = [];
   if(!$self->{'compare_method'})
   {
     $self->{'md5_cache'} = Minecraft::FileIO::read_json_file($self->screenshots_path()."/md5.cache");
   }
   # print Dumper $self, $class;
+  if(! -d $main::config->{'user'}{'paths'}{'temp'})
+  {
+    make_path($main::config->{'user'}{'paths'}{'temp'});
+  }
   return $self;
 }
 
@@ -27,6 +33,10 @@ sub DESTROY
   if(!$self->{'compare_method'})
   {
     Minecraft::FileIO::save_json_file($self->screenshots_path()."/md5.cache", $self->{'md5_cache'});
+  }
+  for my $file (@{$self->{'temporally_screenshots'}})
+  {
+    unlink($file);
   }
 }
 
@@ -54,7 +64,15 @@ sub screenshot_item_name
   return sprintf("%s/%d-%d", $self->screenshot_item_path($item, $interface, $cells), $x, $y);
 }
 
-sub take_screenshot
+sub screenshot_temp_filename
+{
+  my $self = $_[0];
+  my $filename = sprintf("%s/%s.bmp", $main::config->{'user'}{'paths'}{'temp'}, int (gettimeofday() * 1000));
+  push(@{$self->{'temporally_screenshots'}}, $filename);
+  return $filename;
+}
+
+sub take_screenshot_and_save_to
 {
   my ($self, $filename, $coordinates, $clean) = @_[0..3];
   if($clean && $main::player->hand()->mouse_hide_from_interface())
@@ -67,14 +85,20 @@ sub take_screenshot
     $coordinates->{'br'}{'y'} - $coordinates->{'tl'}{'y'},
     $coordinates->{'tl'}{'x'},
     $coordinates->{'tl'}{'y'},
-    $self->screenshot_full_filename($filename)));
+    $filename));
   return $filename;
+}
+
+sub take_screenshot
+{
+  my ($self, $filename, $coordinates, $clean) = @_[0..3];
+  return $self->take_screenshot_and_save_to($self->screenshot_full_filename($filename), $coordinates, $clean);
 }
 
 sub take_temp_screenshot
 {
   my ($self, $coordinates, $clean) = @_[0..2];
-  return $self->take_screenshot('temporally', $coordinates, $clean);
+  return $self->take_screenshot_and_save_to($self->screenshot_temp_filename(), $coordinates, $clean);
 }
 
 sub convert_cell_to_item_coordinates
@@ -99,8 +123,7 @@ sub convert_cell_to_item_coordinates
 sub take_item_screenshot
 {
   my ($self, $item, $interface, $cells, $x, $y) = @_[0..5];
-  return $self->take_screenshot(
-                                $self->screenshot_item_name($item, $interface, $cells, $x, $y),
+  return $self->take_screenshot($self->screenshot_full_filename($self->screenshot_item_name($item, $interface, $cells, $x, $y)),
                                 $self->convert_cell_to_item_coordinates($main::config->{'system'}{$interface}{$cells}{$x}{$y}),
                                 1);
 }
@@ -108,19 +131,23 @@ sub take_item_screenshot
 sub take_temp_item_screenshot
 {
   my ($self, $coordinates) = @_[0..1];
-  return $self->take_screenshot(
-                                'temporally',
-                                $self->convert_cell_to_item_coordinates($coordinates),
-                                1);
+  return $self->take_screenshot_and_save_to($self->screenshot_temp_filename(),
+                                            $self->convert_cell_to_item_coordinates($coordinates),
+                                            1);
 }
 
 sub hand_is_empty
 {
   my ($self, $interface) = @_[0..1];
-  $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$interface}{'clean'});
-  sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
-  my $ssname = $self->take_screenshot('temporally', $main::config->{'system'}{$interface}{'clean'}, 0);
-  return $self->compare_screenshots($ssname, sprintf("dont-delete-%s-clean", $interface));
+  if($main::player->hand()->mouse_move_to_cell($main::config->{'system'}{$interface}{'clean'}))
+  {
+    sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});
+  }
+  return $self->compare_screenshots
+                        (
+                          $self->take_temp_screenshot($main::config->{'system'}{$interface}{'clean'}, 0), 
+                          $self->screenshot_full_filename(sprintf("dont-delete-%s-clean", $interface))
+                        );
 }
 
 sub result_is_empty
@@ -128,7 +155,7 @@ sub result_is_empty
   my ($self, $interface) = @_[0..1];
   return $self->compare_screenshots
                         (
-                            sprintf('dont-delete-%s-result-empty', $interface),
+                            $self->screenshot_full_filename(sprintf('dont-delete-%s-result-empty', $interface)),
                             $self->take_temp_screenshot($main::config->{'system'}{$interface}{'result'}, 1)
                         );
 }
@@ -137,16 +164,16 @@ sub interface_is_open
 {
   my ($self, $interface) = @_[0..1];
   return $self->compare_screenshots
-              (
-                sprintf('dont-delete-%s-is-open', $interface),
-                $self->take_temp_screenshot($main::config->{'system'}{$interface}{'is_open'})
-              );
+                        (
+                          $self->screenshot_full_filename(sprintf('dont-delete-%s-is-open', $interface)),
+                          $self->take_temp_screenshot($main::config->{'system'}{$interface}{'is_open'})
+                        );
 }
 
 sub compare_with_cmp
 {
   my ($self, $f0, $f1) = @_[0..2];
-  system("cmp", "--silent", $self->screenshot_full_filename($f0), $self->screenshot_full_filename($f1));
+  system("cmp", "--silent", $f0, $f1);
   if ($? == -1) { die "Не могу запустить cmp: $!\n"; }
   elsif ($? & 127) { die sprintf("cmp издох с сигналом %d, %s\n", ($? & 127),  ($? & 128) ? 'с корой' : 'без коры') ; }
   my $ret = $? >> 8;
@@ -172,7 +199,7 @@ sub compare_screenshots
 sub compare_screenshots_no_cache
 {
   my ($self, $f0, $f1) = @_[0..2];
-  if($self->{'compare_method'} == 0) { return file_md5_base64($self->screenshot_full_filename($f0)) eq file_md5_base64($self->screenshot_full_filename($f1)); }
+  if($self->{'compare_method'} == 0) { return file_md5_base64($f0) eq file_md5_base64($f1); }
   if($self->{'compare_method'} == 1) { return $self->compare_with_cmp($f0, $f1); }
 }
 
@@ -182,11 +209,11 @@ sub get_md5
   if($name eq 'temporally')
   {
     #Minecraft::UserInteraction::say("Считаю md5 от временного файла...");
-    return file_md5_base64($self->screenshot_full_filename($name));
+    return file_md5_base64($name);
   }
   if(!exists($self->{'md5_cache'}{$name}))
   {
-    $self->{'md5_cache'}{$name} = file_md5_base64($self->screenshot_full_filename($name));
+    $self->{'md5_cache'}{$name} = file_md5_base64($name);
     #Minecraft::UserInteraction::say("Новый хэш md5 в кэше: [%s:%s]", $name, $md5_cache->{$name});
   }
   return $self->{'md5_cache'}{$name};

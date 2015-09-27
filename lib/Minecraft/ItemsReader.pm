@@ -5,6 +5,7 @@ use warnings;
 use Data::Dumper;
 use Time::HiRes qw (sleep);
 use Digest::MD5 qw(md5_hex);
+# use Parallel::ForkManager;
 
 sub new
 {
@@ -116,26 +117,49 @@ sub empty
   }
 }
 
+
 sub map_cells
 {
   my $self = $_[0];
   #Minecraft::UserInteraction::say("Картографирую %s:%s...", $self->{'interface'}, $self->{'interface_target'});
   delete($self->{'items-count'});
+#   my $pm = Parallel::ForkManager->new($self->{'dimension'}{'x'}*$self->{'dimension'}{'y'});
+#   $pm->run_on_finish( sub 
+#     { 
+#       my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
+#       print Dumper $data;
+#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'}); 
+#     });
   for my $y (0..$self->{'dimension'}{'y'})
   {
     for my $x (0..$self->{'dimension'}{'x'})
     {
-      my $item = $self->what_item_at_coordinates($x, $y);
-      $self->add_item_to_data($item, $x, $y);
+      $self->add_item_to_data($self->what_item_at_coordinates($x, $y), $x, $y);
+#       $pm->start and next;
+#       my $data = 
+#           {
+#             'item' => $self->what_item_at_coordinates($x, $y),
+#             'x'    => $x, 
+#             'y'    => $y 
+#           };
+#       $pm->finish(0, \$data);
+#       $self->add_item_to_data($item, $x, $y);
       #printf("[%s]", $item);
     }
     #print ("\n");
   }
+#   $pm->wait_all_children;
 }
 
 sub remap_empty_cells
 {
   my ($self, $reverse) = @_[0..1];
+#   my $pm = Parallel::ForkManager->new($self->{'dimension'}{'x'}*$self->{'dimension'}{'y'});
+#   $pm->run_on_finish( sub 
+#     { 
+#       my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
+#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'}); 
+#     });
   for my $y ($reverse?reverse(0..$self->{'dimension'}{'y'}):(0..$self->{'dimension'}{'y'}))
   {
     for my $x ($reverse?reverse(0..$self->{'dimension'}{'x'}):(0..$self->{'dimension'}{'x'}))
@@ -144,11 +168,20 @@ sub remap_empty_cells
       {
         my $item = $self->what_item_at_coordinates($x, $y);
         if($item eq 'empty') { return; }
-        $self->add_item_to_data($item, $x, $y);
+#         $pm->start and next;
+#         my $data = 
+#           {
+#             'item' => $self->what_item_at_coordinates($x, $y),
+#             'x'    => $x, 
+#             'y'    => $y 
+#           };
+#         $pm->finish(0, \$data);
+#         $self->add_item_to_data($item, $x, $y);
         #printf("[%s]", $item);
       }
     }
   }
+#   $pm->wait_all_children;
 }
 
 sub remap
@@ -178,8 +211,9 @@ sub what_item_at_coordinates
         )
       )
     {
-      if($main::player->head()->compare_screenshots($main::player->head()->screenshot_item_name($item, $self->{'interface'}, $self->{'interface_target'}, $x, $y),
-                                                    $temp_item_screenshot))
+      if($main::player->head()->compare_screenshots(
+                  $main::player->head()->screenshot_full_filename($main::player->head()->screenshot_item_name($item, $self->{'interface'}, $self->{'interface_target'}, $x, $y)),
+                  $temp_item_screenshot))
       {
         closedir($dir_h);
         # print $self->{'interface_target'}."->".$item."\n";
