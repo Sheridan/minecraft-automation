@@ -124,11 +124,11 @@ sub map_cells
   #Minecraft::UserInteraction::say("Картографирую %s:%s...", $self->{'interface'}, $self->{'interface_target'});
   delete($self->{'items-count'});
 #   my $pm = Parallel::ForkManager->new($self->{'dimension'}{'x'}*$self->{'dimension'}{'y'});
-#   $pm->run_on_finish( sub 
-#     { 
+#   $pm->run_on_finish( sub
+#     {
 #       my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
 #       print Dumper $data;
-#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'}); 
+#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'});
 #     });
   for my $y (0..$self->{'dimension'}{'y'})
   {
@@ -136,11 +136,11 @@ sub map_cells
     {
       $self->add_item_to_data($self->what_item_at_coordinates($x, $y), $x, $y);
 #       $pm->start and next;
-#       my $data = 
+#       my $data =
 #           {
 #             'item' => $self->what_item_at_coordinates($x, $y),
-#             'x'    => $x, 
-#             'y'    => $y 
+#             'x'    => $x,
+#             'y'    => $y
 #           };
 #       $pm->finish(0, \$data);
 #       $self->add_item_to_data($item, $x, $y);
@@ -155,10 +155,10 @@ sub remap_empty_cells
 {
   my ($self, $reverse) = @_[0..1];
 #   my $pm = Parallel::ForkManager->new($self->{'dimension'}{'x'}*$self->{'dimension'}{'y'});
-#   $pm->run_on_finish( sub 
-#     { 
+#   $pm->run_on_finish( sub
+#     {
 #       my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
-#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'}); 
+#       $self->add_item_to_data($data->{'item'}, $data->{'x'}, $data->{'y'});
 #     });
   for my $y ($reverse?reverse(0..$self->{'dimension'}{'y'}):(0..$self->{'dimension'}{'y'}))
   {
@@ -169,11 +169,11 @@ sub remap_empty_cells
         my $item = $self->what_item_at_coordinates($x, $y);
         if($item eq 'empty') { return; }
 #         $pm->start and next;
-#         my $data = 
+#         my $data =
 #           {
 #             'item' => $self->what_item_at_coordinates($x, $y),
-#             'x'    => $x, 
-#             'y'    => $y 
+#             'x'    => $x,
+#             'y'    => $y
 #           };
 #         $pm->finish(0, \$data);
 #         $self->add_item_to_data($item, $x, $y);
@@ -207,7 +207,8 @@ sub what_item_at_coordinates
         -d $items_dir.$item &&
         (
           (exists($self->{'items_to_find'}{$item}) || scalar(keys(%{$self->{'items_to_find'}})) == 1) ||
-          (exists($self->{'items_to_find'}{'any-plank'}) && $item=~/plank/)
+          (exists($self->{'items_to_find'}{'any-plank'}) && $item=~/-plank/) ||
+          (exists($self->{'items_to_find'}{'any-wood-slab'}) && $item=~/-slab/)
         )
       )
     {
