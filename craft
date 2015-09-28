@@ -15,6 +15,7 @@ $main::config = Minecraft::FileIO::read_config();
 $main::player = Minecraft::Player->new();
 my $target_item = '';
 my $reciepts = {};
+my @hystory = ();
 my $crafttable = Minecraft::Interfaces::Crafttable->new();
 GetOptions(
     "craft=s" => \$target_item,
@@ -160,6 +161,12 @@ sub self_invertory_has_cells_for_result
 sub craft
 {
   my ($item_to_craft) = $_[0];
+  if($#hystory && $hystory[$#hystory-2] eq $item_to_craft && $hystory[$#hystory-1] ne $item_to_craft)
+  {
+    Minecraft::UserInteraction::say("Похоже, что уходим в глубокую рекурсию при крафте %s. Прерываем.", $item_to_craft);
+    exit 0;
+  }
+  push (@hystory, $item_to_craft);
   for my $reciept_number (keys(%{$reciepts->{$item_to_craft}{'reciepts'}}))
   {
     if(self_invertory_has_ingridients($item_to_craft, $reciept_number) && self_invertory_has_cells_for_result($item_to_craft, $reciept_number))
