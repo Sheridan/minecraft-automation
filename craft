@@ -72,16 +72,12 @@ sub reciept_help
   # print Dumper ($reciept);
 }
 
-
-# for my $reciept_file (Minecraft::FileIO::get_items())
-# {
-#   print Dumper (Minecraft::FileIO::read_item_file($reciept_file))
-# }
 sub load_reciept
 {
   my $item = $_[0];
   if(Minecraft::FileIO::item_description_exists($item) && !exists($reciepts->{$item}))
   {
+    Minecraft::UserInteraction::say("Загружаем рецепт крафта %s", $item);
     $reciepts->{$item} = Minecraft::FileIO::read_item($item);
     for my $reciept_number (keys(%{$reciepts->{$item}{'reciepts'}}))
     {
@@ -158,10 +154,32 @@ sub self_invertory_has_cells_for_result
   return 1;
 }
 
+sub reciept_contain_ingridient
+{
+  my ($reciept, $ingridient) = @_[0..1];
+  for my $reciept_number (keys(%{$reciept->{'reciepts'}}))
+  {
+    for my $crafttable_y (0..2)
+    {
+      for my $crafttable_x (0..2)
+      {
+        if($ingridient eq $reciept->{'reciepts'}{$reciept_number}{'crafttable'}{$crafttable_x}{$crafttable_y})
+        {
+          return 1;
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 sub craft
 {
   my ($item_to_craft) = $_[0];
-  if($#hystory && $hystory[$#hystory-2] eq $item_to_craft && $hystory[$#hystory-1] ne $item_to_craft)
+  if(
+      (exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)) ||
+      ($#hystory > 1 && $#hystory && $hystory[$#hystory-2] eq $item_to_craft && $hystory[$#hystory-1] ne $item_to_craft)
+    )
   {
     Minecraft::UserInteraction::say("Похоже, что уходим в глубокую рекурсию при крафте %s. Прерываем.", $item_to_craft);
     exit 0;
