@@ -264,9 +264,9 @@ sub get_crafttable_cells
 
 sub get_crafttable_screenshots
 {
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-crafttable-clean")       , $main::config->{'system'}{'crafttable'}{'clean'});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-crafttable-result-empty"), $main::config->{'system'}{'crafttable'}{'result'});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-crafttable-is-open")     , $main::config->{'system'}{'crafttable'}{'is_open'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-clean"       , $main::config->{'system'}{'crafttable'}{'clean'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-result-empty", $main::config->{'system'}{'crafttable'}{'result'});
+  $main::player->head()->take_screenshot("dont-delete-crafttable-is-open"     , $main::config->{'system'}{'crafttable'}{'is_open'});
 }
 
 sub get_self_invertory_cells
@@ -329,7 +329,7 @@ sub get_big_chest_cells
 
 sub get_big_chest_screenshots
 {
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-big-chest-is-open"), $main::config->{'system'}{'big-chest'}{'is_open'});
+  $main::player->head()->take_screenshot("dont-delete-big-chest-is-open", $main::config->{'system'}{'big-chest'}{'is_open'});
 }
 
 sub get_villager_interface
@@ -367,14 +367,14 @@ sub get_villager_screenshots
     {
       $main::player->hand()->mouse_left_click();
     }
-    $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename(sprintf("dont-delete-villager-%s-not-avialable"), $button_name), $main::config->{'system'}{'villager'}{$button_name});
+    $main::player->head()->take_screenshot(sprintf("dont-delete-villager-%s-not-avialable", $button_name), $main::config->{'system'}{'villager'}{$button_name});
   }
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-is-open")        , $main::config->{'system'}{'villager'}{'is_open'});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-trade-avialable"), $main::config->{'system'}{'villager'}{'trade-avialable'});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-invertory-0")    , $main::config->{'system'}{'villager'}{'invertory'}{0});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-invertory-1")    , $main::config->{'system'}{'villager'}{'invertory'}{1});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-result-empty")   , $main::config->{'system'}{'villager'}{'result'});
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("dont-delete-villager-clean")          , $main::config->{'system'}{'villager'}{'clean'});
+  $main::player->head()->take_screenshot("dont-delete-villager-is-open"        , $main::config->{'system'}{'villager'}{'is_open'});
+  $main::player->head()->take_screenshot("dont-delete-villager-trade-avialable", $main::config->{'system'}{'villager'}{'trade-avialable'});
+  $main::player->head()->take_screenshot("dont-delete-villager-invertory-0"    , $main::config->{'system'}{'villager'}{'invertory'}{0});
+  $main::player->head()->take_screenshot("dont-delete-villager-invertory-1"    , $main::config->{'system'}{'villager'}{'invertory'}{1});
+  $main::player->head()->take_screenshot("dont-delete-villager-result-empty"   , $main::config->{'system'}{'villager'}{'result'});
+  $main::player->head()->take_screenshot("dont-delete-villager-clean"          , $main::config->{'system'}{'villager'}{'clean'});
 }
 
 # ------------------------------------- Обучение шмоту ----------------------------
@@ -428,7 +428,7 @@ sub train_view_item_xy
         }
         while (!$main::player->head()->compare_screenshots_no_cache
                     (
-                        $main::player->head()->screenshot_item_name($item, $interface, $cells, $x, $y),
+                        $main::player->head()->screenshot_full_filename($main::player->head()->screenshot_item_name($item, $interface, $cells, $x, $y)),
                         $main::player->head()->take_temp_item_screenshot($main::config->{'system'}{$interface}{$cells}{$x}{$y}))
                     );
       }
@@ -650,7 +650,7 @@ sub setup_turn
 TEXT
 );
   my $interface_cell = get_cell_coordinates("Пустое место в интерфейсе персонажа размером с ячейку, советую где нибудь под стрелкой, указывающей на результат");
-  $main::player->head()->take_screenshot($main::player->head()->screenshot_full_filename("setup-turn"), $interface_cell);
+  $main::player->head()->take_screenshot("setup-turn", $interface_cell);
 
   my $turn = 0;
   get_cursor_position("Выставьте в строке Facing горизонтальный угол в 0,0. По готовности кликните мышой и ждите, пока персонаж повернется на 10,0");

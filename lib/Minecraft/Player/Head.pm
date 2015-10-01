@@ -123,7 +123,7 @@ sub convert_cell_to_item_coordinates
 sub take_item_screenshot
 {
   my ($self, $item, $interface, $cells, $x, $y) = @_[0..5];
-  return $self->take_screenshot($self->screenshot_full_filename($self->screenshot_item_name($item, $interface, $cells, $x, $y)),
+  return $self->take_screenshot($self->screenshot_item_name($item, $interface, $cells, $x, $y),
                                 $self->convert_cell_to_item_coordinates($main::config->{'system'}{$interface}{$cells}{$x}{$y}),
                                 1);
 }
@@ -206,7 +206,7 @@ sub compare_screenshots_no_cache
 sub get_md5
 {
   my ($self, $name) = @_[0..1];
-  if($name eq 'temporally')
+  if($name =~ '.*/\d+\.bmp')
   {
     #Minecraft::UserInteraction::say("Считаю md5 от временного файла...");
     return file_md5_base64($name);
@@ -214,7 +214,7 @@ sub get_md5
   if(!exists($self->{'md5_cache'}{$name}))
   {
     $self->{'md5_cache'}{$name} = file_md5_base64($name);
-    #Minecraft::UserInteraction::say("Новый хэш md5 в кэше: [%s:%s]", $name, $md5_cache->{$name});
+    #Minecraft::UserInteraction::say("Новый хэш md5 в кэше: [%s:%s]", $name, $self->{'md5_cache'}{$name});
   }
   return $self->{'md5_cache'}{$name};
 }
