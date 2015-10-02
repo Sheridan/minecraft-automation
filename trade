@@ -1,11 +1,15 @@
 #!/usr/bin/perl -w
 
 use strict;
+use utf8;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use JSON;
 use Time::HiRes qw (sleep);
 use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
+use Minecraft::L10n;
 use Minecraft::Player;
 use Minecraft::ItemsReader;
 use Minecraft::UserInteraction;
@@ -13,6 +17,7 @@ use Minecraft::FileIO;
 use Minecraft::Interfaces::Villager;
 use Minecraft::Window;
 $main::config = Minecraft::FileIO::read_config();
+$main::l10n   = Minecraft::L10n->new();
 $main::player = Minecraft::Player->new();
 my $villager = Minecraft::Interfaces::Villager->new();
 my $seller = '';
@@ -25,28 +30,15 @@ GetOptions(
     "buy=s"    => \$buy,
     "target=s" => \$target,
     "help"     => \&help
-    ) or die("Что то не так с опциями командной строки\n");
+    ) or die($main::l10n->tr('wrong_commandline'));
 
 sub help
 {
-  print <<_HELP_;
-Использование: trade <options>
-Опции:
-    --target=строка Указывает приоритет торговли
-        --target=sell приоритет выставляется на продажу. Покупки только для апгрейда торговца. Действует по умолчанию.
-        --target=buy  приоритет выставляется на покупку. Продажи только для апгрейда торговца
-    --buy=строка  Что можно купить (читайте что продают seller'ы выше)
-            Указывайте через запятую, без пробелов
-            Но есть еще две возможности:
-              --buy=all скупает всё что есть (действие по умолчанию)
-              --buy=none ничего не покупает
-    --seller=строка  С кем надо торговать
-          Доступно:
-_HELP_
+  print $main::l10n->tr('trade_help');
   for my $trader_file (Minecraft::FileIO::get_traders())
   {
       my $trader = Minecraft::FileIO::read_trader_file($trader_file);
-      printf("\t\t%s\n\t\t\tПокупает: %s\n\t\t\tПродаёт: %s\n",
+      printf($main::l10n->tr('help_villager'),
                   $trader->{'name'},
                   join(',', keys(%{$trader->{'sell'}})),
                   join(',', keys(%{$trader->{'buy'}})));
@@ -94,7 +86,7 @@ sub trade_item_with_villager
         $done = 1;
       }
     }
-    Minecraft::UserInteraction::say("Забираем обратно остатки");
+    Minecraft::UserInteraction::say($main::l10n->tr('taking_back_remains'));
     if(!$villager->invertory_is_empty($villager_invertory))
     {
       take_to_self_invertory_or_drop($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory});
@@ -116,10 +108,10 @@ sub sell_to_villager
 
   for my $item_to_sell (keys(%{$items_to_sell}))
   {
-    Minecraft::UserInteraction::say("Продаём %s", $item_to_sell);
+    Minecraft::UserInteraction::say($main::l10n->tr('sell_to_trader'), $main::l10n->tr($item_to_sell));
     if(trade_item_with_villager($item_to_sell, $items_to_sell->{$item_to_sell}, $villager_invertory) && $target eq 'buy')
     {
-      Minecraft::UserInteraction::say("Немного продали. Посмотрим, проапгредится ли продавец");
+      Minecraft::UserInteraction::say($main::l10n->tr('some_sell_wait_trader_upgrade'));
       last;
     }
   }
@@ -131,7 +123,7 @@ sub sell_to_villager
   {
     $villager->self_invertory()->remap();
     return sell_to_villager($items_to_sell, $villager_invertory);
-  } else { Minecraft::UserInteraction::say("Продавать больше нечего"); }
+  } else { Minecraft::UserInteraction::say($main::l10n->tr('nothing_to_sell')); }
   return $villager->self_invertory()->state_is_unchanged('before_sell') && $villager->can_trade_all($items_to_sell);
 }
 
@@ -142,10 +134,10 @@ sub buy_from_villager
 
   for my $item_to_buy (keys(%{$items_to_buy}))
   {
-    Minecraft::UserInteraction::say("Покупаем %s", $item_to_buy);
+    Minecraft::UserInteraction::say($main::l10n->tr('buy_from_trader'), $main::l10n->tr($item_to_buy));
      if(trade_item_with_villager('emerald', $items_to_buy->{$item_to_buy}, $villager_invertory) && $target eq 'sell')
     {
-      Minecraft::UserInteraction::say("Немного купили. Посмотрим, проапгредится ли продавец");
+      Minecraft::UserInteraction::say($main::l10n->tr('some_buy_wait_trader_upgrade'));
       last;
     }
   }
@@ -158,7 +150,7 @@ sub buy_from_villager
     $villager->self_invertory()->remap();
     return buy_from_villager($items_to_buy, $villager_invertory);
   }
-  else { Minecraft::UserInteraction::say("Покупать больше нечего"); }
+  else { Minecraft::UserInteraction::say($main::l10n->tr('nothing_to_buy')); }
   return $villager->self_invertory()->state_is_unchanged('before_buy') && $villager->can_trade_all($items_to_buy);
 }
 
@@ -193,13 +185,13 @@ sub trade_with_trader
       }
       else
       {
-        Minecraft::UserInteraction::say("Вы неверно указали цель торговли. Читайте помощь.");
+        Minecraft::UserInteraction::say($main::l10n->tr('wrong_trade_target'));
         help();
       }
     }
   }
   while(!$villager->self_invertory()->state_is_unchanged('trade') && $villager->wait_for_upgrade());
-  Minecraft::UserInteraction::say("Торговать больше нечем и не на что. Уходим.");
+  Minecraft::UserInteraction::say($main::l10n->tr('nothing_to_trade'));
 }
 
 sub filter_sell

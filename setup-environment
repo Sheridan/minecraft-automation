@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
 use strict;
+use utf8;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use JSON;
 use Time::HiRes qw (sleep);
 use File::Path qw(make_path);
@@ -8,6 +11,7 @@ use Data::Dumper;
 use File::Copy;
 use Getopt::Long;
 use lib './lib';
+use Minecraft::L10n;
 use Minecraft::Player;
 use Minecraft::Window;
 use Minecraft::UserInteraction;
@@ -15,34 +19,19 @@ use Minecraft::FileIO;
 
 my $test_mouse_timeout = 0.1;
 my $test_turn_timeout = 0.7;
+$main::config = Minecraft::FileIO::read_config();
+$main::l10n   = Minecraft::L10n->new();
+$main::player = Minecraft::Player->new();
 
 my $target = 'all';
 GetOptions(
     "target=s" => \$target,
     "help"     => \&help
-    ) or die("Что то не так с опциями командной строки\n");
-
-$main::config = Minecraft::FileIO::read_config();
-$main::player = Minecraft::Player->new();
+    ) or die($main::l10n->tr('wrong_commandline'));
 
 sub help
 {
-  print <<_HELP_;
-Использование: setup-environment <options>
-Опции:
-  --target=строка  Что надо настроить
-    all         Настройка всего, по умолчанию
-    invertory   Настройка размещения ячеек инвертаря
-    big-chest   Настройка размещения ячеек большого сундука
-    crafttable  Настройка размещения ячеек стола крафта
-    villager    Настройка размещения ячеек стола торговца
-    items       Настройка распознавания шмота
-    options     Настройка опций пользователя
-    window      Настройка размеров и положения окна
-    turn        Настройка поворотов
-    chrespack   Смена ресурспака. Скрипт спросит имя ресурспака и сделает необхимые скриншоты.
-
-_HELP_
+  print $main::l10n->tr('setup_help');
   exit(0);
 }
 
@@ -77,8 +66,8 @@ sub get_cell_coordinates
   my $text = $_[0];
   my $tmp =
   {
-    'tl' => get_cursor_position("$text. Кликните в левом верхнем углу ячейки"),
-    'br' => get_cursor_position("$text. Кликните в правом нижнем углу ячейки")
+    'tl' => get_cursor_position($text.". ".$main::l10n->tr('click_top_left')),
+    'br' => get_cursor_position($text.". ".$main::l10n->tr('click_bottom_right'))
   };
   $tmp->{'c'} = calc_cell_center($tmp);
   #print Dumper($tmp);
@@ -89,7 +78,7 @@ sub get_button_coordinates
 {
   my $text = $_[0];
   my $tmp = {};
-  $tmp->{'c'} = get_cursor_position("$text. Нажмите эту кнопку, старайтесь жать посередине кнопки");
+  $tmp->{'c'} = get_cursor_position($text.". ".$main::l10n->tr('press_button'));
   return $tmp;
 }
 
@@ -104,9 +93,9 @@ sub get_clean_coordinates
 # --------------------------------------- вопросы -----------------------------------
 sub ask_happened
 {
-  if(!Minecraft::UserInteraction::prompt_yn("Всё прошло успешно?"))
+  if(!Minecraft::UserInteraction::prompt_yn($main::l10n->tr('everything_went_well')))
   {
-    Minecraft::UserInteraction::say("Нет? Тогда надо повторить...");
+    Minecraft::UserInteraction::say($main::l10n->tr('have_to_repeat'));
     return 0;
   }
   $main::config = Minecraft::FileIO::save_system_config($main::config);
@@ -116,12 +105,12 @@ sub ask_happened
 sub prompt_ask
 {
   my ($text, $default) = @_[0..1];
-  my $answer = Minecraft::UserInteraction::prompt(sprintf("%s\nОставить как есть ('%s') - просто энтер.\n", $text, $default));
+  my $answer = Minecraft::UserInteraction::prompt(sprintf($main::l10n->tr('leave_as_is'), $text, $default));
   if($answer eq '')
   {
     $answer = $default;
   }
-  if(!Minecraft::UserInteraction::prompt_yn(sprintf("Вы ввели '%s'. Верно?", $answer)))
+  if(!Minecraft::UserInteraction::prompt_yn(sprintf($main::l10n->tr('you_entered'), $answer)))
   {
     return prompt_ask($text, $default);
   }
@@ -130,49 +119,35 @@ sub prompt_ask
 
 sub ask_texture_pack
 {
-  my $text = <<TTT;
-Введите латиницей имя ресурспака. Необязательно именно так он должен называться. Главное что бы вы потом поняли, что это он.
-Для этой софтины необходимо, что бы не было анимированных вещей. Ну как минимум не более чем в стандартном ресурспаке.
-Или просто работайте с софтиной, переключаясь в стандартный ресурспак
-При смене ресурспака необходимо будет заново обучить софтину опознавать шмот
-Если меняете ресурспак обратно - достаточно руками изменить его имя в user-config.json
-TTT
-  $main::config->{'user'}{'minecraft'}{'texture_pack'} = prompt_ask($text, $main::config->{'user'}{'minecraft'}{'texture_pack'});
+  $main::config->{'user'}{'minecraft'}{'texture_pack'} = prompt_ask($main::l10n->tr('setup_resourcepack'), $main::config->{'user'}{'minecraft'}{'texture_pack'});
   $main::config = Minecraft::FileIO::save_user_config($main::config);
   make_path(sprintf("%s/%s/items", $main::config->{'user'}{'paths'}{'screenshosts'}, $main::config->{'user'}{'minecraft'}{'texture_pack'}));
 }
 
 sub ask_screenshot_path
 {
-  my $text = <<TTT;
-Где можно будет сохранять изображения, необходимые для обратной связи с майном?
-Введите путь.
-TTT
-  $main::config->{'user'}{'paths'}{'screenshosts'} = prompt_ask($text, $main::config->{'user'}{'paths'}{'screenshosts'});
+  $main::config->{'user'}{'paths'}{'screenshosts'} = prompt_ask($main::l10n->tr('enter_screenshot_path'), $main::config->{'user'}{'paths'}{'screenshosts'});
   $main::config = Minecraft::FileIO::save_user_config($main::config);
   make_path($main::config->{'user'}{'paths'}{'screenshosts'});
 }
 
 sub ask_mc_title
 {
-  my $text = <<TTT;
-Введите полностью заголовок окна майна. Не лаунчера!
-TTT
-  $main::config->{'user'}{'minecraft'}{'title'} = prompt_ask($text, $main::config->{'user'}{'minecraft'}{'title'});
+  $main::config->{'user'}{'minecraft'}{'title'} = prompt_ask($main::l10n->tr('enter_minecraft_window_title'), $main::config->{'user'}{'minecraft'}{'title'});
   $main::config = Minecraft::FileIO::save_user_config($main::config);
 }
 
 sub prompt_change_existent
 {
   my $exists = $_[0];
-  return $exists ? Minecraft::UserInteraction::prompt_yn("Это уже было настроено раньше. Желаете перенастроить?") : 1;
+  return $exists ? Minecraft::UserInteraction::prompt_yn($main::l10n->tr('like_to_reconfigure')) : 1;
 }
 
 # ------------------------------------- окна, ячейки.... ----------------------------
 
 sub get_windowsizeposition
 {
-  Minecraft::UserInteraction::wait_press_enter("Расположите окно майнкрафта так, как вам привычно и удобно");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('place_window_comfortable'));
   if(!prompt_change_existent(exists($main::config->{'system'}{'window'}{'geometry'}))) { return; }
   $main::config->{'system'}{'window'}{'geometry'} = $main::player->head()->get_window_size_position();
   if(!ask_happened()) { get_windowsizeposition(); }
@@ -181,12 +156,12 @@ sub get_windowsizeposition
 sub print_cells_numbers
 {
   my ($max_x, $max_y) = @_[0..1];
-  Minecraft::UserInteraction::say("Нумерация ячеек следующая:");
+  Minecraft::UserInteraction::say($main::l10n->tr('cells_numeration'));
   for my $y (0..$max_y)
   {
     for my $x (0..$max_x)
     {
-      printf("%d:%d ", $x, $y);
+      printf("%d:%d ", $x+1, $y+1);
     }
     print "\n";
   }
@@ -228,20 +203,20 @@ sub calculate_cell
 
 sub get_no_interface_point
 {
-  Minecraft::UserInteraction::wait_press_enter("Откройте любой большой сундук, надо определить точку вне интерфейса");
-  $main::config->{'system'}{'no-interface'} = get_clean_coordinates("Кликните вне интерфейса, но в окне майна. Желательно посередине окна, как можно ниже. Эта точка будет использоваться для скрытия мыша и для дропа");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_big-chest'));
+  $main::config->{'system'}{'no-interface'} = get_clean_coordinates($main::l10n->tr('click_outside'));
   if(!ask_happened()) { get_no_interface_point(); }
 }
 
 sub get_crafttable_cells
 {
-  Minecraft::UserInteraction::wait_press_enter("Откройте интерфейс стола крафта");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_crafttable'));
   print_cells_numbers(2,2);
   if(prompt_change_existent(exists($main::config->{'system'}{'crafttable'})))
   {
-    my $params = calculate_cell_params( get_cell_coordinates("Ячейка 0:0 стола крафта"),
-                                        get_cell_coordinates("Ячейка 1:0 стола крафта"),
-                                        get_cell_coordinates("Ячейка 0:1 стола крафта"));
+    my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('crafttable_cell_xy'), 1, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('crafttable_cell_xy'), 2, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('crafttable_cell_xy'), 1, 2)));
     for my $y (0..2)
     {
       for my $x (0..2)
@@ -249,17 +224,17 @@ sub get_crafttable_cells
         $main::config->{'system'}{'crafttable'}{'cells'}{$x}{$y} = calculate_cell($params, $x, $y);
       }
     }
-    $main::config->{'system'}{'crafttable'}{'result'}  = get_cell_coordinates("Ячейка результата стола крафта");
-    $main::config->{'system'}{'crafttable'}{'clean'}   = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую где нибудь под стрелкой, указывающей на результат");
-    $main::config->{'system'}{'crafttable'}{'is_open'} = get_cell_coordinates("Заголовок окна крафта ('Создание')");
+    $main::config->{'system'}{'crafttable'}{'result'}  = get_cell_coordinates($main::l10n->tr('crafttable_result_cell'));
+    $main::config->{'system'}{'crafttable'}{'clean'}   = get_cell_coordinates($main::l10n->tr('crafttable_clean_place_cell'));
+    $main::config->{'system'}{'crafttable'}{'is_open'} = get_cell_coordinates($main::l10n->tr('crafttable_interface_caption'));
   }
   else
   {
-    Minecraft::UserInteraction::wait_press_enter("Всё равно откройте интерфейс стода крафта. Сделаем скриншоты для обратной связи");
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_crafttable')." ".$main::l10n->tr('need_to_make_screenshots'));
   }
   get_crafttable_screenshots();
   if(!ask_happened() || !test_crafttable()) { get_crafttable_cells(); }
-  get_self_invertory_cells("стол крафта", 'crafttable');
+  get_self_invertory_cells('crafttable');
 }
 
 sub get_crafttable_screenshots
@@ -271,20 +246,20 @@ sub get_crafttable_screenshots
 
 sub get_self_invertory_cells
 {
-  my ($text, $interface) = @_[0..1];
+  my $interface = $_[0];
   if($interface =~ m/villager/)
   {
     $main::config->{'system'}{$interface}{'self-invertory'} = $main::config->{'system'}{'crafttable'}{'self-invertory'};
     return;
   }
-  Minecraft::UserInteraction::wait_press_enter("Опять откройте %s, теперь будем выяснять где у нас инвертарь", $text);
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('train_self_invertory'), $main::l10n->tr(sprintf('open_%s', $interface)));
   print_cells_numbers(8,3);
   if(prompt_change_existent(exists($main::config->{'system'}{$interface}{'self-invertory'})))
   {
-    Minecraft::UserInteraction::wait_press_enter("Сначала основной инвертарь");
-    my $params = calculate_cell_params( get_cell_coordinates("Ячейка 0:0 инвертаря"),
-                                        get_cell_coordinates("Ячейка 1:0 инвертаря"),
-                                        get_cell_coordinates("Ячейка 0:1 инвертаря"));
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('main_self_invertory'));
+    my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 2)));
     for my $y (0..2)
     {
       for my $x (0..8)
@@ -292,27 +267,27 @@ sub get_self_invertory_cells
         $main::config->{'system'}{$interface}{'self-invertory'}{$x}{$y} = calculate_cell($params, $x, $y);
       }
     }
-    Minecraft::UserInteraction::wait_press_enter("Теперь инвертарь 'ручной', нижняя стройка инвертаря, которая отображается при игре");
-    $params = calculate_cell_params( get_cell_coordinates("Ячейка 0:3 инвертаря"),
-                                     get_cell_coordinates("Ячейка 1:3 инвертаря"),
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('hand_self_invertory'));
+    $params = calculate_cell_params( get_cell_coordinates(get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 4))),
+                                     get_cell_coordinates(get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 4))),
                                      undef);
     for my $x (0..8)
     {
       $main::config->{'system'}{$interface}{'self-invertory'}{$x}{3} = calculate_cell($params, $x, 0);
     }
-    if(!ask_happened() || !test_invertory($interface)) { get_invertory_cells($text, $interface); }
+    if(!ask_happened() || !test_invertory($interface)) { get_self_invertory_cells($interface); }
   }
 }
 
 sub get_big_chest_cells
 {
-  Minecraft::UserInteraction::wait_press_enter("Откройте пустой большой сундук");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_empty_big_chest'));
   print_cells_numbers(8,5);
   if(prompt_change_existent(exists($main::config->{'system'}{'big-chest'}{'cells'})))
   {
-    my $params = calculate_cell_params( get_cell_coordinates("Ячейка 0:0 большого сундука"),
-                                        get_cell_coordinates("Ячейка 1:0 большого сундука"),
-                                        get_cell_coordinates("Ячейка 0:1 большого сундука"));
+    my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('big_chest_cell_xy'), 1, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('big_chest_cell_xy'), 2, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('big_chest_cell_xy'), 1, 2)));
     for my $y (0..5)
     {
       for my $x (0..8)
@@ -321,10 +296,10 @@ sub get_big_chest_cells
       }
     }
   }
-  $main::config->{'system'}{'big-chest'}{'is_open'} = get_cell_coordinates("Заголовок сундука ('Большой сундук')");
+  $main::config->{'system'}{'big-chest'}{'is_open'} = get_cell_coordinates($main::l10n->tr('big_chest_interface_caption'));
   get_big_chest_screenshots();
   if(!ask_happened() || !test_big_chest()) { get_big_chest_cells(); }
-  get_self_invertory_cells("большой сундук", 'big-chest');
+  get_self_invertory_cells('big-chest');
 }
 
 sub get_big_chest_screenshots
@@ -334,28 +309,28 @@ sub get_big_chest_screenshots
 
 sub get_villager_interface
 {
-  Minecraft::UserInteraction::wait_press_enter("Теперь вам надо найти крестьянина. Станьте возле него. Проверьте, что у него доступно несколько товаров");
-  Minecraft::UserInteraction::wait_press_enter("Откройте интерфейс торговли");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('find_villager'));
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_villager'));
   if(prompt_change_existent(exists($main::config->{'system'}{'villager'})))
   {
-    $main::config->{'system'}{'villager'}{'invertory'}{0} = get_cell_coordinates("Левая ячейка инвертаря крестьянина");
-    $main::config->{'system'}{'villager'}{'invertory'}{1} = get_cell_coordinates("Правая ячейка инвертаря крестьянина");
-    $main::config->{'system'}{'villager'}{'result'}       = get_cell_coordinates("Ячейка результата торговли крестьянина (справа которая)");
-    $main::config->{'system'}{'villager'}{'clean'}        = get_cell_coordinates("Пустое место в интерфейсе размером с ячейку, советую справа, под кнопкой перелистывания страницы вперед");
-    $main::config->{'system'}{'villager'}{'is_open'}      = get_cell_coordinates("Половина заголовка инвертаря в режиме торговли ('Инвен').");
-    Minecraft::UserInteraction::wait_press_enter("Теперь переключитесь на страницу торговли, где крестьянин еще может торговать (стрелки не перечеркнуты)");
-    $main::config->{'system'}{'villager'}{'trade-avialable'} = get_cell_coordinates("Верхняя стрелка");
-    Minecraft::UserInteraction::wait_press_enter("Теперь надо найти крестьянина минимум с тремя доступными страницами торговли (потребуется дважды жать на кнопки)");
-    $main::config->{'system'}{'villager'}{'next_page'} = get_cell_coordinates("Кнопка переключения на следующую страницу торговли");
-    $main::config->{'system'}{'villager'}{'prev_page'} = get_cell_coordinates("Кнопка переключения на предыдущую страницу торговли");
+    $main::config->{'system'}{'villager'}{'invertory'}{0} = get_cell_coordinates($main::l10n->tr('left_villager_invertory_cell'));
+    $main::config->{'system'}{'villager'}{'invertory'}{1} = get_cell_coordinates($main::l10n->tr('right_villager_invertory_cell'));
+    $main::config->{'system'}{'villager'}{'result'}       = get_cell_coordinates($main::l10n->tr('result_villager_cell'));
+    $main::config->{'system'}{'villager'}{'clean'}        = get_cell_coordinates($main::l10n->tr('villager_clean_place_cell'));
+    $main::config->{'system'}{'villager'}{'is_open'}      = get_cell_coordinates($main::l10n->tr('villager_interface_caption'));
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('switch_to_avialable_trade'));
+    $main::config->{'system'}{'villager'}{'trade-avialable'} = get_cell_coordinates($main::l10n->tr('upper_trade_result_arrow'));
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('find_upgraded_villager'));
+    $main::config->{'system'}{'villager'}{'next_page'} = get_cell_coordinates($main::l10n->tr('button_next_page'));
+    $main::config->{'system'}{'villager'}{'prev_page'} = get_cell_coordinates($main::l10n->tr('button_prev_page'));
   }
   else
   {
-    Minecraft::UserInteraction::wait_press_enter("Всё равно подойдите к торговцу, который еще может торговать и у него доступно более 2х товаров, откройте интерфейс торговли. Сделаем скриншоты для обратной связи");
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('find_upgraded_villager')." ".$main::l10n->tr('need_to_make_screenshots'));
   }
   get_villager_screenshots();
   if(!ask_happened() || !test_villager_interface()) { get_villager_interface(); }
-  get_self_invertory_cells("деревенский житель", 'villager');
+  get_self_invertory_cells('villager');
 }
 
 sub get_villager_screenshots
@@ -422,7 +397,7 @@ sub train_view_item_xy
           $attempts--;
           if(!$attempts)
           {
-            Minecraft::UserInteraction::say("Не могу получить одинаковые скриншоты %s", $item);
+            Minecraft::UserInteraction::say($main::l10n->tr('cannot_take_csreenshots'), $main::l10n->tr($item));
             exit(0);
           }
         }
@@ -443,7 +418,7 @@ sub train_view_item_crafttable
   my $deg = 20;
   if(!item_is_known_for($item, 'crafttable', 'self-invertory', 8, 3) + !item_is_known_for($item, 'crafttable', 'cells', 2, 2) > 0)
   {
-    Minecraft::UserInteraction::say("Тренирую %s", $item);
+    Minecraft::UserInteraction::say($main::l10n->tr('training_item'), $main::l10n->tr($item));
     $main::player->hand()->move_stack_between_cells($chest_cell, $main::config->{'system'}{'big-chest'}{'self-invertory'}{8}{3});
     $main::player->hand()->close_interface('big-chest');
     $main::player->body()->turn_down_deg($deg);
@@ -462,27 +437,23 @@ sub train_view_item_crafttable
 sub train_view_items_chest
 {
   my $items = $_[0];
-  Minecraft::UserInteraction::say("Сундук должен содержать в себе (по порядку):");
+  Minecraft::UserInteraction::say($main::l10n->tr('chest_must_contain'));
   for my $y (0..5)
   {
     for my $x (0..8)
     {
       if(exists($items->{$x}{$y}))
       {
-        printf("[%d:%d:%s]", $x, $y, $items->{$x}{$y});
+        printf("[%d:%d:%s]", $x, $y, $main::l10n->tr($items->{$x}{$y}));
       }
       else
       {
-        printf("[%d:%d:%s]", $x, $y, 'empty');
+        printf("[%d:%d:%s]", $x, $y, $main::l10n->tr('empty'));
       }
     }
     print "\n";
   }
-  Minecraft::UserInteraction::wait_press_enter(<<TEXT
-Станьте возле сундука, в полу перед сундуком должен быть стол крафта.
-Наведите прицел на нижнюю часть сундука так, что бы прицел указывал немного выше дна сундука
-TEXT
-);
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('become_near_trunk'));
   for my $y (0..5)
   {
     for my $x (0..8)
@@ -497,17 +468,10 @@ TEXT
 
 sub train_view_items
 {
-  Minecraft::UserInteraction::wait_press_enter(<<TEXT
-Сейчас мы начнем тренировку опознавания шмота. Процесс достаточно долгий.
-Если у вас несколько мониторов - сейчас самое время запустить на втором мониторе что нибудь интересное и продолжительное
-Дело в том, что скрипт будет управлять мышой и не даст ничего делать больше.
-Тренировку надо запускать каждый раз после перенастройки границ инвертаря\стола крафта
-Для этого надо в папке скриншотов удалить папку имя_текстурпака/items/
-TEXT
-);
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('train_items'));
   for my $chest_file (Minecraft::FileIO::get_train_chests())
   {
-      Minecraft::UserInteraction::say("Файл %s", $chest_file);
+      Minecraft::UserInteraction::say($main::l10n->tr('chest_file'), $chest_file);
       train_view_items_chest(Minecraft::FileIO::read_csv_file($chest_file));
   }
   $main::config = Minecraft::FileIO::save_system_config($main::config);
@@ -525,7 +489,7 @@ sub copy_items_images
     if(-d $items_dir.$item)
     {
       make_path($items_dir.$item."/villager/self-invertory");
-      Minecraft::UserInteraction::say("Копирую %s", $item);
+      Minecraft::UserInteraction::say($main::l10n->tr('copy_item_images'), $main::l10n->tr($item));
       for my $y (0..3)
       {
         for my $x (0..8)
@@ -545,7 +509,7 @@ sub copy_items_images
 # -------------------------------------------------- тесты --------------------------------------------
 sub test_crafttable
 {
-  Minecraft::UserInteraction::wait_press_enter("Показываю ячейки стола крафта. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('test_crafttable_cells'));
   for my $y (0..2)
   {
     for my $x (0..2)
@@ -562,7 +526,7 @@ sub test_crafttable
 sub test_invertory
 {
   my $interface = $_[0];
-  Minecraft::UserInteraction::wait_press_enter("Показываю ячейки инвертаря. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('test_self_inventory_cells'));
   for my $y (0..3)
   {
     for my $x (0..8)
@@ -576,7 +540,7 @@ sub test_invertory
 
 sub test_big_chest
 {
-  Minecraft::UserInteraction::wait_press_enter("Показываю ячейки большого сундука. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('test_large_chest_cells'));
   for my $y (0..5)
   {
     for my $x (0..8)
@@ -590,7 +554,7 @@ sub test_big_chest
 
 sub test_villager_interface
 {
-  Minecraft::UserInteraction::wait_press_enter("Показываю интерфейс торговли. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки и верхней стрелки");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('test_trade_interface'));
   $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{'villager'}{'next_page'});       sleep($test_mouse_timeout);
   $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{'villager'}{'prev_page'});       sleep($test_mouse_timeout);
   $main::player->hand()->mouse_move_to_cell($main::config->{'system'}{'villager'}{'invertory'}{0});    sleep($test_mouse_timeout);
@@ -602,16 +566,8 @@ sub test_villager_interface
 
 sub test_turn
 {
-  my $text = <<_text_;
-Персонаж сделает так:
-    1. Посмотрит под ноги
-    2. Посмотрит перед собой
-    3. Посмотрит вверх
-    4. Посмотрит вниз ~ под 45 градусов
-    5. В 12 приёмов обернется вокруг оси
-_text_
-  Minecraft::UserInteraction::wait_press_enter($text);
-  $main::player->hand()->use();                 sleep($test_turn_timeout);
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('test_turn'));
+  $main::player->hand()->use();              sleep($test_turn_timeout);
   $main::player->body()->turn_down_deg(180); sleep($test_turn_timeout);
   $main::player->body()->turn_up_deg(90);    sleep($test_turn_timeout);
   $main::player->body()->turn_up_deg(90);    sleep($test_turn_timeout);
@@ -634,26 +590,12 @@ sub interface_is_open
 
 sub setup_turn
 {
-  Minecraft::UserInteraction::wait_press_enter(<<TEXT
-Теперь настроим повороты персонажа. Проверьте настройки чувствительности мыши, выставьте необходимое.
-После смены чувствительности скорее всего придется перенастраивать
-Переключитесь в дебаг (F3), там следите за строкой "Facing: ... " - в конце строки в скобках указывается угол поворота: ( горизонталь/вертикаль )
-Персонаж смотрит ровно, когда перпендикулярный взгляду вектор не виден.
-Окружите себя однотонными блоками, так будет удобнее
-В процессе поворота не трогайте мыша!
-Настройка идет следующим образом:
-    1. Определяем место в интерфейсе персонажа, на которое будем реагировать
-    2. Вы смотрите куда написано и по готовности кликаете мышой
-    3. Персонаж постепенно поворачивается
-    4. При достижении указанной позиции вызовите интерфейс персонажа опять (e)
-Откройте интерфейс персонажа (е)
-TEXT
-);
-  my $interface_cell = get_cell_coordinates("Пустое место в интерфейсе персонажа размером с ячейку, советую где нибудь под стрелкой, указывающей на результат");
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('setup_turn'));
+  my $interface_cell = get_cell_coordinates($main::l10n->tr('self_interface_clean_place_cell'));
   $main::player->head()->take_screenshot("setup-turn", $interface_cell);
 
   my $turn = 0;
-  get_cursor_position("Выставьте в строке Facing горизонтальный угол в 0,0. По готовности кликните мышой и ждите, пока персонаж повернется на 10,0");
+  get_cursor_position($main::l10n->tr('set_turn_horizont'));
   do
   {
     $turn+=2;
@@ -663,7 +605,7 @@ TEXT
   while(!interface_is_open($interface_cell));
   $main::config->{'system'}{'turn'}{'horizontal'} = $turn/10;
   $turn = 0;
-  get_cursor_position("Выставьте в строке Facing вертикальный угол в 90,0 (посмотрите под ноги). По готовности кликните мышой и ждите, пока персонаж повернется на 80,0");
+  get_cursor_position($main::l10n->tr('set_turn_vertical'));
   do
   {
     $turn+=2;
@@ -688,7 +630,7 @@ sub run_setup
   for ($real_target)
   {
     if     (/default-uc/)   { last; }
-    elsif  (/invertory/)    { get_self_invertory_cells("стол крафта", 'crafttable');    }
+    elsif  (/invertory/)    { get_self_invertory_cells('crafttable');    }
     elsif  (/crafttable/)   { get_crafttable_cells();                                   }
     elsif  (/villager/)     { get_villager_interface();                                 }
     elsif  (/items/)        { train_view_items();                                       }
@@ -718,11 +660,13 @@ sub run_setup
     elsif  (/chrespack/)
     {
       ask_texture_pack();
-      Minecraft::UserInteraction::wait_press_enter("Откройте интерфейс стола крафта");
+      Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_crafttable'));
       get_crafttable_screenshots();
-      Minecraft::UserInteraction::wait_press_enter("Откройте большой сундук");
+      Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('open_big-chest'));
       get_big_chest_screenshots();
-      Minecraft::UserInteraction::wait_press_enter("Откройте интерфейс торговли с более, чем двумя доступными товарами");
+      Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('find_upgraded_villager')." "
+                                                  .$main::l10n->tr('need_to_make_screenshots')." "
+                                                  .$main::l10n->tr('open_villager'));
       get_villager_screenshots();
       run_setup('items');
     }
@@ -731,20 +675,10 @@ sub run_setup
 
 }
 
-Minecraft::UserInteraction::say(<<TEXT
-Начинаем настройку. Следуйте рекомендациям тут.
-Местами надо будет кликать по углам ячеек.
-Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно.
-Удобнее будет, если инвертарь будет пуст. Еще более удобно будет, ежели включить управление мышой с клавиатуры.
-TEXT
-);
+Minecraft::UserInteraction::say($main::l10n->tr('setup_begin'));
 run_setup($target);
 Minecraft::FileIO::save_system_config($main::config);
 Minecraft::FileIO::save_user_config($main::config);
-Minecraft::UserInteraction::wait_press_enter(<<TEXT
-В user-config.json есть еще настройки таймаутов. При низких лагах можно их подкрутить в лучшую сторону.
-Настройка окончена. Обратите внимание на то, что при запуске скриптов раскладка должна быть включена английская.
-TEXT
-);
+Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('setup_end'));
 
 #print Dumper($main::config);

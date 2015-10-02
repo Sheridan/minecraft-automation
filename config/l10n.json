@@ -1,0 +1,805 @@
+{
+  "wrong_commandline":
+  {
+    "ru": "Что то не так с опциями командной строки\n",
+    "en": "Commandline id wrong\n"
+  },
+  "craft_help" : {
+    "ru" : [
+      "Использование:",
+      "  craft --craft=item для крафта",
+      "  craft --craft=item --help для помощи по крафту (поддерживаются неполные имена)",
+      "  craft --help - полный список шмота, который можно скрафтить",
+      "Подразумевается, что мы работаем с полными стэками, если шмот стэкуется.",
+      "Опции:",
+      "  --craft=строка  Что надо скрафтить.",
+      "    Можно выбрать одно из:"
+    ],
+    "en" : [
+      "Use:",
+      "  craft --craft=item crafting",
+      "  craft --craft=item --help for help on craft (supports partial names)",
+      "  craft --help full list of gear that can be crafted",
+      "The implication is that we are working with a full stack, if items is stackable.",
+      "Options:",
+      "  --craft=string What should be crafted.",
+      "    You can choose one from:"
+    ]
+  },
+  "reciepts_count":
+  {
+    "ru" : "\t\t%s : %s, рецептов: %d\n",
+    "en" : "\t\t%s : %s, reciepts: %d\n"
+  },
+  "reciept_number":
+  {
+    "ru" : "\t\t\tРецепт %d: ",
+    "en" : "\t\t\tReciept %d: "
+  },
+  "reciept_load" :
+  {
+    "ru": "Загружаем рецепт крафта %s",
+    "en": "Loading recipt for craft %s"
+  },
+  "reciept_ingridients_not_avialable" :
+  {
+    "ru": "Материалов для %s нет",
+    "en": "Ingridirnts for %s not avialable"
+  },
+  "invrtory_cells_is_ended" :
+  {
+    "ru": "Место в инвентаре при крафте %s закончилось. Не хватило %d ячеек.",
+    "en": "Empty cells in invertory is ended while crafting %s. Need for %d cells."
+  },
+  "deep_recursion_while_craft" :
+  {
+    "ru": "Похоже, что уходим в глубокую рекурсию при крафте %s. Прерываем.",
+    "en": "Deep recursion while craft %s detected. Exit."
+  },
+  "do_craft" :
+  {
+    "ru": "Крафтим %s",
+    "en": "Crafting %s"
+  },
+  "setup_help" : {
+    "ru" : [
+      "Использование: setup-environment <options>",
+      "Опции:",
+      "  --target=строка  Что надо настроить",
+      "    all         Настройка всего, по умолчанию",
+      "    invertory   Настройка размещения ячеек инвертаря",
+      "    big-chest   Настройка размещения ячеек большого сундука",
+      "    crafttable  Настройка размещения ячеек стола крафта",
+      "    villager    Настройка размещения ячеек стола торговца",
+      "    items       Настройка распознавания шмота",
+      "    options     Настройка опций пользователя",
+      "    window      Настройка размеров и положения окна",
+      "    turn        Настройка поворотов",
+      "    chrespack   Смена ресурспака. Скрипт спросит имя ресурспака и сделает необходимые скриншоты."
+    ],
+    "en" : [
+      "Usage: setup-environment <options>",
+      "Options:",
+      "  --target=string What you need to set up",
+      "    all         Customize all in all, the default",
+      "    invertory   Setting placing cells in invertory",
+      "    big-chest   Setting placing cells in large chest",
+      "    crafttable  Setting placing cells in craft table",
+      "    villager    Setting villager placement table cells merchant",
+      "    items       Setting items recognition",
+      "    options     Setting user options",
+      "    window      Setting window size and position",
+      "    turn        Setting player turn",
+      "    chrespack   Change resourcepack. The script will ask the name of resourcepack and make need screenshots."
+    ]
+  },
+  "click_top_left" :
+  {
+    "ru": "Кликните в левом верхнем углу ячейки",
+    "en": "Click in the upper left corner of the cell"
+  },
+  "click_bottom_right" :
+  {
+    "ru": "Кликните в правом нижнем углу ячейки",
+    "en": "Click in the lower right corner of the cell"
+  },
+  "press_button" :
+  {
+    "ru": "Нажмите эту кнопку, старайтесь жать посередине кнопки",
+    "en": "Press this button, try to press in the middle"
+  },
+  "everything_went_well" :
+  {
+    "ru": "Всё прошло успешно?",
+    "en": "Everything went well?"
+  },
+  "have_to_repeat" :
+  {
+    "ru": "Нет? Тогда надо повторить...",
+    "en": "No? Then we have to repeat..."
+  },
+  "leave_as_is" :
+  {
+    "ru": "%s\nОставить как есть ('%s') - просто энтер.\n",
+    "en": "%s\nLeave as is ('%s') - just enter.\n"
+  },
+  "you_entered" :
+  {
+    "ru": "Вы ввели '%s'. Верно?",
+    "en": "You entered '%s'. Right?"
+  },
+  "setup_resourcepack" : {
+    "ru" : [
+      "Введите латиницей имя ресурспака. Необязательно именно так он должен называться. Главное что бы вы потом поняли, что это он.",
+      "Для этой софтины необходимо, что бы не было анимированных вещей. Ну как минимум не более чем в стандартном ресурспаке.",
+      "Или просто работайте с софтиной, переключаясь в стандартный ресурспак",
+      "При смене ресурспака необходимо будет заново обучить софтину опознавать шмот",
+      "Если меняете ресурспак обратно - достаточно руками изменить его имя в user-config.json"
+    ],
+    "en" : [
+      "Enter the Latin name of the resourcepack.",
+      "For this script necessary, that would not be animated textures. Well, at least no more than in the standard resourcepack.",
+      "Or just work with script switching to the standard resourcepack",
+      "When changing resourcepack will need to be re-trained to recognize items",
+      "If you back previous resourcepack - just change its name in the user-config.json"
+    ]
+  },
+  "enter_screenshot_path" :
+  {
+    "ru": "Где можно будет сохранять изображения, необходимые для обратной связи с майном? Введите путь.",
+    "en": "Where we can save screenshots? Enter path to folder."
+  },
+  "enter_minecraft_window_title" :
+  {
+    "ru": "Введите полностью заголовок окна майна. Не лаунчера!",
+    "en": "Type full minecraft window title. Not launcher!"
+  },
+  "like_to_reconfigure" :
+  {
+    "ru": "Это уже было настроено раньше. Желаете перенастроить?",
+    "en": "It has already been set up before. Would you like to reconfigure?"
+  },
+  "place_window_comfortable" :
+  {
+    "ru": "Расположите окно майнкрафта так, как вам привычно и удобно",
+    "en": "Place the minecraft window as you are comfortable"
+  },
+  "cells_numeration" :
+  {
+    "ru": "Нумерация ячеек следующая:",
+    "en": "The numbering of the cells as follows:"
+  },
+  "open_big-chest" :
+  {
+    "ru": "Откройте большой сундук",
+    "en": "Open large chest interface"
+  },
+  "open_empty_big_chest" :
+  {
+    "ru": "Откройте пустой большой сундук",
+    "en": "Open empty large chest interface"
+  },
+  "open_crafttable" :
+  {
+    "ru": "Откройте интерфейс стола крафта",
+    "en": "Open crafttablet interface"
+  },
+  "open_villager" :
+  {
+    "ru": "Откройте интерфейс торговли",
+    "en": "Open villager trade interface"
+  },
+  "click_outside" :
+  {
+    "ru": "Кликните вне интерфейса, но в окне майна. Желательно посередине окна, как можно ниже. Эта точка будет использоваться для скрытия мыша и для дропа",
+    "en": "Click outside of the interface, but in the minecraft window. It is desirable in the middle of the window and bottom as possible. This point will be used to hide the mouse and drop loot"
+  },
+  "crafttable_cell_xy" :
+  {
+    "ru": "Ячейка %d:%d стола крафта",
+    "en": "Crafttable cell %d:%d"
+  },
+  "crafttable_result_cell" :
+  {
+    "ru": "Ячейка результата стола крафта",
+    "en": "Craft result cell"
+  },
+  "crafttable_clean_place_cell" :
+  {
+    "ru": "Пустое место в интерфейсе размером с ячейку, советую где нибудь под стрелкой, указывающей на результат",
+    "en": "The empty space in the interface of the size of a cell, I suggest somewhere below the craft result cell"
+  },
+  "villager_clean_place_cell" :
+  {
+    "ru": "Пустое место в интерфейсе размером с ячейку, советую справа, под кнопкой перелистывания страницы вперед",
+    "en": "The empty space in the interface of the size of a cell, I suggest somewhere below the button 'Next page'"
+  },
+  "self_interface_clean_place_cell" :
+  {
+    "ru": "Пустое место в интерфейсе персонажа размером с ячейку, советую где нибудь под стрелкой, указывающей на результат",
+    "en": "The empty space in the interface character size of a cell, I suggest somewhere below the arrow pointing to the results"
+  },
+  "crafttable_interface_caption" :
+  {
+    "ru": "Заголовок окна крафта ('Создание') или любую неактивную уникальную часть интерфейса",
+    "en": "Crafttable interface title ('Crafting'), or any inactive and unique part of the interface"
+  },
+  "big_chest_interface_caption" :
+  {
+    "ru": "Заголовок сундука ('Большой сундук') или любую неактивную уникальную часть интерфейса",
+    "en": "Large chest interface title ('Large chest'), or any inactive and unique part of the interface"
+  },
+  "villager_interface_caption" :
+  {
+    "ru": "Половина заголовка инвертаря в режиме торговли ('Инвен') или любую неактивную уникальную часть интерфейса.",
+    "en": "Half of inventory title in trade interface ('Inven'), or any inactive and unique part of the interface"
+  },
+  "need_to_make_screenshots" :
+  {
+    "ru": "Необходимо сделать скриншоты для обратной связи",
+    "en": "It is necessary to take screenshots for feedback"
+  },
+  "train_self_invertory":
+  {
+    "ru": "%s, теперь будем выяснять где у нас инвертарь",
+    "en": "%s, now we need to train self invertory"
+  },
+  "main_self_invertory":
+  {
+    "ru": "Сначала основной инвертарь",
+    "en": "First, the main invertory"
+  },
+  "hand_self_invertory":
+  {
+    "ru": "Теперь инвертарь 'ручной', нижняя строка инвертаря, которая отображается при игре",
+    "en": "Now 'hands' invertory, the lower row of invertory that is displayed in the game"
+  },
+  "invertory_cell_xy" :
+  {
+    "ru": "Ячейка %d:%d инвертаря",
+    "en": "Invertory cell %d:%d"
+  },
+  "big_chest_cell_xy" :
+  {
+    "ru": "Ячейка %d:%d большого сундука",
+    "en": "Large chest cell %d:%d"
+  },
+  "find_villager" :
+  {
+    "ru": "Теперь вам надо найти крестьянина. Станьте возле него. Проверьте, что у него доступно несколько товаров",
+    "en": "Now you need to find a villager. Get near it. Make sure that it has available several products"
+  },
+  "left_villager_invertory_cell" :
+  {
+    "ru": "Левая ячейка инвертаря крестьянина",
+    "en": "Left villager invertory cell"
+  },
+  "right_villager_invertory_cell" :
+  {
+    "ru": "Правая ячейка инвертаря крестьянина",
+    "en": "Right villager invertory cell"
+  },
+  "result_villager_cell" :
+  {
+    "ru": "Ячейка результата торговли крестьянина (справа которая)",
+    "en": "Trade result cell"
+  },
+  "switch_to_avialable_trade" :
+  {
+    "ru": "Теперь переключитесь на страницу торговли, где крестьянин еще может торговать (стрелки не перечеркнуты)",
+    "en": "Now switch to the page of trade, where the villager can still trade (not crossed arrows)"
+  },
+  "upper_trade_result_arrow" :
+  {
+    "ru": "Верхняя стрелка",
+    "en": "Upper arrow"
+  },
+  "find_upgraded_villager" :
+  {
+    "ru": "Теперь надо найти крестьянина минимум с тремя доступными страницами торговли (потребуется дважды жать на кнопки)",
+    "en": "Now we have to find a farmer with at least three pages of available trade (need to press the button twice)"
+  },
+  "button_next_page" :
+  {
+    "ru": "Кнопка переключения на следующую страницу торговли",
+    "en": "Button to switch to the next page of trade"
+  },
+  "button_prev_page" :
+  {
+    "ru": "Кнопка переключения на педыдущую страницу торговли",
+    "en": "Button to switch to the previous page of trade"
+  },
+  "cannot_take_csreenshots" :
+  {
+    "ru": "Не могу получить одинаковые скриншоты %s, попробуйте увеличить значение between_mouse_hide_and_screenshot в user-config.json. Проверьте, не используется ли анимированная текстура",
+    "en": "Can not take same screenshots of %s. Try to increase value of between_mouse_hide_and_screenshot in user-config.json. Check whether animated texture"
+  },
+  "training_item" :
+  {
+    "ru": "Тренирую %s",
+    "en": "Training %s"
+  },
+  "chest_must_contain" :
+  {
+    "ru": "Сундук должен содержать в себе (по порядку):",
+    "en": "The chest should contain (in order):"
+  },
+  "become_near_trunk" :
+  {
+    "ru": [
+      "Станьте возле сундука, в полу перед сундуком должен быть стол крафта.",
+      "Наведите прицел на нижнюю часть сундука так, что бы прицел указывал немного выше дна сундука"
+    ],
+    "en": [
+      "Become near the chest, on the floor in front of the chest should be crafting table.",
+      "Place your sight at the bottom of the chest so that the sight pointed slightly above the bottom of the chest"
+    ]
+  },
+  "train_items" :
+  {
+    "ru": [
+      "Сейчас мы начнем тренировку опознавания шмота. Процесс достаточно долгий.",
+      "Если у вас несколько мониторов - сейчас самое время запустить на втором мониторе что нибудь интересное и продолжительное",
+      "Дело в том, что скрипт будет управлять мышой и не даст ничего делать больше.",
+      "Тренировку надо запускать каждый раз после перенастройки границ инвертаря/стола крафта",
+      "Для этого надо в папке скриншотов удалить папку имя_текстурпака/items/"
+    ],
+    "en": [
+      "We will now begin training recognition of items. The process is quite long.",
+      "If you have multiple monitors - now is the time to start on the second monitor that something interesting and long",
+      "The fact is that the script will will control the mouse and you will never do anything more.",
+      "Training should be run every time you reset the boundaries inventory / craft table",
+      "To do this in the screenshots folder to delete a folder texturepack_name/items/"
+    ]
+  },
+  "chest_file" :
+  {
+    "ru": "Содержимое сундука из файла %s",
+    "en": "The contents of the chest from file %s"
+  },
+  "copy_item_images" :
+  {
+    "ru": "Копирую изображения %s",
+    "en": "Copying images of %s"
+  },
+  "test_crafttable_cells" :
+  {
+    "ru": "Показываю ячейки стола крафта. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки",
+    "en": "Showing crafting table cells. If you do them correctly pointed out, the cursor will be approximately in the middle of each cell"
+  },
+  "test_self_inventory_cells" :
+  {
+    "ru": "Показываю ячейки инвентори. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки",
+    "en": "Showing inventory cells. If you do them correctly pointed out, the cursor will be approximately in the middle of each cell"
+  },
+  "test_large_chest_cells" :
+  {
+    "ru": "Показываю ячейки большого сундука. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки",
+    "en": "Showing large chest cells. If you do them correctly pointed out, the cursor will be approximately in the middle of each cell"
+  },
+  "test_trade_interface" :
+  {
+    "ru": "Показываю ячейки интерфейса торговли. Если вы правильно их отмечали, курсор будет приблизительно посередине каждой ячейки",
+    "en": "Showing villager interface cells. If you do them correctly pointed out, the cursor will be approximately in the middle of each cell"
+  },
+  "setup_turn" :
+  {
+    "ru": [
+      "Теперь настроим повороты персонажа. Проверьте настройки чувствительности мыши, выставьте необходимое.",
+      "После смены чувствительности скорее всего придется перенастраивать",
+      "Переключитесь в дебаг (F3), там следите за строкой 'Facing: ... ' - в конце строки в скобках указывается угол поворота: ( горизонталь/вертикаль )",
+      "Персонаж смотрит ровно, когда перпендикулярный взгляду вектор не виден.",
+      "Окружите себя однотонными блоками, так будет удобнее",
+      "В процессе поворота не трогайте мыша!",
+      "Настройка идет следующим образом:",
+      "    1. Определяем место в интерфейсе персонажа, на которое будем реагировать",
+      "    2. Вы смотрите куда написано и по готовности кликаете мышой",
+      "    3. Персонаж постепенно поворачивается",
+      "    4. При достижении указанной позиции вызовите интерфейс персонажа опять (e)",
+      "Откройте интерфейс персонажа (е)"
+    ],
+    "en": [
+      "Now you set the character turns. Check the settings of the sensitivity of the mouse, set the desired.",
+      "After changing the sensitivity will probably need to reconfigure",
+      "Switch to debug (F3), there follow the line 'Facing: ...' - at the end of the line in brackets indicates the rotation angle (horizontal / vertical)",
+      "Surround yourself with self-colored blocks, so it will be more convenient",
+      "During the rotation, do not touch the mouse!",
+      "Setup is as follows:",
+      "    1. Determine the location of the character in the interface, to which we will respond",
+      "    2. Do you see where it is written and ready click the mouse",
+      "    3. The character gradually turns",
+      "    4. When you reach that position again call the character interface (e)",
+      "Open character interface (e)"
+    ]
+  },
+  "test_turn" :
+  {
+    "ru": [
+      "Персонаж сделает так:",
+      "    1. Посмотрит под ноги",
+      "    2. Посмотрит перед собой",
+      "    3. Посмотрит вверх",
+      "    4. Посмотрит вниз ~ под 45 градусов",
+      "    5. В 12 приёмов обернется вокруг оси"
+    ],
+    "en": [
+      "The character will do so:",
+      "    1. Look under your feet",
+      "    2. Look ahead",
+      "    3. Look up",
+      "    4. Look down ~ 45 degrees",
+      "    5. wrap around itself"
+    ]
+  },
+  "set_turn_horizont" :
+  {
+    "ru": "Выставьте в строке Facing горизонтальный угол в 0.0. По готовности кликните мышой и ждите, пока персонаж повернется на 10.0",
+    "en": "Set in a row Facing the horizontal angle in 0.0. When ready, click the mouse and wait until the character turns to 10.0"
+  },
+  "set_turn_vertical" :
+  {
+    "ru": "Выставьте в строке Facing вертикальный угол в 90,0 (посмотрите под ноги). По готовности кликните мышой и ждите, пока персонаж повернется на 80,0",
+    "en": "Set in a row Facing the vertical angle of 90.0 (look under the feet). When ready, click myshoy and wait until a character is rotated by 80.0"
+  },
+  "setup_begin" :
+  {
+    "ru": [
+      "Начинаем настройку. Следуйте рекомендациям тут.",
+      "Местами надо будет кликать по углам ячеек.",
+      "Правильное наведение на угол - это когда ячейка остается 'подсвеченой'. Старайтесь попадать в углы максимально точно.",
+      "Удобнее будет, если инвертарь будет пуст. Еще более удобно будет, ежели включить управление мышой с клавиатуры."
+    ],
+    "en": [
+      "Start setting. Follow the instructions here.",
+      "Mostly it will be necessary to click on the corners of the cell.",
+      "Proper guidance on the corner - this is when the cell is 'highlighted'. Try to get into the corners as accurately as possible.",
+      "It will be convenient if inventory is empty. Even more convenient is, if enable mouse control from the keyboard."
+    ]
+  },
+  "setup_end" :
+  {
+    "ru": [
+      "В user-config.json есть еще настройки таймаутов. При низких лагах можно их подкрутить в лучшую сторону.",
+      "Настройка окончена. Обратите внимание на то, что при запуске скриптов раскладка должна быть включена английская."
+    ],
+    "en": [
+      "The user-config.json there is setting timeouts. At lags you can tweak them for the better.",
+      "Setting over. Note that when you run the script - keyboard layout should be english."
+    ]
+  },
+  "trade_help" : {
+    "ru" : [
+      "Использование: trade <options>",
+      "Опции:",
+      "    --target=строка Указывает приоритет торговли",
+      "        --target=sell приоритет выставляется на продажу. Покупки только для апгрейда торговца. Действует по умолчанию.",
+      "        --target=buy  приоритет выставляется на покупку. Продажи только для апгрейда торговца",
+      "    --buy=строка  Что можно купить (читайте выше, что продают прдавцы)",
+      "            Указывайте через запятую, без пробелов",
+      "            Но есть еще две возможности:",
+      "              --buy=all скупает всё что есть (действие по умолчанию)",
+      "              --buy=none ничего не покупает",
+      "    --seller=строка  С кем надо торговать",
+      "          Доступно:"
+    ],
+    "en" : [
+      "Use: trade <options>",
+      "Options:",
+      "    --target=string Specifies the priority of trade",
+      "        --target=sell the priority put up for sale. Shopping only to upgrade the merchant. The default setting.",
+      "        --target=buy priority is put up for purchase. Sales only to upgrade merchant",
+      "    --buy=string What you can buy (read that sell sellers above)",
+      "        Specify a comma, no spaces",
+      "        But there also are two possibilities:",
+      "            --buy=all buying up all that is (default)",
+      "            --buy=none buys nothing",
+      "    --seller=string Who must trade",
+      "        Available:"
+    ]
+  },
+  "help_villager" :
+  {
+    "ru": "\t\t%s\n\t\t\tПокупает: %s\n\t\t\tПродаёт: %s\n",
+    "en": "\t\t%s\n\t\t\tBuy: %s\n\t\t\tSell: %s\n"
+  },
+  "taking_back_remains" :
+  {
+    "ru": "Забираем обратно остатки",
+    "en": "Taking back the remains"
+  },
+  "sell_to_trader" :
+  {
+    "ru": "Продаём %s",
+    "en": "Selling %s"
+  },
+  "some_sell_wait_trader_upgrade" :
+  {
+    "ru": "Немного продали. Посмотрим, проапгредится ли продавец",
+    "en": "Few sold. Let's see whether the seller is updated"
+  },
+  "nothing_to_sell" :
+  {
+    "ru": "Продавать больше нечего",
+    "en": "Nothing to sell"
+  },
+  "buy_from_trader" :
+  {
+    "ru": "Покупаем %s",
+    "en": "Buying %s"
+  },
+  "some_buy_wait_trader_upgrade" :
+  {
+    "ru": "Немного купили. Посмотрим, проапгредится ли продавец",
+    "en": "Few bought. Let's see whether the seller is updated"
+  },
+  "nothing_to_buy" :
+  {
+    "ru": "Покупать больше нечего",
+    "en": "Nothing to buy"
+  },
+  "wrong_trade_target" :
+  {
+    "ru": "Вы неверно указали цель торговли. Читайте помощь.",
+    "en": "You incorrectly stated target of trade. Read help."
+  },
+  "nothing_to_trade" :
+  {
+    "ru": "Торговать больше нечем и не на что. Уходим.",
+    "en": "Trading nothing else and nothing. Care."
+  },
+
+
+
+  "acacia-door": {"ru": "Дверь из акации", "en": "Acacia door"},
+  "acacia-fence": {"ru": "Забор из акации", "en": "Acacia fence"},
+  "acacia-fence-gate": {"ru": "Ворота из акации", "en": "Acacia fence gate"},
+  "acacia-plank": {"ru": "Доски из акации", "en": "Acacia plank"},
+  "acacia-slab": {"ru": "Плита из акации", "en": "Acacia slab"},
+  "acacia-stair": {"ru": "Ступени из акации", "en": "Acacia stair"},
+  "acacia-wood": {"ru": "Древесина акации", "en": "Acacia wood"},
+  "activator-rail": {"ru": "Активирующие рельсы", "en": "Activator rail"},
+  "allium": {"ru": "Лук (цветок)", "en": "Allium"},
+  "andesite": {"ru": "Андезит", "en": "Andesite"},
+  "any-plank": {"ru": "Любые доски", "en": "Any plank"},
+  "any-wood-slab": {"ru": "Любая деревянная плита", "en": "Any wood slab"},
+  "apple": {"ru": "Яблоко", "en": "Apple"},
+  "azure-bluet": {"ru": "Хаустония серая", "en": "azure-bluet"},
+  "birch-door": {"ru": "Дверь из берёзы", "en": "Birch door"},
+  "birch-fence": {"ru": "Забор из берёзы", "en": "Birch fence"},
+  "birch-fence-gate": {"ru": "Ворота из берёзы", "en": "Birch fence gate"},
+  "birch-plank": {"ru": "Доски из берёзы", "en": "Birch plank"},
+  "birch-slab": {"ru": "Плита из берёзы", "en": "Birch slab"},
+  "birch-stair": {"ru": "Ступени из берёзы", "en": "Birch stair"},
+  "birch-wood": {"ru": "Древесина берёзы", "en": "Birch wood"},
+  "black-stained-clay": {"ru": "Чёрная глина", "en": "Black stained clay"},
+  "black-stained-glass": {"ru": "Чёрное стекло", "en": "Black stained glass"},
+  "black-wool": {"ru": "Чёрная шерсть", "en": "Black wool"},
+  "blaze-powder": {"ru": "Огненный порошок", "en": "Blaze powder"},
+  "blaze-rod": {"ru": "Огненный стержень", "en": "Blaze rod"},
+  "blue-orchid": {"ru": "Синяя орхидея", "en": "Blue orchid"},
+  "blue-stained-clay": {"ru": "Голубая глина", "en": "Blue stained clay"},
+  "blue-stained-glass": {"ru": "Голубое стекло", "en": "Blue stained glass"},
+  "blue-wool": {"ru": "Голубая шерть", "en": "Blue wool"},
+  "bone": {"ru": "Кость", "en": "Bone"},
+  "bone-meal": {"ru": "Костяная пыль", "en": "Bone meal"},
+  "book": {"ru": "Книга", "en": "Book"},
+  "bow": {"ru": "Лук", "en": "Bow"},
+  "brick": {"ru": "Кирпич", "en": "Brick"},
+  "brick-block": {"ru": "Блок кирпичей", "en": "Bricks block"},
+  "brick-slab": {"ru": "Плита из кирпичей", "en": "Bricks slab"},
+  "brick-stair": {"ru": "Ступени из кирпичей", "en": "Bricks stair"},
+  "brown-stained-clay": {"ru": "Коричневая глина", "en": "Brown stained clay"},
+  "brown-stained-glass": {"ru": "Коричневое стекло", "en": "Brown stained glass"},
+  "brown-wool": {"ru": "Коричневая шерсть", "en": "Brown wool"},
+  "cactus-green": {"ru": "Кактусовая зелень", "en": "Cactus green"},
+  "carrot": {"ru": "Морковь", "en": "Carrot"},
+  "chest": {"ru": "Сундук", "en": "Chest"},
+  "clay-block": {"ru": "Глиняный блок", "en": "Block of clay"},
+  "coal": {"ru": "Уголь", "en": "Coal"},
+  "coal-block": {"ru": "Угольный блок", "en": "Coal block"},
+  "cobblestone": {"ru": "Булыжник", "en": "Cobblestone"},
+  "cobblestone-slab": {"ru": "Плита из булыжника", "en": "Cobblestone slab"},
+  "cobblestone-stair": {"ru": "Ступени из булыжника", "en": "Cobblestone stair"},
+  "cobblestone-wall": {"ru": "Стена из булыжника", "en": "Cobblestone wall"},
+  "comparator": {"ru": "Компаратор", "en": "Comparator"},
+  "crafting-table": {"ru": "Стол крафта", "en": "Crafting table"},
+  "cyan-dye": {"ru": "Голубая краска", "en": "Cyan dye"},
+  "cyan-stained-clay": {"ru": "Голубая глина", "en": "Cyan stained clay"},
+  "cyan-stained-glass": {"ru": "Голубое стекло", "en": "Cyan stained glass"},
+  "cyan-wool": {"ru": "Голубая шерсть", "en": "Cyan wool"},
+  "dandelion": {"ru": "Одуванчик", "en": "Dandelion"},
+  "dandelion-yellow": {"ru": "Жёлтая краска", "en": "Dandelion yellow"},
+  "dark-oak-door": {"ru": "Дверь из тёмного дуба", "en": "Dark oak door"},
+  "dark-oak-fence": {"ru": "Забор из тёмного дуба", "en": "Dark oak fence"},
+  "dark-oak-fence-gate": {"ru": "Ворота из тёмного дуба", "en": "Dark oak fence gate"},
+  "dark-oak-plank": {"ru": "Доски из тёмного дуба", "en": "Dark oak plank"},
+  "dark-oak-slab": {"ru": "Плита из тёмного дуба", "en": "Dark oak slab"},
+  "dark-oak-stair": {"ru": "Ступени из тёмного дуба", "en": "Dark oak stair"},
+  "dark-oak-wood": {"ru": "Древесина тёмного дуба", "en": "Dark oak wood"},
+  "daylight-sensor": {"ru": "Сенсор дневного света", "en": "Daylight sensor"},
+  "detector-rail": {"ru": "Нажимные рельсы", "en": "Detector rail"},
+  "diamond": {"ru": "Алмаз", "en": "Diamond"},
+  "diamond-block": {"ru": "Алмазный блок", "en": "Diamond block"},
+  "diorite": {"ru": "Диорит", "en": "Diorite"},
+  "dispenser": {"ru": "Раздатчик", "en": "Dispenser"},
+  "dropper": {"ru": "Выбрасыватель", "en": "Dropper"},
+  "emerald": {"ru": "Изумруд", "en": "Emerald"},
+  "emerald-block": {"ru": "Изумрудный блок", "en": "Emerald block"},
+  "empty": {"ru": "Пусто", "en": "Empty"},
+  "ender-pearl": {"ru": "Жемчуг Края", "en": "Ender pearl"},
+  "eye-of-ender": {"ru": "Око Края", "en": "Eye of Ender"},
+  "glass": {"ru": "Стекло", "en": "Glass"},
+  "glass-pane": {"ru": "Стеклянная панель", "en": "Glass pane"},
+  "glowstone": {"ru": "Светящийся камень", "en": "Glowstone"},
+  "glowstone-dust": {"ru": "Светопыль", "en": "Glowstone dust"},
+  "gold-block": {"ru": "Золотой блок", "en": "Gold block"},
+  "gold-ingot": {"ru": "Золотой слиток", "en": "Gold ingot"},
+  "gold-nugget": {"ru": "Золотой самородок", "en": "Gold nugget"},
+  "golden-carrot": {"ru": "Золотая морковь", "en": "Golden carrot"},
+  "granite": {"ru": "Гранит", "en": "Granite"},
+  "gray-dye": {"ru": "Серый краситель", "en": "Gray dye"},
+  "gray-stained-clay": {"ru": "Серая глина", "en": "Gray stained clay"},
+  "gray-stained-glass": {"ru": "Серое стекло", "en": "Gray stained glass"},
+  "gray-wool": {"ru": "Серая шерсть", "en": "Gray wool"},
+  "green-stained-clay": {"ru": "Зелёная глина", "en": "Green stained clay"},
+  "green-stained-glass": {"ru": "Зелёное стекло", "en": "Green stained glass"},
+  "green-wool": {"ru": "Зелёная шерсть", "en": "Green wool"},
+  "gunpowder": {"ru": "Порох", "en": "Gunpowder"},
+  "hardened-clay": {"ru": "Обожжённая глина", "en": "Hardened clay"},
+  "hay-bale": {"ru": "Сноп сена", "en": "Hay bale"},
+  "heavy-pressure-plate": {"ru": "Тяжёлая нажимная плита", "en": "Heavy pressure plate"},
+  "hopper": {"ru": "Воронка", "en": "Hopper"},
+  "ink-sac": {"ru": "Чернильный мешок", "en": "Ink sac"},
+  "iron-bar": {"ru": "Железный забор", "en": "Iron bar"},
+  "iron-block": {"ru": "Железный блок", "en": "Iron block"},
+  "iron-door": {"ru": "Железная дверь", "en": "Iron door"},
+  "iron-ingot": {"ru": "Железный слиток", "en": "Iron ingot"},
+  "iron-trapdoor": {"ru": "Железный люк", "en": "Iron trapdoor"},
+  "jack-lantern": {"ru": "Светильник Джека", "en": "Jack o'Lantern"},
+  "jungle-door": {"ru": "Дверь из джунглевого дерева", "en": "Jungle door"},
+  "jungle-fence": {"ru": "Забор из джунглевого дерева", "en": "Jungle fence"},
+  "jungle-fence-gate": {"ru": "Ворота из джунглевого дерева", "en": "Jungle fence gate"},
+  "jungle-plank": {"ru": "Доски из джунглевого дерева", "en": "Jungle plank"},
+  "jungle-slab": {"ru": "Плита из джунглевого дерева", "en": "Jungle slab"},
+  "jungle-stair": {"ru": "Ступени из джунглевого дерева", "en": "Jungle stair"},
+  "jungle-wood": {"ru": "Древесина джунглевого дерева", "en": "Jungle wood"},
+  "ladder": {"ru": "Лестница", "en": "Ladder"},
+  "lapis-lazuli": {"ru": "Ультрамарин", "en": "Lapis lazuli"},
+  "lapis-lazuli-block": {"ru": "Ультрамариновый блок", "en": "Lapis lazuli block"},
+  "leather": {"ru": "Кожа", "en": "Leather"},
+  "lever": {"ru": "Рычаг", "en": "Lever"},
+  "light-blue-dye": {"ru": "Светло-голубая краска", "en": "Light blue dye"},
+  "light-blue-stained-clay": {"ru": "Светло-голубая глина", "en": "Light blue stained clay"},
+  "light-blue-stained-glass": {"ru": "Светло-голубое стекло", "en": "Light blue stained glass"},
+  "light-blue-wool": {"ru": "Светло-голубая шерсть", "en": "Light blue wool"},
+  "light-gray-dye": {"ru": "Светло-серая краска", "en": "Light gray dye"},
+  "light-gray-stained-clay": {"ru": "Светло-серая глина", "en": "Light gray stained clay"},
+  "light-gray-stained-glass": {"ru": "Светло-серое стекло", "en": "Light gray stained glass"},
+  "light-gray-wool": {"ru": "Светло-серая шерсть", "en": "Light gray wool"},
+  "light-pressure-plate": {"ru": "Лёгкая нажимная плита", "en": "Light pressure plate"},
+  "lilac": {"ru": "Сирень", "en": "Lilac"},
+  "lime-dye": {"ru": "Лаймовая краска", "en": "Lime dye"},
+  "lime-stained-clay": {"ru": "Лаймовая глина", "en": "Lime stained clay"},
+  "lime-stained-glass": {"ru": "Лаймовое стекло", "en": "Lime stained glass"},
+  "lime-wool": {"ru": "Лаймовая шерсть", "en": "Lime wool"},
+  "magenta-dye": {"ru": "Пурпурная краска", "en": "Magenta dye"},
+  "magenta-stained-clay": {"ru": "Пурпурная глина", "en": "Magenta stained clay"},
+  "magenta-stained-glass": {"ru": "Пурпурное стекло", "en": "Magenta stained glass"},
+  "magenta-wool": {"ru": "Пурпурная шерсть", "en": "Magenta wool"},
+  "melon": {"ru": "Долька арбуза", "en": "Melon"},
+  "melon-block": {"ru": "Арбуз", "en": "Melon block"},
+  "mossy-cobblestone-wall": {"ru": "Стена из замшелого булыжника", "en": "Mossy cobblestone wall"},
+  "nether-brick": {"ru": "Адский кирпич", "en": "nether-brick"},
+  "nether-brick-block": {"ru": "Адские кирпичи", "en": "Nether bricks"},
+  "nether-brick-fence": {"ru": "Забор из адского кирпича", "en": "Nether bricks fence"},
+  "nether-brick-slab": {"ru": "Плита из адского кирпича", "en": "Nether bricks slab"},
+  "nether-brick-stair": {"ru": "Ступени из адского кирпича", "en": "Nether bricks stair"},
+  "nether-quartz": {"ru": "Кварц Нижнего мира", "en": "nether-quartz"},
+  "oak-door": {"ru": "Дверь из дуба", "en": "Oak door"},
+  "oak-fence": {"ru": "Забор из дуба", "en": "Oak fence"},
+  "oak-fence-gate": {"ru": "Ворота из дуба", "en": "Oak fence gate"},
+  "oak-plank": {"ru": "Доски из дуба", "en": "Oak plank"},
+  "oak-slab": {"ru": "Плита из дуба", "en": "Oak slab"},
+  "oak-stair": {"ru": "Ступени из дуба", "en": "Oak stair"},
+  "oak-wood": {"ru": "Древесина дуба", "en": "Oak wood"},
+  "obsidian": {"ru": "Обсидиан", "en": "Obsidian"},
+  "orange-dye": {"ru": "Оранжевая краска", "en": "Orange dye"},
+  "orange-stained-clay": {"ru": "Оранжевая глина", "en": "Orange stained clay"},
+  "orange-stained-glass": {"ru": "Оранжевое стекло", "en": "Orange stained glass"},
+  "orange-tulip": {"ru": "Оранжевый тюльпан", "en": "Orange tulip"},
+  "orange-wool": {"ru": "Оранжевая шерсть", "en": "Orange wool"},
+  "oxyeye-daisy": {"ru": "Нивяник", "en": "Oxyeye daisy"},
+  "paper": {"ru": "Бумага", "en": "Paper"},
+  "peony": {"ru": "Пион", "en": "Peony"},
+  "pink-dye": {"ru": "Розовая краска", "en": "Pink dye"},
+  "pink-stained-clay": {"ru": "Розовая глина", "en": "Pink stained clay"},
+  "pink-stained-glass": {"ru": "Розовое стекло", "en": "Pink stained glass"},
+  "pink-tulip": {"ru": "Розовый тюльпан", "en": "Pink tulip"},
+  "pink-wool": {"ru": "Розовая шерсть", "en": "Pink wool"},
+  "piston": {"ru": "Поршень", "en": "Piston"},
+  "polished-andesite": {"ru": "Гладкий андезит", "en": "Polished andesite"},
+  "polished-diorite": {"ru": "Гладкий диорит", "en": "Polished diorite"},
+  "polished-granite": {"ru": "Гладкий гранит", "en": "Polished granite"},
+  "poppy": {"ru": "Мак", "en": "Poppy"},
+  "potato": {"ru": "Картофель", "en": "Potato"},
+  "powered-rail": {"ru": "Энергорельсы", "en": "Powered rail"},
+  "prismarine": {"ru": "Призмарин", "en": "Prismarine"},
+  "prismarine-brick": {"ru": "Призмариновые кирпичи", "en": "Prismarine brick"},
+  "prismarine-crystal": {"ru": "Призмариновый кристалл", "en": "Prismarine crystal"},
+  "prismarine-shard": {"ru": "Призмариновый осколок", "en": "Prismarine shard"},
+  "purple-dye": {"ru": "Пурпурная краска", "en": "Purple dye"},
+  "purple-stained-clay": {"ru": "Пурпурная глина", "en": "Purple stained clay"},
+  "purple-stained-glass": {"ru": "Пурпурное стекло", "en": "Purple stained glass"},
+  "purple-wool": {"ru": "Пурпурная шерсть", "en": "Purple wool"},
+  "quartz-block": {"ru": "Блок из кварца", "en": "Quartz block"},
+  "quartz-chiseled": {"ru": "Резной кварцевый блок", "en": "Quartz chiseled block"},
+  "quartz-pillar": {"ru": "Кварцевая колонна", "en": "Quartz pillar"},
+  "quartz-slab": {"ru": "Плита из кварца", "en": "Quartz slab"},
+  "quartz-stair": {"ru": "Ступени из кварца", "en": "Quartz stair"},
+  "rabbit-hide": {"ru": "Кроличья шкурка", "en": "Rabbit hide"},
+  "rail": {"ru": "Рельсы", "en": "Rail"},
+  "raw-chicken": {"ru": "Сырая курятина", "en": "Raw chicken"},
+  "raw-porkchop": {"ru": "Сырая свинина", "en": "Raw porkchop"},
+  "red-sand": {"ru": "Красный песок", "en": "Red sand"},
+  "red-sandstone": {"ru": "Красный песчанник", "en": "Red sandstone"},
+  "red-sandstone-slab": {"ru": "Плита из красного песчанника", "en": "Red sandstone slab"},
+  "red-sandstone-stair": {"ru": "Ступени из красного песчанника", "en": "Red sandstone stair"},
+  "red-smooth-sandstone": {"ru": "Гладкий красный песчанник", "en": "Red smooth sandstone"},
+  "red-stained-clay": {"ru": "Красная глина", "en": "Red stained clay"},
+  "red-stained-glass": {"ru": "Красное стекло", "en": "Red stained glass"},
+  "red-tulip": {"ru": "Красный тюльпан", "en": "Red tulip"},
+  "red-wool": {"ru": "Красная шерсть", "en": "Red wool"},
+  "redstone": {"ru": "Красная пыль", "en": "Redstone"},
+  "redstone-block": {"ru": "Блок красного камня", "en": "Redstone block"},
+  "redstone-torch": {"ru": "Красный факел", "en": "Redstone torch"},
+  "repeater": {"ru": "Репитер", "en": "Repeater"},
+  "rose-bush": {"ru": "Розовый куст", "en": "Rose bush"},
+  "rose-red": {"ru": "Красная краска", "en": "Rose red"},
+  "rotten-flesh": {"ru": "Гнилая плоть", "en": "Rotten flesh"},
+  "sand": {"ru": "Песок", "en": "Sand"},
+  "sandstone": {"ru": "Песчанник", "en": "Sandstone"},
+  "sandstone-slab": {"ru": "Плита из песчанника", "en": "Sandstone slab"},
+  "sandstone-stair": {"ru": "Ступени из песчанника", "en": "Sandstone stair"},
+  "sea-lantern": {"ru": "Морской фонарь", "en": "Sea lantern"},
+  "slimeball": {"ru": "Слизь", "en": "Simeball"},
+  "slime-block": {"ru": "Блок слизи", "en": "Slime block"},
+  "smooth-sandstone": {"ru": "Гладкий песчанник", "en": "Smooth sandstone"},
+  "snow": {"ru": "Снег", "en": "Snow"},
+  "snow-block": {"ru": "Блок снега", "en": "Snow block"},
+  "snowball": {"ru": "Снежок", "en": "Snowball"},
+  "spruce-door": {"ru": "Дверь из ели", "en": "Spruce door"},
+  "spruce-fence": {"ru": "Забор из ели", "en": "Spruce fence"},
+  "spruce-fence-gate": {"ru": "Ворота из ели", "en": "Spruce fence gate"},
+  "spruce-plank": {"ru": "Доски из ели", "en": "Spruce plank"},
+  "spruce-slab": {"ru": "Плита из ели", "en": "Spruce slab"},
+  "spruce-stair": {"ru": "Ступени из ели", "en": "Spruce stair"},
+  "spruce-wood": {"ru": "Еловая древесина", "en": "Spruce wood"},
+  "stick": {"ru": "Палка", "en": "Stick"},
+  "sticky-piston": {"ru": "Липкий поршень", "en": "Sticky piston"},
+  "stone": {"ru": "Камень", "en": "Stone"},
+  "stone-brick-block": {"ru": "Каменные кирпичи", "en": "Stone bricks"},
+  "stone-brick-slab": {"ru": "Плита из каменный кирпичей", "en": "Stone bricks slab"},
+  "stone-brick-stair": {"ru": "Ступени из каменный кирпичей", "en": "Stone bricks stair"},
+  "stone-button": {"ru": "Каменная кнопка", "en": "Stone button"},
+  "stone-pressure-plate": {"ru": "Каменная нажимная плита", "en": "Stone pressure plate"},
+  "string": {"ru": "Нить", "en": "String"},
+  "sugar": {"ru": "Сахар", "en": "Sugar"},
+  "sugar-cane": {"ru": "Сахарный тростник", "en": "Sugar cane"},
+  "sunflower": {"ru": "Подсолнух", "en": "Sunflower"},
+  "torch": {"ru": "Факел", "en": "Torch"},
+  "trapped-chest": {"ru": "Сундук-ловушка", "en": "Trapped chest"},
+  "tripwire-hook": {"ru": "Натяжной датчик", "en": "Tripwire hook"},
+  "wheat": {"ru": "Пшеница", "en": "Wheat"},
+  "white-stained-clay": {"ru": "Белая глина", "en": "White stained clay"},
+  "white-stained-glass": {"ru": "Белое стекло", "en": "White stained glass"},
+  "white-tulip": {"ru": "Белый тюльпан", "en": "White tulip"},
+  "white-wool": {"ru": "Белая шерсть", "en": "White wool"},
+  "wood-button": {"ru": "Деревянная кнопка", "en": "Wood button"},
+  "wood-pressure-plate": {"ru": "Деревянная нажимная плита", "en": "Wood pressure plate"},
+  "wood-trapdoor": {"ru": "Деревянный люк", "en": "Wood trapdoor"},
+  "wool": {"ru": "Шерсть", "en": "Wool"},
+  "yellow-stained-clay": {"ru": "Жёлтая глина", "en": "Yellow stained clay"},
+  "yellow-stained-glass": {"ru": "Жёлтое стекло", "en": "Yellow stained glass"},
+  "yellow-wool": {"ru": "Жёлтая шерсть", "en": "Yellow wool"}
+
+}

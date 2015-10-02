@@ -223,6 +223,7 @@ sub read_config
   if(!exists($c->{'user'}{'timeouts'}{'mouse_click_ms'}))                    { $c->{'user'}{'timeouts'}{'mouse_click_ms'} = 100; }
   if(!exists($c->{'user'}{'timeouts'}{'after_turn'}))                        { $c->{'user'}{'timeouts'}{'after_turn'} = 0.5; }
   if(!exists($c->{'user'}{'timeouts'}{'villager_page_switch'}))              { $c->{'user'}{'timeouts'}{'villager_page_switch'} = 0.1; }
+  if(!exists($c->{'user'}{'l10n'}{'language'}))                              { $c->{'user'}{'l10n'}{'language'} = 'en'; }
 
   return $c;
 }

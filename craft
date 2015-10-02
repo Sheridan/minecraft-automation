@@ -1,17 +1,22 @@
 #!/usr/bin/perl -w
 
 use strict;
+use utf8;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use JSON;
 use Time::HiRes qw (sleep);
 use Data::Dumper;
 use Getopt::Long;
 use lib './lib';
+use Minecraft::L10n;
 use Minecraft::Player;
 use Minecraft::Window;
 use Minecraft::FileIO;
 use Minecraft::UserInteraction;
 use Minecraft::Interfaces::Crafttable;
 $main::config = Minecraft::FileIO::read_config();
+$main::l10n   = Minecraft::L10n->new();
 $main::player = Minecraft::Player->new();
 my $target_item = '';
 my $reciepts = {};
@@ -20,20 +25,11 @@ my $crafttable = Minecraft::Interfaces::Crafttable->new();
 GetOptions(
     "craft=s" => \$target_item,
     "help"    => \&help
-    ) or die("Что то не так с опциями командной строки\n");
+    ) or die($main::l10n->tr('wrong_commandline'));
 
 sub help
 {
-  print <<_HELP_;
-Использование:
-  craft --craft=item для крафта
-  craft --craft=item --help для помощи по крафту (поддерживаются неполные имена)
-  craft --help - полный список шмота, который можно скрафтить
-Подразумевается, что мы работаем с полными стэками, если шмот стэкуется.
-Опции:
-  --craft=строка  Что надо скрафтить.
-    Можно выбрать одно из:
-_HELP_
+  print $main::l10n->tr('craft_help');
   if(!$target_item)
   {
     $target_item = '.*';
@@ -58,14 +54,14 @@ sub reciept_help
   # }
   my $reciept = Minecraft::FileIO::read_item_file($item);
   if($reciept->{'craftable'} eq 'no') {return;}
-  printf("\t\t%s, рецептов: %d\n", $reciept->{'name'}, $reciept->{'craft-reciepts'});
+  printf($main::l10n->tr('reciepts_count'), $reciept->{'name'}, $main::l10n->tr($reciept->{'name'}), $reciept->{'craft-reciepts'});
   for my $reciept_number (sort keys(%{$reciept->{'reciepts'}}))
   {
-    printf("\t\t\tРецепт %d: ", $reciept_number+1);
+    printf($main::l10n->tr('reciept_number'), $reciept_number+1);
     my @data = ();
     for my $reciept_item (keys(%{$reciept->{'reciepts'}{$reciept_number}{'ingridients'}}))
     {
-      push(@data, sprintf("%s:%d", $reciept_item, $reciept->{'reciepts'}{$reciept_number}{'ingridients'}{$reciept_item}));
+      push(@data, sprintf("%s:%d", $main::l10n->tr($reciept_item), $reciept->{'reciepts'}{$reciept_number}{'ingridients'}{$reciept_item}));
     }
     printf("%s\n", join(',', @data));
   }
@@ -77,7 +73,7 @@ sub load_reciept
   my $item = $_[0];
   if(Minecraft::FileIO::item_description_exists($item) && !exists($reciepts->{$item}))
   {
-    Minecraft::UserInteraction::say("Загружаем рецепт крафта %s", $item);
+    Minecraft::UserInteraction::say($main::l10n->tr('reciept_load'), $main::l10n->tr($item));
     $reciepts->{$item} = Minecraft::FileIO::read_item($item);
     for my $reciept_number (keys(%{$reciepts->{$item}{'reciepts'}}))
     {
@@ -97,7 +93,7 @@ sub self_invertory_has_ingridients
   my ($item_to_craft, $reciept_number) = @_[0..1];
   if(what_ingridient_i_must_craft($item_to_craft, $reciept_number))
   {
-    Minecraft::UserInteraction::say("Материалов для %s нет", $item_to_craft);
+    Minecraft::UserInteraction::say($main::l10n->tr('reciept_ingridients_not_avialable'), $main::l10n->tr($item_to_craft));
     return 0;
   }
   return 1;
@@ -146,8 +142,8 @@ sub self_invertory_has_cells_for_result
       )
     )
   {
-    Minecraft::UserInteraction::say("Место в инвентаре при крафте %s закончилось. Не хватило %d ячеек.",
-                      $item_to_craft,
+    Minecraft::UserInteraction::say($main::l10n->tr('invrtory_cells_is_ended'),
+                      $main::l10n->tr($item_to_craft),
                       $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'quantity'}-$total_ingridients_count-$crafttable->self_invertory()->empty_count());
     return 0;
   }
@@ -181,7 +177,7 @@ sub craft
       ($#hystory > 1 && $#hystory && $hystory[$#hystory-2] eq $item_to_craft && $hystory[$#hystory-1] ne $item_to_craft)
     )
   {
-    Minecraft::UserInteraction::say("Похоже, что уходим в глубокую рекурсию при крафте %s. Прерываем.", $item_to_craft);
+    Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
     exit 0;
   }
   push (@hystory, $item_to_craft);
@@ -189,7 +185,7 @@ sub craft
   {
     if(self_invertory_has_ingridients($item_to_craft, $reciept_number) && self_invertory_has_cells_for_result($item_to_craft, $reciept_number))
     {
-      Minecraft::UserInteraction::say("Крафт %s", $item_to_craft);
+      Minecraft::UserInteraction::say($main::l10n->tr('do_craft'), $main::l10n->tr($item_to_craft));
       for my $crafttable_y (0..2)
       {
         for my $crafttable_x (0..2)
