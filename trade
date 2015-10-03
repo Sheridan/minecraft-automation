@@ -52,13 +52,13 @@ sub take_to_self_invertory_or_drop
   my $cell = $_[0];
   if($villager->self_invertory()->empty_count())
   {
-    # print "take\n";
+#     print "take\n";
     $main::player->hand()->take_stack_to_invertory($cell);
     $villager->self_invertory()->remap();
   }
   else
   {
-    # print "drop\n";
+#     print "drop\n";
     $main::player->hand()->drop_item_from_cell($cell);
   }
 }

@@ -111,16 +111,17 @@ sub page_avialable
 sub wait_for_upgrade
 {
   my ($self, $items_to_trade) = @_[0..1];
-  Minecraft::UserInteraction::say("Отдыхаем, пока торговец апгредится...");
+  Minecraft::UserInteraction::say($main::l10n->tr('wait_trader_upgarde'));
   $main::player->hand()->close_interface('villager');
   sleep($main::config->{'user'}{'timeouts'}{'villager_upgrade'});
   $main::player->hand()->open_interface('villager');
   $self->clear_state();
   if(defined($items_to_trade))
   {
-    Minecraft::UserInteraction::say("Проверяем, проапгредился ли торговец...");
+    Minecraft::UserInteraction::say($main::l10n->tr('check_trader_upgarde'));
     return $self->can_trade_something($items_to_trade);
   }
+  $self->self_invertory()->remap();
   return 1;
 }
 

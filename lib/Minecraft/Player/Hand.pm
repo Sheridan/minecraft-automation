@@ -167,8 +167,8 @@ sub open_interface
     $attempt_check_open_interface--;
     if(!$attempt_check_open_interface)
     {
-      Minecraft::UserInteraction::say("Интерфейс так и не открылся за %d секунд", int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
-                                                                                      $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
+      Minecraft::UserInteraction::say($main::l10n->tr('interface_not_opened'), int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                                                                   $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
       exit(0);
     }
   }
@@ -186,8 +186,8 @@ sub close_interface
     $attempt_check_close_interface--;
     if(!$attempt_check_close_interface)
     {
-      Minecraft::UserInteraction::say("Интерфейс так и не закрылся за %d секунд", int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
-                                                                                      $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
+      Minecraft::UserInteraction::say($main::l10n->tr('interface_not_closed'), int($main::config->{'user'}{'timeouts'}{'max_interface_open'}/
+                                                                                   $main::config->{'user'}{'timeouts'}{'interface_open'}   ));
       exit(0);
     }
   }

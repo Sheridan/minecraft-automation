@@ -547,8 +547,26 @@
     "ru": "Торговать больше нечем и не на что. Уходим.",
     "en": "Trading nothing else and nothing. Care."
   },
-
-
+  "wait_trader_upgarde" :
+  {
+    "ru": "Отдыхаем, пока торговец апгредится...",
+    "en": "Wait, while trader upgrading..."
+  },
+  "check_trader_upgarde" :
+  {
+    "ru": "Проверяем, проапгредился ли торговец...",
+    "en": "Checking for trader upgrade..."
+  },
+  "interface_not_opened" :
+  {
+    "ru": "Интерфейс так и не открылся за %d секунд",
+    "en": "The interface is not opened within %d seconds"
+  },
+  "interface_not_closed" :
+  {
+    "ru": "Интерфейс так и не закрылся за %d секунд",
+    "en": "The interface is not closed within %d seconds"
+  },
 
   "acacia-door": {"ru": "Дверь из акации", "en": "Acacia door"},
   "acacia-fence": {"ru": "Забор из акации", "en": "Acacia fence"},

@@ -79,8 +79,9 @@ sub add_item_to_data
 sub remove_item_from_data
 {
   my ($self, $x, $y) = @_[0..2];
+  #printf("%s => empty\n", $self->{'data'}{$x}{$y});
   $self->{'items-count'}{$self->{'data'}{$x}{$y}}--;
-  $self->{'data'}{$x}{$y} = 'empty';
+  $self->add_item_to_data('empty', $x, $y);
 }
 
 sub empty_count
@@ -128,6 +129,7 @@ sub map_cells
       $self->add_item_to_data($self->what_item_at_coordinates($x, $y), $x, $y);
     }
   }
+#   $self->dump();
 }
 
 sub remap_empty_cells
@@ -155,6 +157,7 @@ sub remap
   $self->remap_empty_cells(0);
   $self->remap_empty_cells(1);
   #print ("\n");
+#   $self->dump();
 }
 
 sub what_item_at_coordinates
@@ -258,14 +261,20 @@ sub state_is_unchanged
 sub dump
 {
   my $self = $_[0];
+  print "Inventory:\n";
   for my $y (0..$self->{'dimension'}{'y'})
   {
     for my $x (0..$self->{'dimension'}{'x'})
     {
       printf("[%d:%d:%s]", $x, $y, $self->{'data'}{$x}{$y});
     }
-    print "\n";
+    print "\nItenms to find:\n";
   }
+  for my $itf (keys(%{$self->{'items_to_find'}}))
+  {
+    printf("[%s]", $itf);
+  }
+  print "\n";
   #Minecraft::UserInteraction::wait_press_enter("Жду пока сверите инвертарь");
 }
 
