@@ -174,9 +174,10 @@ sub craft
   my ($item_to_craft) = $_[0];
   if(
       (exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)) ||
-      ($#hystory > 1 && $#hystory && $hystory[$#hystory-2] eq $item_to_craft && $hystory[$#hystory-1] ne $item_to_craft)
+      ($#hystory > 3 && $hystory[$#hystory-1] eq $hystory[$#hystory-3] && $hystory[$#hystory-2] eq $hystory[$#hystory-4])
     )
   {
+    print Dumper @hystory;
     Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
     exit 0;
   }

@@ -18,7 +18,7 @@ sub capture_screen
 {
 
   Minecraft::Window::restore_size_and_position();
-  system(sprintf('ffmpeg -video_size %dx%d -framerate 25 -f x11grab -i :0.0+%d,%d -f alsa -ac 2 -i hw:0 %s/%s_capture.mkv',
+  system(sprintf('ffmpeg -video_size %dx%d -framerate 25 -f x11grab -i :0.0+%d,%d %s/%s_capture.mkv',
                 $main::config->{'system'}{'window'}{'geometry'}{'w'},
                 $main::config->{'system'}{'window'}{'geometry'}{'h'},
                 $main::config->{'system'}{'window'}{'geometry'}{'x'},

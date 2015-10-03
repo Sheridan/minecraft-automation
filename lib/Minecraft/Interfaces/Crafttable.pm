@@ -18,8 +18,8 @@ sub take_all_craft_result
 {
   my $self = $_[0];
   $main::player->hand()->take_stack_to_invertory($main::config->{'system'}{'crafttable'}{'result'});
-  $self->interface_invertory()->empty(); # а правильно ли так? А если не скрафтилось?
-  $self->self_invertory()->map_cells();
+  $self->interface_invertory()->map_cells(); 
+  $self->self_invertory()->remap();
 }
 
 sub put_item
