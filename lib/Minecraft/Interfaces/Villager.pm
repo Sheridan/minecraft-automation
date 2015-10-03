@@ -27,7 +27,7 @@ sub can_trade
 {
     return $main::player->head()->compare_screenshots
                         (
-                            'dont-delete-villager-trade-avialable',
+                            $main::player->head()->screenshot_full_filename('dont-delete-villager-trade-avialable'),
                             $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'trade-avialable'}, 0)
                         );
 }
@@ -37,7 +37,7 @@ sub invertory_is_empty
   my ($self, $villager_invertory) = @_[0..1];
   return $main::player->head()->compare_screenshots
                         (
-                            sprintf('dont-delete-villager-invertory-%d', $villager_invertory),
+                            $main::player->head()->screenshot_full_filename(sprintf('dont-delete-villager-invertory-%d', $villager_invertory)),
                             $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{'invertory'}{$villager_invertory}, 1)
                         );
 }
@@ -101,7 +101,7 @@ sub page_avialable
     $self->{'pages'}{'cache'}{$button_name}{$page} =
                 !$main::player->head()->compare_screenshots
                           (
-                            sprintf("dont-delete-villager-%s-not-avialable", $button_name),
+                            $main::player->head()->screenshot_full_filename(sprintf("dont-delete-villager-%s-not-avialable", $button_name)),
                             $main::player->head()->take_temp_screenshot($main::config->{'system'}{'villager'}{$button_name}, 1)
                           );
   }
