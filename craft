@@ -177,7 +177,7 @@ sub craft
       ($#hystory > 3 && $hystory[$#hystory-1] eq $hystory[$#hystory-3] && $hystory[$#hystory-2] eq $hystory[$#hystory-4])
     )
   {
-    print Dumper @hystory;
+    #print Dumper @hystory;
     Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
     exit 0;
   }
