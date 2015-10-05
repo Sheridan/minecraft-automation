@@ -567,7 +567,28 @@
     "ru": "Интерфейс так и не закрылся за %d секунд",
     "en": "The interface is not closed within %d seconds"
   },
-
+  "capture_help" : {
+    "ru" : [
+      "Использование:",
+      "  capture --streaming=тип потока [--stream-key=ключ]",
+      "Опции:",
+      "  --streaming=тип потока",
+      "     capture - запись в файл (создаётся файл в папке для скриншотов)",
+      "     youtube - вещание на youtube, не забудьте указать ключ потока",
+      "     twitch - вещание на twitch, не забудьте указать ключ потока",
+      "  --stream-key=ключ потока для вещания онлайн"
+    ],
+    "en" : [
+      "Usage:",
+      "  capture --streaming=stream type [--stream-key=stream key]",
+      "Options:",
+      "  --streaming=string Stream type",
+      "     capture - record to file (file creating in screensots folder)",
+      "     youtube - streaming to youtube, do not forget to specify the key of stream",
+      "     twitch - streaming to twitch, do not forget to specify the key of stream",
+      "  --stream-key=string Streaming key for live broadcasting"
+    ]
+  },
   "acacia-door": {"ru": "Дверь из акации", "en": "Acacia door"},
   "acacia-fence": {"ru": "Забор из акации", "en": "Acacia fence"},
   "acacia-fence-gate": {"ru": "Ворота из акации", "en": "Acacia fence gate"},

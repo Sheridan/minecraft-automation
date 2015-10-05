@@ -8,23 +8,73 @@ use JSON;
 use Time::HiRes qw (sleep);
 use POSIX qw(strftime);
 use Data::Dumper;
+use Getopt::Long;
 use lib './lib';
 use Minecraft::L10n;
 use Minecraft::Window;
 $main::config = Minecraft::FileIO::read_config();
-# $main::l10n   = Minecraft::L10n->new();
+$main::l10n   = Minecraft::L10n->new();
+my $streaming = "capture";
+my $youtube_stream_url = "rtmp://a.rtmp.youtube.com/live2";
+my $stream_key = "";
+my $twitch_server = "live-prg"; # http://bashtech.net/twitch/ingest.php
+my $fps = 30;
+GetOptions(
+    "streaming=s" => \$streaming,
+    "youtube-stream-url=s" => \$youtube_stream_url,
+    "stream-key=s" => \$stream_key,
+    "fps=i" => \$fps,
+    "help"     => \&help
+    ) or die($main::l10n->tr('wrong_commandline'));
+
+sub help
+{
+  print $main::l10n->tr('capture_help');
+  exit (0);
+}
+
+sub run_ffmpeg
+{
+  my $options = $_[0];
+  Minecraft::Window::restore_size_and_position();
+  system(sprintf('ffmpeg -video_size %dx%d -framerate %d -f x11grab -i :0.0+%d,%d -f alsa -ac 2 -i pulse '.
+                 '-vcodec libx264 -pix_fmt yuv420p -preset medium -r %d -g %d '.
+                 '-acodec libmp3lame -ar 44100 -threads 6 -qscale 3 -b 712000 -bufsize 512k %s',
+                $main::config->{'system'}{'window'}{'geometry'}{'w'},
+                $main::config->{'system'}{'window'}{'geometry'}{'h'},
+                $fps,
+                $main::config->{'system'}{'window'}{'geometry'}{'x'},
+                $main::config->{'system'}{'window'}{'geometry'}{'y'},
+                $fps,
+                $fps*2,
+                $options));
+}
 
 sub capture_screen
 {
-
-  Minecraft::Window::restore_size_and_position();
-  system(sprintf('ffmpeg -video_size %dx%d -framerate 25 -f x11grab -i :0.0+%d,%d %s/%s_capture.mkv',
-                $main::config->{'system'}{'window'}{'geometry'}{'w'},
-                $main::config->{'system'}{'window'}{'geometry'}{'h'},
-                $main::config->{'system'}{'window'}{'geometry'}{'x'},
-                $main::config->{'system'}{'window'}{'geometry'}{'y'},
+  run_ffmpeg(sprintf('%s/%s_capture.mkv',
                 $main::config->{'user'}{'paths'}{'screenshosts'},
                 strftime("%d.%m.%Y_%H-%M-%S", localtime)));
 }
 
-capture_screen();
+sub stream_youtube
+{
+  run_ffmpeg(sprintf('-f flv "%s/%s"',
+                $youtube_stream_url,
+                $stream_key));
+}
+
+sub stream_twitch
+{
+  run_ffmpeg(sprintf('-f flv "rtmp://%s.twitch.tv/app/%s"',
+                $twitch_server,
+                $stream_key));
+}
+
+for ($streaming)
+{
+  if   (/capture/) { capture_screen(); }
+  elsif(/youtube/) { stream_youtube(); }
+  elsif(/twitch/)  { stream_twitch();  }
+  else { help(); }
+}
