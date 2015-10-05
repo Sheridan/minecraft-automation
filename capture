@@ -33,6 +33,13 @@ sub help
   exit (0);
 }
 
+sub must_divide_by_2
+{
+    my $value = $_[0];
+    if($value%2) { return $value + 1; }
+    return $value;
+}
+
 sub run_ffmpeg
 {
   my $options = $_[0];
@@ -40,8 +47,8 @@ sub run_ffmpeg
   system(sprintf('ffmpeg -video_size %dx%d -framerate %d -f x11grab -i :0.0+%d,%d -f alsa -ac 2 -i pulse '.
                  '-vcodec libx264 -pix_fmt yuv420p -preset medium -r %d -g %d '.
                  '-acodec libmp3lame -ar 44100 -threads 6 -qscale 3 -b 712000 -bufsize 512k %s',
-                $main::config->{'system'}{'window'}{'geometry'}{'w'},
-                $main::config->{'system'}{'window'}{'geometry'}{'h'},
+                must_divide_by_2($main::config->{'system'}{'window'}{'geometry'}{'w'}),
+                must_divide_by_2($main::config->{'system'}{'window'}{'geometry'}{'h'}),
                 $fps,
                 $main::config->{'system'}{'window'}{'geometry'}{'x'},
                 $main::config->{'system'}{'window'}{'geometry'}{'y'},
