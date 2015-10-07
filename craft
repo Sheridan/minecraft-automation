@@ -20,7 +20,6 @@ $main::l10n   = Minecraft::L10n->new();
 $main::player = Minecraft::Player->new();
 my $target_item = '';
 my $reciepts = {};
-my @hystory = ();
 my $crafttable = Minecraft::Interfaces::Crafttable->new();
 GetOptions(
     "craft=s" => \$target_item,
@@ -173,15 +172,12 @@ sub craft
 {
   my ($item_to_craft) = $_[0];
   if(
-      (exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)) ||
-      ($#hystory > 3 && $hystory[$#hystory-1] eq $hystory[$#hystory-3] && $hystory[$#hystory-2] eq $hystory[$#hystory-4])
+      exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)
     )
   {
-    #print Dumper @hystory;
     Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
     exit 0;
   }
-  push (@hystory, $item_to_craft);
   for my $reciept_number (keys(%{$reciepts->{$item_to_craft}{'reciepts'}}))
   {
     if(self_invertory_has_ingridients($item_to_craft, $reciept_number) && self_invertory_has_cells_for_result($item_to_craft, $reciept_number))
