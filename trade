@@ -103,7 +103,6 @@ sub trade_item_with_villager
 sub sell_to_villager
 {
   my ($items_to_sell, $villager_invertory) = @_[0..1];
-  my @sell_pages;
   $villager->self_invertory()->save_state('before_sell');
 
   for my $item_to_sell (keys(%{$items_to_sell}))
@@ -135,7 +134,7 @@ sub buy_from_villager
   for my $item_to_buy (keys(%{$items_to_buy}))
   {
     Minecraft::UserInteraction::say($main::l10n->tr('buy_from_trader'), $main::l10n->tr($item_to_buy));
-     if(trade_item_with_villager('emerald', $items_to_buy->{$item_to_buy}, $villager_invertory) && $target eq 'sell')
+    if(trade_item_with_villager('emerald', $items_to_buy->{$item_to_buy}, $villager_invertory) && $target eq 'sell')
     {
       Minecraft::UserInteraction::say($main::l10n->tr('some_buy_wait_trader_upgrade'));
       last;
