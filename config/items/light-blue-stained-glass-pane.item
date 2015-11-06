@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty,empty
+light-blue-stained-glass,light-blue-stained-glass,light-blue-stained-glass
+light-blue-stained-glass,light-blue-stained-glass,light-blue-stained-glass
+result:stack,16

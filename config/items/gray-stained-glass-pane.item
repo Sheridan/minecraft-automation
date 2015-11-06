@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty,empty
+gray-stained-glass,gray-stained-glass,gray-stained-glass
+gray-stained-glass,gray-stained-glass,gray-stained-glass
+result:stack,16

@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+
+
+#print Dumper @woods;
+
+sub generate_glass_pane
+{
+    my ($name, $item) = @_[0..1];
+    open( my $fh, '>>', $name );
+    printf  {$fh} ("craftable:yes\nstackable:yes\nietms-in-stack:64\ncraft-reciepts:1\nempty,empty,empty\n%s,%s,%s\n%s,%s,%s\nresult:stack,16", 
+			    $item,$item,$item,$item,$item,$item,);
+    close($fh);
+}
+
+my $dyes = 
+    {
+	'bone-meal'        => 'white',
+	'light-gray-dye'   => 'light-gray',
+	'gray-dye'         => 'gray',
+	'ink-sac'          => 'black',
+	'cocoa-beans'      => 'brown',
+	'rose-red'         => 'red',
+	'orange-dye'       => 'orange',
+	'dandelion-yellow' => 'yellow',
+	'lime-dye'         => 'lime',
+	'cactus-green'     => 'green',
+	'cyan-dye'         => 'cyan',
+	'light-blue-dye'   => 'light-blue',
+	'lapis-lazuli'     => 'blue',
+	'purple-dye'       => 'purple',
+	'magenta-dye'      => 'magenta',
+	'pink-dye'         => 'pink'
+};
+
+for my $dye (keys(%{$dyes}))
+{
+    generate_glass_pane(sprintf("%s-stained-glass-pane.item", $dyes->{$dye}), sprintf("%s-stained-glass", $dyes->{$dye}));
+}

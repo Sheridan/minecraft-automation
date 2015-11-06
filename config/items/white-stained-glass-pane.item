@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,empty,empty
+white-stained-glass,white-stained-glass,white-stained-glass
+white-stained-glass,white-stained-glass,white-stained-glass
+result:stack,16

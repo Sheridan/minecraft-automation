@@ -1,6 +1,6 @@
-bone-meal     ,orange-dye      ,lapis-lazuli,empty,sunflower,red-tulip   ,empty       ,empty,empty
-light-gray-dye,dandelion-yellow,purple-dye  ,empty,dandelion,orange-tulip,empty       ,empty,empty
-gray-dye      ,lime-dye        ,magenta-dye ,empty,rose-bush,pink-tulip  ,empty       ,empty,empty
-ink-sac       ,cactus-green    ,pink-dye    ,empty,poppy    ,white-tulip ,empty       ,empty,empty
-cocoa-beans   ,cyan-dye        ,empty       ,empty,peony    ,allium      ,azure-bluet ,empty,empty
-rose-red      ,light-blue-dye  ,empty       ,empty,lilac    ,blue-orchid ,oxyeye-daisy,empty,empty
+bone-meal     ,orange-dye      ,lapis-lazuli,empty,sunflower,red-tulip   ,black-stained-glass     ,green-stained-glass ,pink-stained-glass
+light-gray-dye,dandelion-yellow,purple-dye  ,empty,dandelion,orange-tulip,gray-stained-glass      ,lime-stained-glass  ,magenta-stained-glass
+gray-dye      ,lime-dye        ,magenta-dye ,empty,rose-bush,pink-tulip  ,light-gray-stained-glass,yellow-stained-glass,purple-stained-glass
+ink-sac       ,cactus-green    ,pink-dye    ,empty,poppy    ,white-tulip ,white-stained-glass     ,orange-stained-glass,blue-stained-glass
+cocoa-beans   ,cyan-dye        ,empty       ,empty,peony    ,allium      ,azure-bluet             ,red-stained-glass   ,light-blue-stained-glass
+rose-red      ,light-blue-dye  ,empty       ,empty,lilac    ,blue-orchid ,oxyeye-daisy            ,brown-stained-glass ,cyan-stained-glass
