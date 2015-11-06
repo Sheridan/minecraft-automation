@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+gold-ingot,gold-ingot,gold-ingot
+gold-ingot,apple,gold-ingot
+gold-ingot,gold-ingot,gold-ingot
+result:stack,1

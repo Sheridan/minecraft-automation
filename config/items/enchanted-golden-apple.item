@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+gold-block,gold-block,gold-block
+gold-block,apple,gold-block
+gold-block,gold-block,gold-block
+result:stack,1
