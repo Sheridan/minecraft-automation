@@ -637,6 +637,8 @@
   "carrot": {"ru": "Морковь", "en": "Carrot"},
   "chest": {"ru": "Сундук", "en": "Chest"},
   "chiseled-stone-bricks": {"ru": "Резной каменный кирпич", "en": "Chiseled Stone Bricks"},
+  "chiseled-sandstone": {"ru": "Резной песчанник", "en": "Chiseled sandstone"},
+  "chiseled-red-sandstone": {"ru": "Резной красный песчанник", "en": "Chiseled red sandstone"},
   "clay-block": {"ru": "Глиняный блок", "en": "Block of clay"},
   "coal": {"ru": "Уголь", "en": "Coal"},
   "coal-block": {"ru": "Угольный блок", "en": "Coal block"},
