@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+empty,red-sandstone-slab,empty
+empty,red-sandstone-slab,empty
+empty,empty,empty
+result:stack,1
