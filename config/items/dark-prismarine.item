@@ -1,8 +1,0 @@
-craftable:yes
-stackable:yes
-ietms-in-stack:64
-craft-reciepts:1
-prismarine-shard,prismarine-shard,prismarine-shard
-prismarine-shard,ink-sac         ,prismarine-shard
-prismarine-shard,prismarine-shard,prismarine-shard
-result:stack,1
