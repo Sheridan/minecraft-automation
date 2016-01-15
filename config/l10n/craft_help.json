@@ -1,0 +1,22 @@
+{
+   "en" : [
+      "Use:",
+      "  craft --craft=item crafting",
+      "  craft --craft=item --help for help on craft (supports partial names)",
+      "  craft --help full list of gear that can be crafted",
+      "The implication is that we are working with a full stack, if items is stackable.",
+      "Options:",
+      "  --craft=string What should be crafted.",
+      "    You can choose one from:"
+   ],
+   "ru" : [
+      "Использование:",
+      "  craft --craft=item для крафта",
+      "  craft --craft=item --help для помощи по крафту (поддерживаются неполные имена)",
+      "  craft --help - полный список шмота, который можно скрафтить",
+      "Подразумевается, что мы работаем с полными стэками, если шмот стэкуется.",
+      "Опции:",
+      "  --craft=строка  Что надо скрафтить.",
+      "    Можно выбрать одно из:"
+   ]
+}

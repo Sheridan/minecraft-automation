@@ -1,0 +1,16 @@
+{
+   "ru" : [
+      "Сейчас мы начнем тренировку опознавания шмота. Процесс достаточно долгий.",
+      "Если у вас несколько мониторов - сейчас самое время запустить на втором мониторе что нибудь интересное и продолжительное",
+      "Дело в том, что скрипт будет управлять мышой и не даст ничего делать больше.",
+      "Тренировку надо запускать каждый раз после перенастройки границ инвертаря/стола крафта",
+      "Для этого надо в папке скриншотов удалить папку имя_текстурпака/items/"
+   ],
+   "en" : [
+      "We will now begin training recognition of items. The process is quite long.",
+      "If you have multiple monitors - now is the time to start on the second monitor that something interesting and long",
+      "The fact is that the script will will control the mouse and you will never do anything more.",
+      "Training should be run every time you reset the boundaries inventory / craft table",
+      "To do this in the screenshots folder to delete a folder texturepack_name/items/"
+   ]
+}

@@ -1,0 +1,4 @@
+{
+   "en" : "Can not take same screenshots of %s. Try to increase value of between_mouse_hide_and_screenshot in user-config.json. Check whether animated texture",
+   "ru" : "Не могу получить одинаковые скриншоты %s, попробуйте увеличить значение between_mouse_hide_and_screenshot в user-config.json. Проверьте, не используется ли анимированная текстура"
+}

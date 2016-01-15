@@ -1,0 +1,4 @@
+{
+   "ru" : "Похоже, что уходим в глубокую рекурсию при крафте %s. Прерываем.",
+   "en" : "Deep recursion while craft %s detected. Exit."
+}

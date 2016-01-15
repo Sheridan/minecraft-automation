@@ -1,0 +1,32 @@
+{
+   "ru" : [
+      "Использование: setup-environment <options>",
+      "Опции:",
+      "  --target=строка  Что надо настроить",
+      "    all         Настройка всего, по умолчанию",
+      "    invertory   Настройка размещения ячеек инвертаря",
+      "    big-chest   Настройка размещения ячеек большого сундука",
+      "    crafttable  Настройка размещения ячеек стола крафта",
+      "    villager    Настройка размещения ячеек стола торговца",
+      "    items       Настройка распознавания шмота",
+      "    options     Настройка опций пользователя",
+      "    window      Настройка размеров и положения окна",
+      "    turn        Настройка поворотов",
+      "    chrespack   Смена ресурспака. Скрипт спросит имя ресурспака и сделает необходимые скриншоты."
+   ],
+   "en" : [
+      "Usage: setup-environment <options>",
+      "Options:",
+      "  --target=string What you need to set up",
+      "    all         Customize all in all, the default",
+      "    invertory   Setting placing cells in invertory",
+      "    big-chest   Setting placing cells in large chest",
+      "    crafttable  Setting placing cells in craft table",
+      "    villager    Setting villager placement table cells merchant",
+      "    items       Setting items recognition",
+      "    options     Setting user options",
+      "    window      Setting window size and position",
+      "    turn        Setting player turn",
+      "    chrespack   Change resourcepack. The script will ask the name of resourcepack and make need screenshots."
+   ]
+}

@@ -1,0 +1,10 @@
+{
+   "ru" : [
+      "В user-config.json есть еще настройки таймаутов. При низких лагах можно их подкрутить в лучшую сторону.",
+      "Настройка окончена. Обратите внимание на то, что при запуске скриптов раскладка должна быть включена английская."
+   ],
+   "en" : [
+      "The user-config.json there is setting timeouts. At lags you can tweak them for the better.",
+      "Setting over. Note that when you run the script - keyboard layout should be english."
+   ]
+}

@@ -1,0 +1,29 @@
+{
+   "ru" : [
+      "Теперь настроим повороты персонажа. Проверьте настройки чувствительности мыши, выставьте необходимое.",
+      "После смены чувствительности скорее всего придется перенастраивать",
+      "Переключитесь в дебаг (F3), там следите за строкой 'Facing: ... ' - в конце строки в скобках указывается угол поворота: ( горизонталь/вертикаль )",
+      "Персонаж смотрит ровно, когда перпендикулярный взгляду вектор не виден.",
+      "Окружите себя однотонными блоками, так будет удобнее",
+      "В процессе поворота не трогайте мыша!",
+      "Настройка идет следующим образом:",
+      "    1. Определяем место в интерфейсе персонажа, на которое будем реагировать",
+      "    2. Вы смотрите куда написано и по готовности кликаете мышой",
+      "    3. Персонаж постепенно поворачивается",
+      "    4. При достижении указанной позиции вызовите интерфейс персонажа опять (e)",
+      "Откройте интерфейс персонажа (е)"
+   ],
+   "en" : [
+      "Now you set the character turns. Check the settings of the sensitivity of the mouse, set the desired.",
+      "After changing the sensitivity will probably need to reconfigure",
+      "Switch to debug (F3), there follow the line 'Facing: ...' - at the end of the line in brackets indicates the rotation angle (horizontal / vertical)",
+      "Surround yourself with self-colored blocks, so it will be more convenient",
+      "During the rotation, do not touch the mouse!",
+      "Setup is as follows:",
+      "    1. Determine the location of the character in the interface, to which we will respond",
+      "    2. Do you see where it is written and ready click the mouse",
+      "    3. The character gradually turns",
+      "    4. When you reach that position again call the character interface (e)",
+      "Open character interface (e)"
+   ]
+}

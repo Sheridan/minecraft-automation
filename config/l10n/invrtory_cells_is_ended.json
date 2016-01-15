@@ -1,0 +1,4 @@
+{
+   "en" : "Empty cells in invertory is ended while crafting %s. Need for %d cells.",
+   "ru" : "Место в инвентаре при крафте %s закончилось. Не хватило %d ячеек."
+}

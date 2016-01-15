@@ -1,0 +1,16 @@
+{
+   "en" : [
+      "Enter the Latin name of the resourcepack.",
+      "For this script necessary, that would not be animated textures. Well, at least no more than in the standard resourcepack.",
+      "Or just work with script switching to the standard resourcepack",
+      "When changing resourcepack will need to be re-trained to recognize items",
+      "If you back previous resourcepack - just change its name in the user-config.json"
+   ],
+   "ru" : [
+      "Введите латиницей имя ресурспака. Необязательно именно так он должен называться. Главное что бы вы потом поняли, что это он.",
+      "Для этой софтины необходимо, что бы не было анимированных вещей. Ну как минимум не более чем в стандартном ресурспаке.",
+      "Или просто работайте с софтиной, переключаясь в стандартный ресурспак",
+      "При смене ресурспака необходимо будет заново обучить софтину опознавать шмот",
+      "Если меняете ресурспак обратно - достаточно руками изменить его имя в user-config.json"
+   ]
+}
