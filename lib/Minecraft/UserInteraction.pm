@@ -2,6 +2,9 @@ package Minecraft::UserInteraction;
 
 use strict;
 use warnings;
+use utf8;
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
 use Exporter qw(import);
 use Time::HiRes qw (sleep);
 

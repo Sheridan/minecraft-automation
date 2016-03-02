@@ -149,7 +149,7 @@ sub get_windowsizeposition
 {
   Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('place_window_comfortable'));
   if(!prompt_change_existent(exists($main::config->{'system'}{'window'}{'geometry'}))) { return; }
-  $main::config->{'system'}{'window'}{'geometry'} = $main::player->head()->get_window_size_position();
+  $main::config->{'system'}{'window'}{'geometry'} = Minecraft::Window::get_size_and_position();
   if(!ask_happened()) { get_windowsizeposition(); }
 }
 
