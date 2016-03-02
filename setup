@@ -256,20 +256,20 @@ sub get_self_invertory_cells
   print_cells_numbers(8,3);
   if(prompt_change_existent(exists($main::config->{'system'}{$interface}{'self-invertory'})))
   {
-    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('main_self_invertory'));
-    my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 1)),
-                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 1)),
-                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 2)));
-    for my $y (0..2)
-    {
-      for my $x (0..8)
-      {
-        $main::config->{'system'}{$interface}{'self-invertory'}{$x}{$y} = calculate_cell($params, $x, $y);
-      }
+     Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('main_self_invertory'));
+     my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 1)),
+                                         get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 1)),
+                                         get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 2)));
+     for my $y (0..2)
+     {
+       for my $x (0..8)
+       {
+         $main::config->{'system'}{$interface}{'self-invertory'}{$x}{$y} = calculate_cell($params, $x, $y);
+       }
     }
     Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('hand_self_invertory'));
-    $params = calculate_cell_params( get_cell_coordinates(get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 4))),
-                                     get_cell_coordinates(get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 4))),
+    $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 4)),
+                                     get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 4)),
                                      undef);
     for my $x (0..8)
     {
@@ -585,7 +585,7 @@ sub interface_is_open
 {
   my $place_cell = $_[0];
   return $main::player->head()->compare_screenshots('setup-turn',
-                  $main::player->head()->take_temp_screenshot($place_cell, 0));
+         $main::player->head()->take_temp_screenshot($place_cell, 0));
 }
 
 sub setup_turn
