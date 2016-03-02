@@ -584,7 +584,7 @@ sub test_turn
 sub interface_is_open
 {
   my $place_cell = $_[0];
-  return $main::player->head()->compare_screenshots('setup-turn',
+  return $main::player->head()->compare_screenshots($main::player->head()->screenshot_full_filename('setup-turn'),
          $main::player->head()->take_temp_screenshot($place_cell, 0));
 }
 
