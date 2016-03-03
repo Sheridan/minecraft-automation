@@ -89,6 +89,7 @@ sub read_trader_file
   open(my $fh, '<', $file_name) or die $!;
   my $row = 0;
   my $result = {'name' => basename($file_name, '.trader')};
+  my $max_page = 0;
   while (my $line = <$fh>)
   {
     chomp $line;
@@ -96,10 +97,13 @@ sub read_trader_file
     for my $data (split(/,/, $line))
     {
       my @page = split(/:/, trim($data));
-      $result->{$row>0?'buy':'sell'}{trim($page[0])} = trim($page[1]);
+      my $current_page = trim($page[1]);
+      $result->{$row>0?'buy':'sell'}{trim($page[0])} = $current_page;
+      if($current_page > $max_page) { $max_page = $current_page; }
     }
     $row++;
   }
+  $result->{'max_page'} = $max_page;
   close($fh);
   #print Dumper($result);
   return $result;

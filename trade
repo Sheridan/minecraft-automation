@@ -25,6 +25,7 @@ my $buy = 'all';
 my $target = 'sell';
 my $current_trader_page = 1;
 my $page_avialable_cache = {};
+my $is_upgrade_trade = 0;
 GetOptions(
     "seller=s" => \$seller,
     "buy=s"    => \$buy,
@@ -32,6 +33,12 @@ GetOptions(
     "help"     => \&help
     ) or die($main::l10n->tr('wrong_commandline'));
 
+if ($target eq 'upgrade')
+{
+  $target = 'sell';
+  $is_upgrade_trade = 1;
+}
+    
 sub help
 {
   print $main::l10n->tr('trade_help');
@@ -45,7 +52,6 @@ sub help
   }
   exit(0);
 }
-
 
 sub take_to_self_invertory_or_drop
 {
@@ -155,7 +161,7 @@ sub buy_from_villager
 
 sub trade_with_trader
 {
-  my ($items_to_sell, $items_to_buy) = @_[0..1];
+  my ($items_to_sell, $items_to_buy, $max_page) = @_[0..2];
   $villager->self_invertory()->add_items_to_items_to_find($items_to_sell);
   $villager->self_invertory()->map_cells();
   # print Dumper $villager;
@@ -166,6 +172,15 @@ sub trade_with_trader
   do
   {
     $villager->self_invertory()->save_state('trade');
+    if($is_upgrade_trade)
+    {
+      if($villager->switch_to_page($max_page))
+      {
+        Minecraft::UserInteraction::say($main::l10n->tr('upgrade_is_done'));
+        exit(0);
+      }
+      $villager->switch_to_page(1);
+    }
     for ($target)
     {
       if(/buy/)
@@ -244,7 +259,7 @@ for ($seller)
   my $traders_names = join('|', keys(%{$traders}));
   if    (/$traders_names/)
   {
-    trade_with_trader($traders->{$seller}{'sell'}, filter_buy($traders->{$seller}{'buy'}));
+    trade_with_trader($traders->{$seller}{'sell'}, filter_buy($traders->{$seller}{'buy'}), $traders->{$seller}{'max_page'});
   }
   else { help(); }
 
