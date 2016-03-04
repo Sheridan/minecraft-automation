@@ -55,7 +55,7 @@ sub help
 
 sub check_trader_is_upgraded
 {
-  if($villager_upgrading)
+  if($villager_upgrading > 0)
   {
     my $villager = $_[0];
     if($villager->switch_to_page($villager_upgrading))
@@ -273,7 +273,7 @@ for ($seller)
   my $traders_names = join('|', keys(%{$traders}));
   if    (/$traders_names/)
   {
-    $villager_upgrading = $traders->{$seller}{'max_page'};
+    if($villager_upgrading == 1) { $villager_upgrading = $traders->{$seller}{'max_page'}; }
     trade_with_trader($traders->{$seller}{'sell'}, filter_buy($traders->{$seller}{'buy'}));
   }
   else { help(); }

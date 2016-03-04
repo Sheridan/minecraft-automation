@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+purpur-block,empty,empty
+purpur-block,purpur-block,empty
+purpur-block,purpur-block,purpur-block
+result:stack,4
