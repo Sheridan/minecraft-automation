@@ -1,0 +1,13 @@
+#!/bin/bash
+
+xdotool search --name "Minecraft 1.9" windowactivate --sync 	key e
+
+i=0
+
+while (true)
+do
+    i=$((i+1))
+    xdotool search --name "Minecraft 1.9" windowactivate --sync click 1 sleep 0.6
+    echo -n "$i "
+done
+echo
