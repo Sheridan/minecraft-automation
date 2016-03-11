@@ -43,15 +43,19 @@ sub must_divide_by_2
 sub run_ffmpeg
 {
   my $options = $_[0];
+  my $pulse_source =  `pacmd list-sources | grep -e 'name:.*alsa_output' | sed -e 's/.*<\\(.*\\)>.*/\\1/ig'`;
+  chomp $pulse_source;
+  #print  $pulse_source; exit(0);
   Minecraft::Window::restore_size_and_position();
-  system(sprintf('ffmpeg -video_size %dx%d -framerate %d -f x11grab -i :0.0+%d,%d -f alsa -ac 2 -i pulse '.
-                 '-c:v libx264 -pix_fmt yuv420p -preset medium -r %d -g %d -b:v 4M '.
-                 '-c:a libmp3lame -ar 44100 -threads 6 -qscale 3 -b:a 128k -bufsize 512k %s',
+  system(sprintf('ffmpeg -video_size %dx%d -framerate %d -f x11grab -i :0.0+%d,%d -f pulse -i "%s" '.
+                 '-c:v libx264 -pix_fmt yuv420p -preset medium -r %d -g %d -b:v 8M '.
+                 '-c:a libmp3lame -ar 48000 -ac 2 -b:a 128k -threads 6 -q:v 3 -bufsize 512k %s',
                 must_divide_by_2($main::config->{'system'}{'window'}{'geometry'}{'w'}),
                 must_divide_by_2($main::config->{'system'}{'window'}{'geometry'}{'h'}),
                 $fps,
                 $main::config->{'system'}{'window'}{'geometry'}{'x'},
                 $main::config->{'system'}{'window'}{'geometry'}{'y'},
+                $pulse_source,
                 $fps,
                 $fps*2,
                 $options));
