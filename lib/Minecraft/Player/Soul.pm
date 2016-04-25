@@ -19,7 +19,7 @@ sub call_xdotool
 {
   my ($self, $command) = @_[0..1];
   my $attempts = 10;
-  $command = sprintf('xdotool search --name "%s" windowactivate --sync %s > %s/xdotool-minecraft-automation.log 2>&1',
+  $command = sprintf('xdotool search --onlyvisible --name "%s" windowactivate --sync %s > %s/xdotool-minecraft-automation.log 2>&1',
                                     $main::config->{'user'}{'minecraft'}{'title'},
                                     $command,
                                     $main::config->{'user'}{'paths'}{'temp'});
