@@ -1,13 +1,56 @@
 #!/bin/bash
 
-xdotool search --onlyvisible --name "Minecraft 16w15b" windowactivate --sync 	key e
+function run_xdotool()
+{
+    xdotool search --onlyvisible --name "Minecraft 1.10"  windowactivate --sync $@
+}
+
+function press_e()
+{
+    run_xdotool key e
+}
+
+function eat()
+{
+    press_e
+    run_xdotool mousedown 3 sleep 10 mouseup 3
+    press_e
+}
+
+function hit()
+{
+    run_xdotool click 1 sleep 1.5
+}
 
 i=0
+sleep_between_attacks=120
+hits=10
+cycles_between_eat=10
 
 while (true)
 do
-    i=$((i+1))
-    xdotool search --onlyvisible --name "Minecraft 16w15b" windowactivate --sync click 1 sleep 0.6
-    echo -n "$i "
+    for ((e=$cycles_between_eat; e>0; e--))
+    do
+	i=$((i+1))
+	echo -n "$i "
+    
+	press_e
+	echo -n "{ "
+	for ((j=$hits; j>0; j--))
+	do
+	    hit
+	    echo -n "$j "
+	done
+	echo -n "} "
+	press_e
+	echo -n "[ "
+	for ((j=$sleep_between_attacks; j>0; j--))
+	do
+	    echo -n "$j "
+	    sleep 1
+	done
+	echo "]"
+    done
+    eat
 done
 echo

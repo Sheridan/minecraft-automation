@@ -24,8 +24,10 @@ $main::l10n   = Minecraft::L10n->new();
 $main::player = Minecraft::Player->new();
 
 my $target = 'all';
+my $test = 'all';
 GetOptions(
     "target=s" => \$target,
+    "test=s"   => \$target,
     "help"     => \&help
     ) or die($main::l10n->tr('wrong_commandline'));
 
