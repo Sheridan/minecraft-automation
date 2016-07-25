@@ -1,6 +1,6 @@
-sand            ,red-sand            ,stone     ,stone-brick-block,cobblestone     ,nether-brick      ,brick      ,glass     ,quartz-block
-sandstone       ,red-sandstone       ,stone-slab,stone-brick-slab ,cobblestone-slab,nether-brick-block,brick-block,glass-pane,quartz-chiseled
-smooth-sandstone,smooth-red-sandstone,snowball  ,empty            ,empty           ,nether-brick-slab ,brick-slab ,empty     ,quartz-pillar
-sandstone-slab  ,red-sandstone-slab  ,snow-block,empty            ,empty           ,empty             ,empty      ,empty     ,quartz-slab
-empty           ,empty               ,snow      ,empty            ,empty           ,empty             ,empty      ,empty     ,empty
-end-stone       ,andesite            ,granite   ,diorite          ,empty           ,empty             ,empty      ,empty     ,empty
+sand            ,red-sand            ,stone     ,stone-brick-block,cobblestone     ,nether-brick          ,brick            ,glass     ,quartz-block
+sandstone       ,red-sandstone       ,stone-slab,stone-brick-slab ,cobblestone-slab,nether-brick-block    ,brick-block      ,glass-pane,quartz-chiseled
+smooth-sandstone,smooth-red-sandstone,snowball  ,empty            ,empty           ,nether-brick-slab     ,brick-slab       ,empty     ,quartz-pillar
+sandstone-slab  ,red-sandstone-slab  ,snow-block,empty            ,empty           ,red-nether-brick-block,nether-wart-block,empty     ,quartz-slab
+empty           ,empty               ,snow      ,empty            ,empty           ,empty                 ,empty            ,empty     ,empty
+end-stone       ,andesite            ,granite   ,diorite          ,empty           ,empty                 ,empty            ,bone-block,empty

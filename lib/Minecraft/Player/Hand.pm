@@ -27,6 +27,8 @@ sub mouse_move_to_cell
 {
   my ($self, $to) = @_[0..1];
   #print Dumper($to);
+  $to = $main::player->head()->coordinates_shift_by_delta($to);
+  #print Dumper($to);
   if($self->mouse_coordinates_is_changed($to))
   {
     $self->{'last_mouse_coordinates'}{'c'}{'x'} = $to->{'c'}{'x'};

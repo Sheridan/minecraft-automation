@@ -40,6 +40,23 @@ sub DESTROY
   }
 }
 
+sub coordinates_shift_by_delta
+{
+  my ($self, $coordinates) = @_[0..1];
+  my $c_shifted = {};
+  for my $crdpnt ('tl', 'c', 'br')
+  {
+	if (not exists($coordinates->{$crdpnt})) { next; }
+	$c_shifted->{$crdpnt} = { 'x' => 0, 'y' => 0 };
+	for my $crd ('x', 'y')
+	{
+		$c_shifted->{$crdpnt}{$crd} = $coordinates->{$crdpnt}{$crd} + $main::config->{'system'}{'coordinates_delta'}{$crd};
+	}
+  }
+  return $c_shifted;
+}
+
+
 sub screenshots_path
 {
   my $self = $_[0];
@@ -75,6 +92,7 @@ sub screenshot_temp_filename
 sub take_screenshot_and_save_to
 {
   my ($self, $filename, $coordinates, $clean) = @_[0..3];
+  $coordinates = $self->coordinates_shift_by_delta($coordinates);
   if($clean && $main::player->hand()->mouse_hide_from_interface())
   {
     sleep($main::config->{'user'}{'timeouts'}{'between_mouse_hide_and_screenshot'});

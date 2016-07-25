@@ -43,7 +43,7 @@ sub get_cursor_position
 {
   my $text = $_[0];
   Minecraft::UserInteraction::say($text);
-  my @tmp = split(/ /, `./get-mouse-position`);
+  my @tmp = split(/[^0-9]/, `./get-mouse-position`);
   #print Dumper(@tmp);
   return
     {
@@ -277,8 +277,8 @@ sub get_self_invertory_cells
     {
       $main::config->{'system'}{$interface}{'self-invertory'}{$x}{3} = calculate_cell($params, $x, 0);
     }
-    if(!ask_happened() || !test_invertory($interface)) { get_self_invertory_cells($interface); }
   }
+  if(!ask_happened() || !test_invertory($interface)) { get_self_invertory_cells($interface); }
 }
 
 sub get_big_chest_cells
@@ -353,6 +353,29 @@ sub get_villager_screenshots
   $main::player->head()->take_screenshot("dont-delete-villager-result-empty"   , $main::config->{'system'}{'villager'}{'result'});
   $main::player->head()->take_screenshot("dont-delete-villager-clean"          , $main::config->{'system'}{'villager'}{'clean'});
 }
+
+# ------------------------------------- Вычисление дельты: поправка координат ----------------------------
+sub calculate_deltas
+{
+  Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('calculating_deltas'));
+  if(prompt_change_existent(exists($main::config->{'system'}{'deltas'})))
+  {
+	$main::config->{'system'}{'coordinates_delta'} = { 'x' => 0, 'y' => 0 };
+	my $click_coordinates_0 = { 'c' => get_cursor_position($main::l10n->tr('click_somewhere_in_mc_window')) };
+	$main::player->hand()->mouse_move_to_cell($click_coordinates_0);
+	my $click_coordinates_1 = { 'c' => get_cursor_position($main::l10n->tr('click_in_same_place')) };
+	#print Dumper($click_coordinates_0);
+	#print Dumper($click_coordinates_1);
+	$main::config->{'system'}{'coordinates_delta'} = 
+	{
+		'x' => $click_coordinates_0->{'c'}{'x'} - $click_coordinates_1->{'c'}{'x'},
+		'y' => $click_coordinates_0->{'c'}{'y'} - $click_coordinates_1->{'c'}{'y'}
+	};
+	print Dumper($main::config->{'system'}{'coordinates_delta'});
+  }
+  if(!ask_happened()) { calculate_deltas(); }
+}
+
 
 # ------------------------------------- Обучение шмоту ----------------------------
 sub item_is_known_for
@@ -632,7 +655,7 @@ sub run_setup
   for ($real_target)
   {
     if     (/default-uc/)   { last; }
-    elsif  (/invertory/)    { get_self_invertory_cells('crafttable');    }
+    elsif  (/invertory/)    { get_self_invertory_cells('crafttable');                   }
     elsif  (/crafttable/)   { get_crafttable_cells();                                   }
     elsif  (/villager/)     { get_villager_interface();                                 }
     elsif  (/items/)        { train_view_items();                                       }
@@ -643,7 +666,7 @@ sub run_setup
       ask_texture_pack();
       ask_mc_title();
     }
-    elsif  (/window/)       { get_windowsizeposition();                                 }
+    elsif  (/window/)       { get_windowsizeposition(); calculate_deltas();             }
     elsif  (/big-chest/)
     {
       get_big_chest_cells();
@@ -651,8 +674,9 @@ sub run_setup
     }
     elsif  (/all/)
     {
-      run_setup('window');
       run_setup('options');
+      run_setup('window');
+      run_setup('deltas');
       run_setup('crafttable');
       run_setup('big-chest');
       run_setup('turn');
