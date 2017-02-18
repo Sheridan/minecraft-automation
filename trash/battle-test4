@@ -2,7 +2,7 @@
 
 function run_xdotool()
 {
-    xdotool search --onlyvisible --name "Minecraft 1.10"  windowactivate --sync $@
+    xdotool search --onlyvisible --name "Minecraft 1.10.2"  windowactivate --sync $@
 }
 
 function press_e()
@@ -25,7 +25,7 @@ function hit()
 i=0
 sleep_between_attacks=120
 hits=10
-cycles_between_eat=10
+cycles_between_eat=5
 
 while (true)
 do

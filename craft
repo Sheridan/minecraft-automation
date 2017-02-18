@@ -92,7 +92,10 @@ sub self_invertory_has_ingridients
   my ($item_to_craft, $reciept_number) = @_[0..1];
   if(what_ingridient_i_must_craft($item_to_craft, $reciept_number))
   {
-    Minecraft::UserInteraction::say($main::l10n->tr('reciept_ingridients_not_avialable'), $main::l10n->tr($item_to_craft));
+    if($item_to_craft ne $target_item)
+    {
+      Minecraft::UserInteraction::say($main::l10n->tr('reciept_ingridients_not_avialable'), $main::l10n->tr($item_to_craft));
+    }
     return 0;
   }
   return 1;
@@ -175,8 +178,9 @@ sub craft
       exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)
     )
   {
-    Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
-    exit 0;
+    #Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
+    #exit 0;
+    return;
   }
   for my $reciept_number (keys(%{$reciepts->{$item_to_craft}{'reciepts'}}))
   {
@@ -188,7 +192,8 @@ sub craft
         for my $crafttable_x (0..2)
         {
           my $current_ingridient = $reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'crafttable'}{$crafttable_x}{$crafttable_y};
-          if($current_ingridient ne 'empty')
+          #Minecraft::UserInteraction::say("%s -- %s", ($current_ingridient, $target_item));
+          if($current_ingridient ne 'empty') # && $current_ingridient ne $target_item)
           {
             my $coordinates_from = $crafttable->self_invertory()->take_stack_of_items($current_ingridient);
             if($reciepts->{$item_to_craft}{'reciepts'}{$reciept_number}{'result'}{'units'} eq 'stack')
