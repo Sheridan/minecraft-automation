@@ -64,7 +64,7 @@ sub reciept_help
     }
     printf("%s\n", join(',', @data));
   }
-  # print Dumper ($reciept);
+  # print Dumper ($reciept); 
 }
 
 sub load_reciept
@@ -92,10 +92,10 @@ sub self_invertory_has_ingridients
   my ($item_to_craft, $reciept_number) = @_[0..1];
   if(what_ingridient_i_must_craft($item_to_craft, $reciept_number))
   {
-    if($item_to_craft ne $target_item)
-    {
+    # if($item_to_craft ne $target_item)
+    # {
       Minecraft::UserInteraction::say($main::l10n->tr('reciept_ingridients_not_avialable'), $main::l10n->tr($item_to_craft));
-    }
+    # }
     return 0;
   }
   return 1;
@@ -178,9 +178,9 @@ sub craft
       exists($reciepts->{$item_to_craft}) && reciept_contain_ingridient($reciepts->{$item_to_craft}, $target_item)
     )
   {
-    #Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
-    #exit 0;
-    return;
+    Minecraft::UserInteraction::say($main::l10n->tr('deep_recursion_while_craft'), $main::l10n->tr($item_to_craft));
+    exit 0;
+    # return;
   }
   for my $reciept_number (keys(%{$reciepts->{$item_to_craft}{'reciepts'}}))
   {

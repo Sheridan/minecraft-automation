@@ -258,27 +258,28 @@ sub get_self_invertory_cells
   print_cells_numbers(8,3);
   if(prompt_change_existent(exists($main::config->{'system'}{$interface}{'self-invertory'})))
   {
-     Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('main_self_invertory'));
-     my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 1)),
-                                         get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 1)),
-                                         get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 2)));
-     for my $y (0..2)
-     {
-       for my $x (0..8)
-       {
-         $main::config->{'system'}{$interface}{'self-invertory'}{$x}{$y} = calculate_cell($params, $x, $y);
-       }
+    Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('main_self_invertory'));
+    my $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 1)),
+                                        get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 2)));
+    for my $y (0..2)
+    {
+      for my $x (0..8)
+      {
+        $main::config->{'system'}{$interface}{'self-invertory'}{$x}{$y} = calculate_cell($params, $x, $y);
+      }
     }
     Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('hand_self_invertory'));
     $params = calculate_cell_params( get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 1, 4)),
-                                     get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 4)),
-                                     undef);
+                                    get_cell_coordinates(sprintf($main::l10n->tr('invertory_cell_xy'), 2, 4)),
+                                    undef);
     for my $x (0..8)
     {
       $main::config->{'system'}{$interface}{'self-invertory'}{$x}{3} = calculate_cell($params, $x, 0);
     }
+    if(!ask_happened()) { get_self_invertory_cells($interface); }
   }
-  if(!ask_happened() || !test_invertory($interface)) { get_self_invertory_cells($interface); }
+  if(!test_invertory($interface)) { get_self_invertory_cells($interface); }
 }
 
 sub get_big_chest_cells
@@ -297,10 +298,11 @@ sub get_big_chest_cells
         $main::config->{'system'}{'big-chest'}{'cells'}{$x}{$y} = calculate_cell($params, $x, $y);
       }
     }
+    if(!ask_happened()) { get_big_chest_cells(); }
   }
   $main::config->{'system'}{'big-chest'}{'is_open'} = get_cell_coordinates($main::l10n->tr('big_chest_interface_caption'));
   get_big_chest_screenshots();
-  if(!ask_happened() || !test_big_chest()) { get_big_chest_cells(); }
+  if(!test_big_chest()) { get_big_chest_cells(); }
   get_self_invertory_cells('big-chest');
 }
 
@@ -360,18 +362,18 @@ sub calculate_deltas
   Minecraft::UserInteraction::wait_press_enter($main::l10n->tr('calculating_deltas'));
   if(prompt_change_existent(exists($main::config->{'system'}{'deltas'})))
   {
-	$main::config->{'system'}{'coordinates_delta'} = { 'x' => 0, 'y' => 0 };
-	my $click_coordinates_0 = { 'c' => get_cursor_position($main::l10n->tr('click_somewhere_in_mc_window')) };
-	$main::player->hand()->mouse_move_to_cell($click_coordinates_0);
-	my $click_coordinates_1 = { 'c' => get_cursor_position($main::l10n->tr('click_in_same_place')) };
-	#print Dumper($click_coordinates_0);
-	#print Dumper($click_coordinates_1);
-	$main::config->{'system'}{'coordinates_delta'} = 
-	{
-		'x' => $click_coordinates_0->{'c'}{'x'} - $click_coordinates_1->{'c'}{'x'},
-		'y' => $click_coordinates_0->{'c'}{'y'} - $click_coordinates_1->{'c'}{'y'}
-	};
-	print Dumper($main::config->{'system'}{'coordinates_delta'});
+    $main::config->{'system'}{'coordinates_delta'} = { 'x' => 0, 'y' => 0 };
+    my $click_coordinates_0 = { 'c' => get_cursor_position($main::l10n->tr('click_somewhere_in_mc_window')) };
+    $main::player->hand()->mouse_move_to_cell($click_coordinates_0);
+    my $click_coordinates_1 = { 'c' => get_cursor_position($main::l10n->tr('click_in_same_place')) };
+    #print Dumper($click_coordinates_0);
+    #print Dumper($click_coordinates_1);
+    $main::config->{'system'}{'coordinates_delta'} =
+    {
+      'x' => $click_coordinates_0->{'c'}{'x'} - $click_coordinates_1->{'c'}{'x'},
+      'y' => $click_coordinates_0->{'c'}{'y'} - $click_coordinates_1->{'c'}{'y'}
+    };
+    print Dumper($main::config->{'system'}{'coordinates_delta'});
   }
   if(!ask_happened()) { calculate_deltas(); }
 }
@@ -666,7 +668,8 @@ sub run_setup
       ask_texture_pack();
       ask_mc_title();
     }
-    elsif  (/window/)       { get_windowsizeposition(); calculate_deltas();             }
+    elsif  (/window/)       { get_windowsizeposition();       }
+    elsif  (/deltas/)       { calculate_deltas();             }
     elsif  (/big-chest/)
     {
       get_big_chest_cells();
