@@ -1,8 +1,12 @@
 craftable:yes
 stackable:yes
 ietms-in-stack:64
-craft-reciepts:1
+craft-reciepts:2
 empty,empty,empty
 stone-brick-block,stone-brick-block,stone-brick-block
+empty,empty,empty
+result:stack,6
+empty,empty,empty
+cracked-stone-brick-block,cracked-stone-brick-block,cracked-stone-brick-block
 empty,empty,empty
 result:stack,6
