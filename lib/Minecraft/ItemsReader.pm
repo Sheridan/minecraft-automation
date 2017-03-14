@@ -102,6 +102,20 @@ sub items_count
            $self->items_count('acacia-plank') +
            $self->items_count('birch-plank');
   }
+  if($item eq 'any-wood-slab')
+  {
+    return $self->items_count('dark-oak-slab') +
+           $self->items_count('spruce-slab') +
+           $self->items_count('jungle-slab') +
+           $self->items_count('oak-slab') +
+           $self->items_count('acacia-slab') +
+           $self->items_count('birch-slab');
+  }
+  if($item eq 'any-stone-brick')
+  {
+    return $self->items_count('cracked-stone-brick-block') +
+           $self->items_count('stone-brick-block');
+  }
   return exists($self->{'items-count'}{$item}) ? $self->{'items-count'}{$item} : 0;
 }
 
@@ -175,7 +189,8 @@ sub what_item_at_coordinates
         (
           (exists($self->{'items_to_find'}{$item}) || scalar(keys(%{$self->{'items_to_find'}})) == 1) ||
           (exists($self->{'items_to_find'}{'any-plank'}) && $item=~/-plank/) ||
-          (exists($self->{'items_to_find'}{'any-wood-slab'}) && $item=~/-slab/)
+          (exists($self->{'items_to_find'}{'any-wood-slab'}) && $item=~/-slab/) ||
+          (exists($self->{'items_to_find'}{'any-stone-brick'}) && $item=~/([^d]s|cracked-s)tone-brick-block/)
         )
       )
     {
@@ -207,9 +222,12 @@ sub get_first_item_coordinates
     {
       if(
           ($self->{'data'}{$x}{$y} eq $item) ||
-          ($item eq 'any-plank' && $self->{'data'}{$x}{$y} =~ /plank/)
+          ($item eq 'any-plank' && $self->{'data'}{$x}{$y} =~ /-plank/) ||
+          ($item eq 'any-wood-slab' && $self->{'data'}{$x}{$y} =~ /-slab/) ||
+          ($item eq 'any-stone-brick' && $self->{'data'}{$x}{$y} =~ /^(cracked)?-stone-brick-block/)
         )
       {
+        # print $x." ".$y." ".$item."\n"; die;
         return {'x' => $x, 'y' => $y};
       }
     }

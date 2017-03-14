@@ -654,6 +654,9 @@ sub run_setup
   {
     Minecraft::Window::restore_size_and_position();
   }
+
+  test_invertory('crafttable'); die();
+
   for ($real_target)
   {
     if     (/default-uc/)   { last; }
