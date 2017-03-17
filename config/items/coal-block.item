@@ -1,0 +1,8 @@
+craftable:yes
+stackable:yes
+ietms-in-stack:64
+craft-reciepts:1
+coal,coal,coal
+coal,coal,coal
+coal,coal,coal
+result:stack,1
